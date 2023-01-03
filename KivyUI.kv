@@ -1,0 +1,15 @@
+MainWidget:
+<MainWidget>:
+    Button:
+        text: "Button"
+        size: "100dp", "100dp"
+        pos: "100dp", "100dp"
+
+    Button:
+        text: "Button all properties"
+        size: "100dp", "100dp"
+        pos: "300dp", "100dp"
+
+        on_press: print("Pressed")
+        on_release: print("Released")
+        on_state: print("state is {}".format(self.state))
