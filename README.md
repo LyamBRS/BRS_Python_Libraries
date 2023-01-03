@@ -3,7 +3,7 @@
 If you want to learn more about the directory tree or what folders will contain what, you can refer yourself to this document (view through Diagram.net): https://drive.google.com/file/d/148wSuXA7z0FR9rAaGs48DwkEv2R8qK-p/view?usp=share_link.
 
 Here is a short list of the directories and their descriptions:
-- **Debug:** <span style="color: #696969;">Contains scripts used for various debugging such as prints and loggings</span>
+- **Debug:** <span style="color: #696900;">Contains scripts used for various debugging such as prints and loggings</span>
 - **GUI:** <span style="color: #696969;">Contains script for custom Widgets for BRS UI layouts</span>
 - **Hardware:** <span style="color: #696969;">Folder containing all scripts and classes related to controlling hardware specific things</span>
 - **Network:** <span style="color: #696969;">Contains script used to interface with various ethernet or Wifi aspects. Such as UDP TCP or APIs.</span>
