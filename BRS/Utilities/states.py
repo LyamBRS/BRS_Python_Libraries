@@ -1,13 +1,21 @@
+#====================================================================#
+# Imports
+#====================================================================#
 from signal import raise_signal
 
-
+#====================================================================#
+# Classes
+#====================================================================#
 class States:
-    ''' This class is a reference style class which represents the current state that a device can be in.
+    #region --------------------------- DOCSTRING
+    '''
+        This class is a reference style class which represents the current state that a device can be in.
         A device can be GUI or hardware.
         You don't have to use this class when defining the state of a device, but it is more convenient than
         memorizing all the numbers associated by heart.
-        '''
-
+    '''
+    #endregion
+    #region --------------------------- MEMBERS
     Disabled = 0
     '''To use when you want to disable a device. Meaning it cannot be used at all and events related to it won't occur.'''
     Inactive = 1
@@ -22,6 +30,9 @@ class States:
     '''Specifies that the device or control is currently not available for some reasons. Not to confuse with Disabled'''
     Locked = 6
     '''Specifies that the device or control is not disabled and is available but it's locked for some reasons.'''
+    #endregion
+    #region --------------------------- CONSTRUCTORS
+    #endregion
     ###########################################################################################
     class Colors:
         '''Default BRS palette for colors associated with each state'''
