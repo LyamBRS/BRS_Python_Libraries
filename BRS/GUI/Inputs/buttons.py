@@ -1,3 +1,10 @@
+#====================================================================#
+# File Information
+#====================================================================#
+
+#====================================================================#
+# Imports
+#====================================================================#
 from BRS.References.states import States
 from BRS.GUI.PreDefines.font import Font
 #from BRS._PreDefines.states import States
@@ -14,17 +21,25 @@ from kivy.event import EventDispatcher
 from kivy.uix.label import Label
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
-######################################################################
-class RoundedButton(ButtonBehavior, Widget):
+#====================================================================#
+# Functions
+#====================================================================#
 
-    #region ------------------------------------------# MEMBERS
+#====================================================================#
+# Classes
+#====================================================================#
+class RoundedButton(ButtonBehavior, Widget):
+    #region   --------------------------- DOCSTRING
+    #endregion
+    #region   --------------------------- MEMBERS
     State : States
     font : Font
     label : Label
     Text : str
     #endregion
-
-    #region ------------------------------------------# CONSTRUCTORS
+    #region   --------------------------- METHODS
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
     def __init__(self, radius = 10, initialState = States.Disabled, initialFont = Font(), wantedText="", **kwargs):
         super(RoundedButton, self).__init__(**kwargs)
         #region --------------------------------------# Set Variables
@@ -86,3 +101,4 @@ class RoundedButton(ButtonBehavior, Widget):
     def set_Label(self, wantedText=""):
         self.label.text = wantedText
     #endregion
+    pass
