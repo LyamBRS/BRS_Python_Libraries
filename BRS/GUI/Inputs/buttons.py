@@ -92,10 +92,10 @@ class TextButton(ButtonBehavior, Widget):
     def UpdateColors(self, instance, value):
         if self.state == "down":  # if the button is being pressed
             self.color.rgba = StatesColors.Pressed.GetColorFrom(self.State)
-            self.label.color = StatesColors.Text.GetColorFrom(self.State)
+            self._label.color = StatesColors.Text.GetColorFrom(self.State)
         else:
             self.color.rgba = StatesColors.Default.GetColorFrom(self.State)
-            self.label.color = StatesColors.Text.GetColorFrom(self.State)
+            self._label.color = StatesColors.Text.GetColorFrom(self.State)
     # ------------------------------------------------------
     def UpdateShape(self, *args):
         self.rect.pos = self.pos
