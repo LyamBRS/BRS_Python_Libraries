@@ -6,7 +6,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 
-#from kivy.uix.button import Button
 from BRS.GUI.Utilities.font import Font
 from BRS.GUI.Inputs.buttons import RoundedButton
 from BRS.Utilities.states import States
