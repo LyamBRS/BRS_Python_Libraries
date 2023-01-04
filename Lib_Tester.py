@@ -24,9 +24,9 @@ class MyGridLayout(GridLayout):
         self.size = (Window.width,Window.height)
 
         # Add the RoundedButton widget
-        Debug.Log("Initializing the main textbutton")
+        Debug.Log("Initializing the main TextButton")
         self.rounded_button = TextButton()
-        Debug.Log("Success")
+
         self.rounded_button.Text = "Among us"
         x = (Window.width/2) - self.rounded_button.width/2
         y = (Window.height/2) - self.rounded_button.height/2
@@ -34,22 +34,40 @@ class MyGridLayout(GridLayout):
         self.add_widget(self.rounded_button)  # add the RoundedButton widget to the MyGridLayout widget
 
         #region - States Buttons
-        self.SetToDisable       = TextButton(wantedText = "Disabled",   initialState = States.Disabled)
-        self.SetToWarning       = TextButton(wantedText = "Warning",    initialState = States.Warning)
-        self.SetToActive        = TextButton(wantedText = "Active",     initialState = States.Active)
-        self.SetToInactive      = TextButton(wantedText = "Inactive",   initialState = States.Inactive)
-        self.SetToError         = TextButton(wantedText = "Error",      initialState = States.Error)
-        self.SetToLocked        = TextButton(wantedText = "Locked",     initialState = States.Locked)
-        self.SetToUnavailable   = TextButton(wantedText = "Unavailable",initialState = States.Unavailable)
+        Debug.Log("Initializing State changers rounded text buttons")
+        self.SetToDisable       = TextButton(wantedText = "Disabled",   initialState = States.Disabled,     initialFont = amogusFont, radius=22)
+        self.SetToWarning       = TextButton(wantedText = "Warning",    initialState = States.Warning,      initialFont = amogusFont, radius=22)
+        self.SetToActive        = TextButton(wantedText = "Active",     initialState = States.Active,       initialFont = amogusFont, radius=22)
+        self.SetToInactive      = TextButton(wantedText = "Inactive",   initialState = States.Inactive,     initialFont = amogusFont, radius=22)
+        self.SetToError         = TextButton(wantedText = "Error",      initialState = States.Error,        initialFont = amogusFont, radius=22)
+        self.SetToLocked        = TextButton(wantedText = "Locked",     initialState = States.Locked,       initialFont = amogusFont, radius=22)
+        self.SetToUnavailable   = TextButton(wantedText = "Unavailable",initialState = States.Unavailable,  initialFont = amogusFont, radius=22)
+        self.SetToGood          = TextButton(wantedText = "Good",       initialState = States.Good,         initialFont = amogusFont, radius=22)
+        Debug.Log("Success")
 
-        self.SetToDisable.pos = (0,0)
+        Debug.Log("Success")
+        self.SetToDisable.pos = (1,0)
         self.SetToWarning.pos = (125,0)
         self.SetToActive.pos = (250, 0)
         self.SetToInactive.pos = (375, 0)
         self.SetToError.pos = (500, 0)
         self.SetToLocked.pos = (625, 0)
         self.SetToUnavailable.pos = (750, 0)
+        self.SetToGood.pos = (875, 0)
+        Debug.Log("Success")
 
+        Debug.Log("Overwriting space changer's press events")
+        self.SetToDisable.on_press = self.SetStateTo_Disable
+        self.SetToWarning.on_press = self.SetStateTo_Warning
+        self.SetToActive.on_press = self.SetStateTo_Active
+        self.SetToInactive.on_press = self.SetStateTo_Inactive
+        self.SetToError.on_press = self.SetStateTo_Error
+        self.SetToLocked.on_press = self.SetStateTo_Locked
+        self.SetToUnavailable.on_press = self.SetStateTo_Unavailable
+        self.SetToGood.on_press = self.SetStateTo_Good
+        Debug.Log("Success")
+
+        Debug.Log("Adding widgets to the gridlayout")
         self.add_widget(self.SetToDisable)
         self.add_widget(self.SetToWarning)
         self.add_widget(self.SetToActive)
@@ -57,9 +75,28 @@ class MyGridLayout(GridLayout):
         self.add_widget(self.SetToError)
         self.add_widget(self.SetToLocked)
         self.add_widget(self.SetToUnavailable)
+        self.add_widget(self.SetToGood)
+        Debug.Log("Success")
 
         Debug.End()
         #endregion
+
+    def SetStateTo_Disable(self):
+        self.rounded_button.State = States.Disabled
+    def SetStateTo_Inactive(self):
+        self.rounded_button.State = States.Inactive
+    def SetStateTo_Active(self):
+        self.rounded_button.State = States.Active
+    def SetStateTo_Error(self):
+        self.rounded_button.State = States.Error
+    def SetStateTo_Locked(self):
+        self.rounded_button.State = States.Locked
+    def SetStateTo_Unavailable(self):
+        self.rounded_button.State = States.Unavailable
+    def SetStateTo_Warning(self):
+        self.rounded_button.State = States.Warning
+    def SetStateTo_Good(self):
+        self.rounded_button.State = States.Good
 #################################################################### WIDGETS
 class MainWidget(Widget):
     pass

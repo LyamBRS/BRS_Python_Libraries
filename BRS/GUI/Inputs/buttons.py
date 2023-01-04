@@ -38,7 +38,7 @@ class TextButton(ButtonBehavior, Widget):
     _font : Font = Font()
     _label : Label = Label()
     _text : str = ""
-    color : list = [0,0,0,0]
+    heightPadding = 30
     #endregion
     #region   --------------------------- GET SET
     @property
@@ -87,6 +87,8 @@ class TextButton(ButtonBehavior, Widget):
         self._label.underline       = self._font.isUnderline
         #Visually update the text with the new font
         self._label.text            = self._text
+        self.height = self._font.size
+        self.size = (self.width, self.height + self.heightPadding)
     #endregion
     #region   --------------------------- METHODS
     def UpdateColors(self, instance, value):
@@ -101,15 +103,19 @@ class TextButton(ButtonBehavior, Widget):
         self.rect.pos = self.pos
         self.rect.size = self.size
         self.rect.radius = [self.radius, self.radius, self.radius, self.radius]
+        self._label.size = self.size
         self._label.pos = self.pos
     # ------------------------------------------------------
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, radius = 10, initialState = States.Disabled, initialFont = Font(), wantedText="", **kwargs):
         super(TextButton, self).__init__(**kwargs)
+        Debug.enableConsole = False
         Debug.Start()
         #region --------------------------- Set Variables
         Debug.Log("Setting Textbutton's variables...")
+        self.size = (self.width, self._font.size)
+        self.height = self.height + self.heightPadding
         self._label = Label(pos = self.pos)
         self.radius = radius
         Debug.Log("Success")
@@ -144,5 +150,6 @@ class TextButton(ButtonBehavior, Widget):
         Debug.Warn("End of TextButton's Constructor.")
         #endregion
         Debug.End()
+        Debug.enableConsole = True
     #endregion
     pass

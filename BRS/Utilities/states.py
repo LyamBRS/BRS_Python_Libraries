@@ -150,14 +150,14 @@ class _StatesColor(States):
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self) -> None:
-        self.Disabled = [105/255, 105/255, 105/255, 1]
-        self.Inactive = [170/255, 170/255, 170/255, 1]
+        self.Disabled = [90/255, 90/255, 90/255, 1]
+        self.Inactive = [150/255, 150/255, 150/255, 1]
         self.Active = [96/255, 241/255, 241/255, 1]
         self.Warning = [255/255, 237/255, 101/255, 1]
         self.Error = [255/255, 77/255, 77/255, 1]
         self.Unavailable = [221/255, 0, 0, 1]
         self.Locked = [255/255, 170/255, 105/255, 1]
-        self.Good = [38/255, 80/255, 38/255, 1]
+        self.Good = [77/255, 210/255, 77/255, 1]
     #endregion
     pass
 class StatesColors:
