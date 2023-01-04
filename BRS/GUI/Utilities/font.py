@@ -93,7 +93,7 @@ class Font:
         self.isItalic = newItalic
         self.isUnderline = newUnderline
     #-----------------------------------#
-    def GetFrom(self, thatLabel:Label = None, thatButton:Button = None, thatTextInput:TextInput = None):
+    def GetFrom(self, thatLabel:Label = None, thatButton:Button = None, thatTextInput:TextInput = None, thatFont:Any = None):
         '''Copy all the font attribute of a referenced uix element into the font class.'''
         #If we are copying from a label
         if(thatLabel != None):
@@ -138,9 +138,25 @@ class Font:
             self.isItalic =         thatTextInput.italic
             self.isUnderline =      thatTextInput.underline
 
+        #If we are copying from an other font class
+        elif(thatFont != None):
+            self.size =             thatFont.size
+            self.blended =          thatFont.blended
+            self.context =          thatFont.context
+            self.name =             thatFont.name
+            self.family =           thatFont.family
+            self.kerning =          thatFont.kerning
+            self.hinting =          thatFont.hinting
+
+            self.isBold =           thatFont.isBold
+            self.isStrikethrough =  thatFont.isStrikethrough
+            self.isItalic =         thatFont.isItalic
+            self.isUnderline =      thatFont.isUnderline
+
         del thatButton
         del thatLabel
         del thatTextInput
+        del thatFont
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self):
