@@ -7,15 +7,13 @@ from kivy.uix.textinput import TextInput
 from kivy.core.window import Window
 
 #from kivy.uix.button import Button
-#from kivy.uix.label import Label
-
-from BRS.GUI.PreDefines.font import Font
-from BRS.GUI.buttons import RoundedButton
-from BRS.References.states import States
-from BRS.Debugging.consoleLog import Debug
+from BRS.GUI.Utilities.font import Font
+from BRS.GUI.Inputs.buttons import RoundedButton
+from BRS.Utilities.states import States
+from BRS.Debug.consoleLog import Debug
 #################################################################### Configs
 amogusFont = Font()
-amogusFont.bold = True
+amogusFont.isBold = True
 #################################################################### GridLayout
 class MyGridLayout(GridLayout):
     # Initialize infinite keywords

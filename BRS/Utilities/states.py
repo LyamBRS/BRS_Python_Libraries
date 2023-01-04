@@ -1,8 +1,16 @@
 #====================================================================#
+# File Information
+#====================================================================#
+
+#====================================================================#
 # Imports
 #====================================================================#
-from signal import raise_signal
+from typing import TypeVar
 
+#====================================================================#
+# Functions
+#====================================================================#
+#__StateColorsRef = TypeVar("T", bound="_StatesColor")
 #====================================================================#
 # Classes
 #====================================================================#
@@ -30,108 +38,146 @@ class States:
     '''Specifies that the device or control is currently not available for some reasons. Not to confuse with Disabled'''
     Locked = 6
     '''Specifies that the device or control is not disabled and is available but it's locked for some reasons.'''
+    Good = 7
+    '''Specifies that the device or control is Good/Ok/Checked. Typically for stuff like (ok/cancel) or checkboxes'''
     #endregion
-    #region --------------------------- CONSTRUCTORS
+    #region   --------------------------- METHODS
+    def Delete(self):
+        '''For deleting this class'''
+        del self.Disabled
+        del self.Inactive
+        del self.Active
+        del self.Warning
+        del self.Error
+        del self.Unavailable
+        del self.Locked
+        del self.Good
     #endregion
-    ###########################################################################################
-    class Colors:
-        '''Default BRS palette for colors associated with each state'''
-        ###########################################################################################
-        class Default:
-            '''If we use a button as an example, these would be background colors'''
-            Disabled = [105/255, 105/255, 105/255, 1]
-            ''' ARGB Color that text uses when disabled'''
-            Inactive = [170/255, 170/255, 170/255, 1]
-            ''' ARGB Color that text uses when Inactive'''
-            Active = [96/255, 241/255, 241/255, 1]
-            ''' ARGB Color that text uses when Active'''
-            Warning = [255/255, 237/255, 101/255, 1]
-            ''' ARGB Color that text uses when Warning'''
-            Error = [255/255, 77/255, 77/255, 1]
-            ''' ARGB Color that text uses when Error'''
-            Unavailable = [221/255, 0, 0, 1]
-            ''' ARGB Color that text uses when Unavailable'''
-            Locked = [255/255, 170/255, 105/255, 1]
-            ''' ARGB Color that text uses when Locked'''
-            #------------------------------------------------------#
-            def GetColor(stateToCheck):
-                state_colors = {
-                    States.Active: States.Colors.Default.Active,
-                    States.Disabled: States.Colors.Default.Disabled,
-                    States.Error: States.Colors.Default.Error,
-                    States.Inactive: States.Colors.Default.Inactive,
-                    States.Locked: States.Colors.Default.Locked,
-                    States.Unavailable: States.Colors.Default.Unavailable,
-                    States.Warning: States.Colors.Default.Warning,
-                }
+    #region   --------------------------- CONSTRUCTOR
+    #endregion
+    pass
+class _StatesColor(States):
+    #region --------------------------- DOCSTRING
+    '''
+        This class is used to make a class of colors associated with States
+    '''
+    #endregion
+    #region --------------------------- MEMBERS
+    Disabled = [105/255, 105/255, 105/255, 1]
+    '''RGBA color when a device's states is Disabled. See States for full definition'''
+    Inactive = [170/255, 170/255, 170/255, 1]
+    '''RGBA color when a device's states is Inactive. See States for full definition'''
+    Active = [96/255, 241/255, 241/255, 1]
+    '''RGBA color when a device's states is Active. See States for full definition'''
+    Warning = [255/255, 237/255, 101/255, 1]
+    '''RGBA color when a device's states is Warning. See States for full definition'''
+    Error = [255/255, 77/255, 77/255, 1]
+    '''RGBA color when a device's states is Error. See States for full definition'''
+    Unavailable = [221/255, 0, 0, 1]
+    '''RGBA color when a device's states is Unavailable. See States for full definition'''
+    Locked = [255/255, 170/255, 105/255, 1]
+    '''RGBA color when a device's states is Locked. See States for full definition'''
+    Good = [38/255, 80/255, 38/255, 1]
+    '''RGBA color when a device's states is Good. See States for full definition'''
+    #endregion
+    #region   --------------------------- METHODS
+    def GetColorFrom(self, thatState: int):
+        '''
+            Allows you to get a color from the list of states
+        '''
+        state_colors = {
+            States.Active:      self.Active,
+            States.Disabled:    self.Disabled,
+            States.Error:       self.Error,
+            States.Inactive:    self.Inactive,
+            States.Locked:      self.Locked,
+            States.Unavailable: self.Unavailable,
+            States.Warning:     self.Warning,
+            States.Good:        self.Good
+        }
 
-                color = state_colors.get(stateToCheck)
-                if color is None:
-                    raise ValueError("Invalid state: {}".format(stateToCheck))
-                return color
-        ###########################################################################################
-        class Pressed: # x/1.2
-            '''If we use a button as an example, these would be outline colors'''
-            Disabled = [87/255, 87/255, 87/255, 1]
-            ''' ARGB Color that text uses when disabled'''
-            Inactive = [141/255, 141/255, 141/255, 1]
-            ''' ARGB Color that text uses when Inactive'''
-            Active = [80/255, 200/255, 200/255, 1]
-            ''' ARGB Color that text uses when Active'''
-            Warning = [212/255, 197/255, 84/255, 1]
-            ''' ARGB Color that text uses when Warning'''
-            Error = [212/255, 64/255, 64/255, 1]
-            ''' ARGB Color that text uses when Error'''
-            Unavailable = [184/255, 0, 0, 1]
-            ''' ARGB Color that text uses when Unavailable'''
-            Locked = [212/255, 141/255, 87/255, 1]
-            ''' ARGB Color that text uses when Locked'''
-            #------------------------------------------------------#
-            def GetColor(stateToCheck):
-                state_colors = {
-                    States.Active: States.Colors.Pressed.Active,
-                    States.Disabled: States.Colors.Pressed.Disabled,
-                    States.Error: States.Colors.Pressed.Error,
-                    States.Inactive: States.Colors.Pressed.Inactive,
-                    States.Locked: States.Colors.Pressed.Locked,
-                    States.Unavailable: States.Colors.Pressed.Unavailable,
-                    States.Warning: States.Colors.Pressed.Warning,
-                }
+        color = state_colors.get(thatState)
+        if color is None:
+            raise ValueError("Invalid state: {}".format(thatState))
+        return color
+    def GetStateFrom(self, thatColor: list):
+        '''
+            Allows you to get the corresponding state associated with a given color stored in this class
+        '''
+        colors_state = {
+            self.Active:      States.Active,
+            self.Disabled:    States.Disabled,
+            self.Error:       States.Error,
+            self.Inactive:    States.Inactive,
+            self.Locked:      States.Locked,
+            self.Unavailable: States.Unavailable,
+            self.Warning:     States.Warning,
+            self.Good:        States.Good
+        }
+        state = colors_state.get(thatColor)
+        if state is None:
+            raise ValueError("Invalid color: {}".format(thatColor))
+        return state
+    def CopyColorsFrom(self, thatStatesColor = None):
+        '''Copy a StatesColor's colors in this StatesColor'''
+        if(thatStatesColor != None):
+            self.Active:      thatStatesColor.Active
+            self.Disabled:    thatStatesColor.Disabled
+            self.Error:       thatStatesColor.Error
+            self.Inactive:    thatStatesColor.Inactive
+            self.Locked:      thatStatesColor.Locked
+            self.Unavailable: thatStatesColor.Unavailable
+            self.Warning:     thatStatesColor.Warning
+            self.Good:        thatStatesColor.Good
+    def MultiplyColorsBy(self, thisMultiplier:float):
+        '''Allows you to darken/brighten all of the class's colors'''
 
-                color = state_colors.get(stateToCheck)
-                if color is None:
-                    raise ValueError("Invalid state: {}".format(stateToCheck))
-                return color
-        ###########################################################################################
-        class Text: # x/2
-            '''If we use a button as an example, these would be text colors'''
-            Disabled = [52/255, 52/255, 52/255, 1]
-            ''' ARGB Color that text uses when disabled'''
-            Inactive = [85/255, 85/255, 85/255, 1]
-            ''' ARGB Color that text uses when Inactive'''
-            Active = [48/255, 120/255, 120/255, 1]
-            ''' ARGB Color that text uses when Active'''
-            Warning = [127/255, 118/255, 50/255, 1]
-            ''' ARGB Color that text uses when Warning'''
-            Error = [127/255, 38/255, 38/255, 1]
-            ''' ARGB Color that text uses when Error'''
-            Unavailable = [110/255, 0, 0, 1]
-            ''' ARGB Color that text uses when Unavailable'''
-            Locked = [127/255, 85/255, 52/255, 1]
-            ''' ARGB Color that text uses when Locked'''
-            #------------------------------------------------------#
-            def GetColor(stateToCheck):
-                state_colors = {
-                    States.Active: States.Colors.Text.Active,
-                    States.Disabled: States.Colors.Text.Disabled,
-                    States.Error: States.Colors.Text.Error,
-                    States.Inactive: States.Colors.Text.Inactive,
-                    States.Locked: States.Colors.Text.Locked,
-                    States.Unavailable: States.Colors.Text.Unavailable,
-                    States.Warning: States.Colors.Text.Warning,
-                }
+        def Multiply(aList:list):
+            aList[0] = aList[0] * thisMultiplier
+            aList[1] = aList[1] * thisMultiplier
+            aList[2] = aList[2] * thisMultiplier
+            return aList
 
-                color = state_colors.get(stateToCheck)
-                if color is None:
-                    raise ValueError("Invalid state: {}".format(stateToCheck))
-                return color
+        self.Disabled =     Multiply(self.Disabled)
+        self.Inactive =     Multiply(self.Inactive)
+        self.Active =       Multiply(self.Active)
+        self.Warning =      Multiply(self.Warning)
+        self.Error =        Multiply(self.Error)
+        self.Unavailable =  Multiply(self.Unavailable)
+        self.Locked =       Multiply(self.Locked)
+        self.Good =         Multiply(self.Good)
+
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    def __init__(self) -> None:
+        self.Disabled = [105/255, 105/255, 105/255, 1]
+        self.Inactive = [170/255, 170/255, 170/255, 1]
+        self.Active = [96/255, 241/255, 241/255, 1]
+        self.Warning = [255/255, 237/255, 101/255, 1]
+        self.Error = [255/255, 77/255, 77/255, 1]
+        self.Unavailable = [221/255, 0, 0, 1]
+        self.Locked = [255/255, 170/255, 105/255, 1]
+        self.Good = [38/255, 80/255, 38/255, 1]
+    #endregion
+    pass
+class StatesColors:
+    #region --------------------------- DOCSTRING
+    '''
+        This class is refered to when a device needs
+        a new color. This class holds Colors associated with states
+        for Text, pressed or default values etc.
+    '''
+    #endregion
+    #region --------------------------- MEMBERS
+    Default = _StatesColor()
+    Pressed = _StatesColor()
+    Text    = _StatesColor()
+    #endregion
+    #region   --------------------------- METHODS
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    Default.MultiplyColorsBy(1)
+    Pressed.MultiplyColorsBy(0.75)
+    Text.MultiplyColorsBy(0.1)
+    #endregion
+    pass

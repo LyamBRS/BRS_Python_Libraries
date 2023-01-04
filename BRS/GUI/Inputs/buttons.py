@@ -5,22 +5,17 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from BRS.References.states import States
-from BRS.GUI.PreDefines.font import Font
-#from BRS._PreDefines.states import States
-#from BRS.GUI.PreDefines.font import Font
-#from BRS.Debugging.consoleLog import Debug
+from BRS.Utilities.states import States,StatesColors
+from BRS.GUI.Utilities.font import Font
+
 
 from kivy.uix.widget import Widget
-from logging import exception
 from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import RoundedRectangle
 from kivy.graphics import Color
 from kivy.event import EventDispatcher
 from kivy.uix.label import Label
-from kivy.properties import ListProperty
-from kivy.properties import NumericProperty
 #====================================================================#
 # Functions
 #====================================================================#
@@ -32,10 +27,10 @@ class RoundedButton(ButtonBehavior, Widget):
     #region   --------------------------- DOCSTRING
     #endregion
     #region   --------------------------- MEMBERS
-    State : States
-    font : Font
-    label : Label
-    Text : str
+    State : States = States.Disabled
+    font : Font = Font()
+    label : Label = Label()
+    Text : str = ""
     #endregion
     #region   --------------------------- METHODS
     #endregion
@@ -54,13 +49,13 @@ class RoundedButton(ButtonBehavior, Widget):
         #endregion
         #region --------------------------------------# Set Canvas
         with self.canvas:
-            self.color = Color(rgba=States.Colors.Default.GetColor(self.State))  # set the initial color to green
+            self.color = Color(rgba = StatesColors.Default.GetColorFrom(self.State))  # set the initial color to green
             self.rect = RoundedRectangle(size=self.size, pos=self.pos, radius=[self.radius, self.radius, self.radius, self.radius])
             self.bind(pos=self.update_rect, size=self.update_rect)
             self.bind(state=self.update_color)  # bind the state property to the update_color method
         #endregion
         #region --------------------------------------# Set Widgets
-        self.label.color = States.Colors.Text.GetColor(self.State)
+        self.label.color = StatesColors.Text.GetColorFrom(thatState=self.State)
         self.add_widget(self.label)
         #endregion
     #endregion
@@ -74,11 +69,11 @@ class RoundedButton(ButtonBehavior, Widget):
 
     def update_color(self, instance, value):
         if self.state == "down":  # if the button is being pressed
-            self.color.rgba = States.Colors.Pressed.GetColor(self.State)
-            self.label.color = States.Colors.Text.GetColor(self.State)
+            self.color.rgba = StatesColors.Pressed.GetColorFrom(self.State)
+            self.label.color = StatesColors.Text.GetColorFrom(self.State)
         else:
-            self.color.rgba = States.Colors.Default.GetColor(self.State)
-            self.label.color = States.Colors.Text.GetColor(self.State)
+            self.color.rgba = StatesColors.Default.GetColorFrom(self.State)
+            self.label.color = StatesColors.Text.GetColorFrom(self.State)
     #endregion
 
     #region #------------------------------------------# BUILDING
@@ -87,16 +82,19 @@ class RoundedButton(ButtonBehavior, Widget):
         self.label.font_blended = font.blended
         self.label.font_context = font.context
         self.label.font_family = font.family
-        self.label.font_features = font.features
         self.label.font_hinting = font.hinting
         self.label.font_size = font.size
         self.label.font_kerning = font.kerning
         self.label.font_name = font.name
+        self.label.bold = font.isBold
+        self.label.italic = font.isItalic
+        self.label.strikethrough = font.isStrikethrough
+        self.label.underline = font.isUnderline
 
     def set_State(self, wantedState:States):
         self.State = wantedState
-        self.label.color = States.Colors.LastLayer.GetColor(self.State)
-        self.rect.rgba =   States.Colors.TopLayer.GetColor(self.State)
+        self.label.color = StatesColors.Text.GetColorFrom(self.State)
+        self.rect.rgba =   StatesColors.Default.GetColorFrom(self.State)
 
     def set_Label(self, wantedText=""):
         self.label.text = wantedText
