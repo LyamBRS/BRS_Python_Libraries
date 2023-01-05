@@ -1,15 +1,20 @@
 #################################################################### IMPORTS
+from turtle import color
 from kivy.uix.widget import Widget
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.textinput import TextInput
+from kivy.uix.slider import Slider
 from kivy.core.window import Window
+from kivy.clock import Clock
 
 from BRS.GUI.Utilities.font import Font
 from BRS.GUI.Inputs.buttons import TextButton
+from BRS.GUI.Status.Progress import Bar
 from BRS.Utilities.states import States
 from BRS.Debug.consoleLog import Debug
+from BRS.GUI.Status.ValueDisplay import Dial
 #################################################################### Configs
 amogusFont = Font()
 amogusFont.isBold = True
@@ -46,14 +51,14 @@ class MyGridLayout(GridLayout):
         Debug.Log("Success")
 
         Debug.Log("Success")
-        self.SetToDisable.pos = (1,0)
-        self.SetToWarning.pos = (125,0)
-        self.SetToActive.pos = (250, 0)
-        self.SetToInactive.pos = (375, 0)
-        self.SetToError.pos = (500, 0)
-        self.SetToLocked.pos = (625, 0)
-        self.SetToUnavailable.pos = (750, 0)
-        self.SetToGood.pos = (875, 0)
+        self.SetToDisable.pos = ('1sp',0)
+        self.SetToWarning.pos = ('125sp',0)
+        self.SetToActive.pos = ('250sp', 0)
+        self.SetToInactive.pos = ('375sp', 0)
+        self.SetToError.pos = ('500sp', 0)
+        self.SetToLocked.pos = ('625sp', 0)
+        self.SetToUnavailable.pos = ('750sp', 0)
+        self.SetToGood.pos = ('875sp', 0)
         Debug.Log("Success")
 
         Debug.Log("Overwriting space changer's press events")
@@ -78,13 +83,38 @@ class MyGridLayout(GridLayout):
         self.add_widget(self.SetToGood)
         Debug.Log("Success")
 
+        Debug.Log("Adding progress bar for testing purposes")
+        self.progressBar = Bar(max = 100)
+        self.progressBar.pos = (100,200)
+        self.progressBar.height = 100
+        self.progressBar.background_color = [1,0,1,1]
+        self.add_widget(self.progressBar)
+        Debug.Log("Success")
+
+        Debug.Log("Adding slider for testing purposes")
+        self.slider = Slider(max = 100)
+        self.slider.pos = (100,300)
+        self.slider.cursor_size = ("25sp","25sp")
+        self.slider.bind(value=self.SliderMoving)
+        self.slider.value_track = True
+        self.slider.value_track_color = [1,1,0,1]
+        self.add_widget(self.slider)
+        Debug.Log("Success")
+
+        Debug.Log("Adding BRS Dial")
+        #self.dial = Dial()
+        #self.pos = (500,500)
+        #self.add_widget(self.dial)
+
         Debug.End()
         #endregion
 
     def SetStateTo_Disable(self):
         self.rounded_button.State = States.Disabled
+        self.progressBar.Value = 0
     def SetStateTo_Inactive(self):
         self.rounded_button.State = States.Inactive
+        self.progressBar.Value = 100
     def SetStateTo_Active(self):
         self.rounded_button.State = States.Active
     def SetStateTo_Error(self):
@@ -97,6 +127,11 @@ class MyGridLayout(GridLayout):
         self.rounded_button.State = States.Warning
     def SetStateTo_Good(self):
         self.rounded_button.State = States.Good
+    def SliderMoving(self, a, b):
+        Debug.Start()
+        Debug.Log(f"SliderMoving: New slider value: {self.slider.value}")
+        self.progressBar.Value = self.slider.value
+        Debug.End()
 #################################################################### WIDGETS
 class MainWidget(Widget):
     pass
@@ -111,9 +146,12 @@ class KivyUIApp(App):
         self.title = "Window Name"
         #---------------------------------------------------------# Window properties
         Debug.Log("Setting Window configurations...")
-        Window.fullscreen = 'auto'
+
         Window.borderless = False
         Window.resizable = True
+        Window.left = -1024
+        Window.top = 600
+        Window.fullscreen = 'auto'
         #---------------------------------------------------------#
         Debug.End()
         return MyGridLayout()
