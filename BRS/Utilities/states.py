@@ -178,6 +178,6 @@ class StatesColors:
     #region   --------------------------- CONSTRUCTOR
     Default.MultiplyColorsBy(1)
     Pressed.MultiplyColorsBy(0.5)
-    Text.MultiplyColorsBy(0.1)
+    Text.MultiplyColorsBy(0.25)
     #endregion
     pass

@@ -21,7 +21,7 @@ amogusFont.isBold = True
 class MyGridLayout(GridLayout):
     # Initialize infinite keywords
     def __init__(self, **kwargs):
-        Debug.Start()
+        Debug.Start("MyGridLayout")
         # Call gridlayout constructor
         super(MyGridLayout, self).__init__(**kwargs)
         self.col = 1
@@ -105,6 +105,7 @@ class MyGridLayout(GridLayout):
         self.dial.size = (200,200)
         self.dial.pos = (400,400)
         self.add_widget(self.dial)
+        self.dial.animated = True
 
         Debug.End()
         #endregion

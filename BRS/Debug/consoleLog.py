@@ -6,15 +6,18 @@ class Debug:
     _indentationStyle = "|\t"
     #endregion
 
-    def Start():
+    def Start(functionName:str=None):
         '''Indicates the start of a debugging chain for fast, auto indentation that doesn't rely on getting the stack size'''
         if Debug.enableConsole == True:
+            if(functionName != None):
+                Debug.Log("["+functionName+"]:")
             Debug._currentDepth = Debug._currentDepth + 1
         pass
 
     def End():
         '''Closes an indentation when debugging. Put this at the end of debugged functions, along with a start at the top'''
         if Debug.enableConsole == True and Debug._currentDepth > 0:
+            Debug.Log("")
             Debug._currentDepth = Debug._currentDepth - 1
         pass
 

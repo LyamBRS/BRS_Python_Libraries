@@ -5,14 +5,13 @@
 #====================================================================#
 # Imports
 #====================================================================#
-import math
-
 from BRS.Utilities.states import States,StatesColors
 from BRS.GUI.Utilities.font import Font
 from BRS.Debug.consoleLog import Debug
 from BRS.GUI.Utilities.drawings import DrawingProperties
 from BRS.GUI.Utilities.drawings import GetEllipse
 from BRS.GUI.Utilities.drawings import UpdateEllipse
+from BRS.GUI.Utilities.drawings import Animated
 
 from kivy.uix.widget import Widget
 from kivy.animation import Animation
@@ -29,7 +28,7 @@ from kivy.uix.label import Label
 #====================================================================#
 # Classes
 #====================================================================#
-class Dial(Widget):
+class Dial(Animated, Widget):
     #region   --------------------------- DOCSTRING
     '''
         This class allows you to create a Dial like widget which represents
@@ -40,9 +39,7 @@ class Dial(Widget):
     #endregion
     #region   --------------------------- MEMBERS
     _state = States.Disabled
-    _wantedValue = 0
-    _value = 0
-
+    animated : bool = False
     Properties = DrawingProperties()
     #endregion
     #region   --------------------------- GET SET
@@ -68,7 +65,7 @@ class Dial(Widget):
     @property
     def Value(self) -> int:
         """ Returns the State in which the widget is in """
-        # return self.Properties.value
+        return self.Properties.value
 
     @Value.setter
     def Value(self, newValue:float) -> None:
@@ -78,17 +75,16 @@ class Dial(Widget):
         Args:
             newValue (float): the new value (from min to max)
         """
+
         # [Step 0]: Save newValue
-        self._wantedValue = newValue
+        # Debug.Log("0: VALUE = {}".format(self.Properties.value))
+        self._animated_value        = self.Properties.value
+        self._animated_wantedValue  = newValue
+        # Debug.Log("1: VALUE = {}".format(self.Properties.value))
+        # Debug.Log("1: WANTEDVALUE = {}".format(self.Animating.wantedValue))
 
-        self.animation = Animation(_value = self._wantedValue, duration = 1, t='out_back')
-        self.animation.bind(on_progress = self._Animating)
-        self.animation.start(self)
-
-        UpdateEllipse(self.Properties, self, "Track", self.Track)
-        UpdateEllipse(self.Properties, self, "Filling", self.Filling)
-
-        # self._UpdateColors(None,None)
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape(None)
     #endregion
     #endregion
     #region   --------------------------- METHODS
@@ -111,42 +107,95 @@ class Dial(Widget):
     #endregion
     #region   -- Private
     def _UpdateColors(self, instance, value):
-        """Updates the color based on the widget's State"""
-        self.Properties.trackColor.rgba = StatesColors.Pressed.GetColorFrom(self._state)
-        self.Properties.fillingColor.rgba = StatesColors.Default.GetColorFrom(self._state)
+        """
+            Updates the color based on the widget's State
+        """
+        Debug.Start("_UpdateColors")
+        # [Step 0]: Set wanted animation results
+        # Debug.Log("[Step 0]:")
+        self._animated_wantedFillingColor   = StatesColors.Default.GetColorFrom(self._state)
+        self._animated_wantedTrackColor     = StatesColors.Pressed.GetColorFrom(self._state)
+        self._animated_wantedBackgroundColor= StatesColors.Text.GetColorFrom(self._state)
 
+        # [Step 1]: Set animation's current values
+        # Debug.Log("[Step 1]:")
+        self._animated_fillingColor     = self.Properties.fillingColor.rgba
+        self._animated_trackColor       = self.Properties.trackColor.rgba
+        self._animated_backgroundColor  = self.backgroundColor.rgba
+
+        # [Step 2]: Start animation
+        # Debug.Log("[Step 2]:")
+        if(self.animated):
+            self._StartColorAnimation(duration=0.5)
+        else:
+            self._InstantAnimation()
+            self._AnimatingColors(None, None, None)
+        Debug.End()
+    # ------------------------------------------------------
     def _UpdateShape(self, *args):
         """
             Updates the general shape of the widget.
         """
-        Debug.Start()
-        Debug.Log("Updating the shape of the Dial")
-        #Update the widget's sizes and positions
-        self.rect.pos = self.pos
-        self.rect.size = self.size
+        Debug.Start("_UpdateShape")
+        # Debug.Log("Updating the shape of the Dial")
 
-        Debug.Log("Setting angles for tracks and filling")
-        UpdateEllipse(self.Properties, self, "Track", self.Track)
-        UpdateEllipse(self.Properties, self, "Filling", self.Filling)
+        # Debug.Log("Setting animation parameters")
+        self._animated_wantedSize = self.size
+        self._animated_wantedPos  = self.pos
 
+        self._animated_pos = self.rect.pos
+        self._animated_size = self.rect.size
+
+        self._animated_endAngle     = self.Properties.endAngle
+        self._animated_startAngle   = self.Properties.startAngle
+        self._animated_value        = self.Properties.value
+
+        # Debug.Log("2: VALUE = {}".format(self.Properties.value))
+        # Debug.Log("2: WANTEDVALUE = {}".format(self.Animating.wantedValue))
+
+        # Debug.Log("Launching shape animator")
+        if(self.animated):
+            self._StartShapeAnimation(duration=0.5)
+        else:
+            self._InstantAnimation()
+            self._AnimatingShapes(None, None, None)
         Debug.End()
-        Debug.Log("Success")
-
-    def _Animating(self, animation, value, theOtherOne):
+    # ------------------------------------------------------
+    def _AnimatingShapes(self, animation, value, theOtherOne):
         """ Called when Animations are executed """
+        Debug.Start("_AnimatingShapes")
 
-        self.Properties.value = self._value
+        # [Step 0]: Save private values as actual values
+        # Debug.Log("Value : {}".format(self.Animating.value))
+        self.Properties.value         = self._animated_value
+        self.Properties.endAngle      = self._animated_endAngle
+        self.Properties.startAngle    = self._animated_startAngle
 
+        # [Step 1]: Update drawings based on new values
+        # Debug.Log("[Step 1]")
         UpdateEllipse(self.Properties, self, "Track", self.Track)
         UpdateEllipse(self.Properties, self, "Filling", self.Filling)
-        self.Properties.trackColor.rgba = StatesColors.Pressed.GetColorFrom(self._state)
-        self.Properties.fillingColor.rgba = StatesColors.Default.GetColorFrom(self._state)
+
+        # [Step 2]: Update background's positions
+        # Debug.Log("[Step 2]")
+        self.rect.pos   = self._animated_pos
+        self.rect.size  = self._animated_size
+        Debug.End()
+
+    def _AnimatingColors(self, animation, value, theOtherOne):
+        """ Called when color related animations are executed """
+        Debug.Start("_AnimatingColors")
+        # [Step 0]: Save private values as actual values
+        self.Properties.trackColor.rgba   = self._animated_trackColor
+        self.Properties.fillingColor.rgba = self._animated_fillingColor
+        self.backgroundColor.rgba         = self._animated_backgroundColor
+        Debug.End()
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, initialState=_state, trackWidth=Properties.trackWidth, fillingWidth=Properties.fillingWidth, min=Properties.min, max=Properties.max, startAngle=Properties.startAngle, endAngle=Properties.endAngle,  **kwargs):
         super(Dial, self).__init__(**kwargs)
-        Debug.Start()
+        Debug.Start("Dial")
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")
         self._state = initialState
@@ -187,7 +236,27 @@ class Dial(Widget):
             self.bind(pos = self._UpdateShape, size = self._UpdateShape)
             # self.bind(_state = self._UpdateColors)  # bind the state property to the update_color method
         #endregion
+        #region --------------------------- Set Animation Properties
+        Debug.Log("Setting dial's color animation properties")
+        self._animated_backgroundColor      = self.backgroundColor.rgba
+        self._animated_wantedBackgroundColor= self.backgroundColor.rgba
+        self._animated_fillingColor         = self.Properties.fillingColor.rgba
+        self._animated_wantedFillingColor   = self.Properties.fillingColor.rgba
+        self._animated_trackColor           = self.Properties.trackColor.rgba
+        self._animated_wantedTrackColor     = self.Properties.trackColor.rgba
+
+        Debug.Log("Setting dial's shape animation properties")
+        self._animated_pos              = self.pos
+        self._animated_pos              = self.pos
+        self._animated_size             = self.size
+        self._animated_wantedSize       = self.size
+        self._animated_value            = self.Properties.value
+        self._animated_wantedValue      = self.Properties.value
+        self._animated_endAngle         = self.Properties.endAngle
+        self._animated_wantedEndAngle   = self.Properties.endAngle
+        self._animated_startAngle       = self.Properties.startAngle
+        self._animated_wantedStartAngle = self.Properties.startAngle
+        #endregion
         Debug.End()
-        Debug.Log("Success")
     #endregion
     pass
