@@ -108,8 +108,8 @@ class Dial(Animated, Widget):
     #region   -- TrackWidth
     @property
     def TrackWidth(self) -> int:
-        """ Returns the current width of the filling aspect """
-        return self.Properties.fillingWidth
+        """ Returns the current width of the track aspect """
+        return self.Properties.trackWidth
 
     @TrackWidth.setter
     def TrackWidth(self, newValue:int) -> None:
@@ -121,6 +121,48 @@ class Dial(Animated, Widget):
         Debug.Start("TrackWidth")
         # [Step 0]: Save newValue
         self._animated_wantedTrackWidth  = newValue
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape(None)
+        Debug.End()
+    #endregion
+    #region   -- Size
+    @property
+    def Size(self) -> int:
+        """ Returns the current Size of the widget """
+        return self.size
+
+    @Size.setter
+    def Size(self, newValue:int) -> None:
+        """_summary_
+            Sets the Size of the dial.
+        Args:
+            newValue (float): the new size of the widget
+        """
+        Debug.Start("Size")
+        # [Step 0]: Save newValue
+        self._animated_wantedSize = newValue
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape(None)
+        Debug.End()
+    #endregion
+    #region   -- Pos
+    @property
+    def Pos(self) -> int:
+        """ Returns the current position of the widget (x,y)"""
+        return self.pos
+
+    @Pos.setter
+    def Pos(self, newValue:int) -> None:
+        """_summary_
+            Sets the position of the dial.
+        Args:
+            newValue (float): the new position of the dial (x,y)
+        """
+        Debug.Start("Pos")
+        # [Step 0]: Save newValue
+        self._animated_wantedPos = newValue
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape(None)
@@ -144,6 +186,21 @@ class Dial(Animated, Widget):
         # [Step 2]: Return corresponding angle.
         return (ratio * (_max - _min)) + _min
 
+    def SetAttributes(self, TrackWidth=Properties.trackWidth, FillingWidth=Properties.fillingWidth, position=None, size=None):
+        """
+            Allows you to set multiple properties at once instead of creating an animation for each one you change.
+        """
+        if(position == None):
+            pos = self.pos
+        if(size == None):
+            size = self.size
+
+        self._animated_wantedFillingWidth = FillingWidth
+        self._animated_wantedTrackWidth   = TrackWidth
+        self._animated_wantedPos          = position
+        self._animated_wantedSize         = size
+
+        self._UpdateShape(None)
     #endregion
     #region   -- Private
     def _UpdateColors(self, instance, value):
@@ -186,8 +243,6 @@ class Dial(Animated, Widget):
         self._animated_size = self.rect.size
 
         # Debug.Log("Set wanteds")
-        self._animated_wantedPos = self.pos
-        self._animated_wantedSize = self.size
 
         # Debug.Log("Launching shape animator")
         if(self.animated):
@@ -207,6 +262,8 @@ class Dial(Animated, Widget):
         self.Properties.startAngle    = self._animated_startAngle
         self.Properties.fillingWidth  = self._animated_fillingWidth
         self.Properties.trackWidth    = self._animated_trackWidth
+        self.pos = self._animated_pos
+        self.size = self._animated_size
 
         # [Step 1]: Update drawings based on new values
         # Debug.Log("[Step 1]")
@@ -270,7 +327,7 @@ class Dial(Animated, Widget):
                 self.Filling = GetEllipse(self.Properties, self, "Filling")
 
             Debug.Log("Binding events to dial")
-            self.bind(pos = self._UpdateShape, size = self._UpdateShape)
+            # self.bind(pos = self._UpdateShape, size = self._UpdateShape)
             # self.bind(_state = self._UpdateColors)  # bind the state property to the update_color method
         #endregion
         #region --------------------------- Set Animation Properties
@@ -283,16 +340,16 @@ class Dial(Animated, Widget):
         self._animated_wantedTrackColor     = self.Properties.trackColor.rgba
 
         Debug.Log("Setting dial's shape animation properties")
-        self._animated_pos              = self.pos
-        self._animated_pos              = self.pos
-        self._animated_size             = self.size
-        self._animated_wantedSize       = self.size
-        self._animated_value            = self.Properties.value
-        self._animated_wantedValue      = self.Properties.value
-        self._animated_endAngle         = self.Properties.endAngle
-        self._animated_wantedEndAngle   = self.Properties.endAngle
-        self._animated_startAngle       = self.Properties.startAngle
-        self._animated_wantedStartAngle = self.Properties.startAngle
+        self._animated_pos                  = self.pos
+        self._animated_pos                  = self.pos
+        self._animated_size                 = self.size
+        self._animated_wantedSize           = self.size
+        self._animated_value                = self.Properties.value
+        self._animated_wantedValue          = self.Properties.value
+        self._animated_endAngle             = self.Properties.endAngle
+        self._animated_wantedEndAngle       = self.Properties.endAngle
+        self._animated_startAngle           = self.Properties.startAngle
+        self._animated_wantedStartAngle     = self.Properties.startAngle
         self._animated_fillingWidth         = self.Properties.fillingWidth
         self._animated_trackWidth           = self.Properties.trackWidth
         self._animated_wantedFillingWidth   = self.Properties.fillingWidth

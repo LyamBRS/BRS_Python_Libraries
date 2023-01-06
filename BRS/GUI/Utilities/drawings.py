@@ -53,9 +53,6 @@ def UpdateEllipse(Properties, widget, type:str, ellipse):
         # Debug.Log("min = {}".format(Properties.min))
         # Debug.Log("Ratio = {}".format(ratio))
 
-    width   = widget.size[0] - Properties.fillingWidth
-    height  = widget.size[1] - Properties.trackWidth
-
     Debug.End()
 
 def GetEllipse(Properties, widget, type:str):
@@ -117,7 +114,7 @@ class DrawingProperties:
     """Ending angle. (angle when value=max) This is only used in circular drawings"""
 
     showTrack : bool = True
-    """Enables the filling's background"""
+    """Enables the tracks's background"""
     trackWidth : float = 10
     """The width of the track's (diameter)"""
 

@@ -104,8 +104,8 @@ class MyGridLayout(GridLayout):
 
         Debug.Log("Adding BRS Dial")
         self.dial = Dial(min = 0, max = 70, startAngle=0, endAngle=360, trackWidth=10, fillingWidth=50)
-        self.dial.size = (200,200)
-        self.dial.pos = (400,400)
+        self.dial.Size = (200,200)
+        self.dial.Pos = (400,400)
         self.add_widget(self.dial)
         self.dial.animated = True
 
@@ -114,15 +114,17 @@ class MyGridLayout(GridLayout):
 
     def GetNewDialCoordinates(self):
         Debug.Start("GetNewDialCoordinates")
-        # x = random.randint(0,Window.width)
-        # y = random.randint(0,Window.height)
+        x = random.randint(0,Window.width/2)
+        y = random.randint(0,Window.height/2)
 
-        # self.dial.pos = (x,y)
+        start = random.randint(0,360)
+        end = random.randint(start,360)
+
         track = random.randint(0,90)
         filling = random.randint(0,90)
         Debug.Log("filling = {}".format(filling))
-        self.dial.TrackWidth = track
-        self.dial.FillingWidth = filling
+
+        self.dial.SetAttributes(position=(x,y), TrackWidth=track, FillingWidth=filling)
         Debug.End()
 
     def SetStateTo_Disable(self):
@@ -162,7 +164,10 @@ class MyGridLayout(GridLayout):
         Debug.Start()
         Debug.Log(f"SliderMoving: New slider value: {self.slider.value}")
         self.progressBar.Value = self.slider.value
+
+        self.dial.animated = False
         self.dial.Value = self.slider.value
+        self.dial.animated = True
         Debug.End()
 #################################################################### WIDGETS
 class MainWidget(Widget):
