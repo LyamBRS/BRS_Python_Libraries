@@ -53,7 +53,9 @@ class DrawingProperties:
     """The width of the filling above the track (diameter)"""
 
     trackColor = [0,0,0,0]
+    """The current track color. The track is underneath the filling. """
     fillingColor = [0,0,0,0]
+    """The current filling color. The filling is shown above the track and represents the displayed value"""
     #endregion
     #region   --------------------------- METHODS
     #endregion

@@ -101,9 +101,9 @@ class MyGridLayout(GridLayout):
         Debug.Log("Success")
 
         Debug.Log("Adding BRS Dial")
-        #self.dial = Dial()
-        #self.pos = (500,500)
-        #self.add_widget(self.dial)
+        self.dial = Dial()
+        self.pos = (500,500)
+        self.add_widget(self.dial)
 
         Debug.End()
         #endregion

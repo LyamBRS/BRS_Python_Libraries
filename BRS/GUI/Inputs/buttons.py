@@ -12,11 +12,11 @@ from BRS.Debug.consoleLog import Debug
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
+from kivy.uix.label import Label
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import RoundedRectangle
 from kivy.graphics import Color
 from kivy.event import EventDispatcher
-from kivy.uix.label import Label
 #====================================================================#
 # Functions
 #====================================================================#
@@ -25,50 +25,68 @@ from kivy.uix.label import Label
 # Classes
 #====================================================================#
 class TextButton(ButtonBehavior, Widget):
-    #region   --------------------------- DOCSTRING
+    # region   --------------------------- DOCSTRING
     """
     This class generates a button widget with rounded edges which
-    contains a text string defined by via Text
+    contains a text string defined by via .Text
     Args:
         ButtonBehavior (Kivy): See Kivy's documentation
         Widget (Kivy): See Kivy's documentation
     """
     #endregion
-    #region   --------------------------- MEMBERS
+    # region   --------------------------- MEMBERS
     _state : States = States.Disabled
+    """ Private variable representing the state of the widget without passing through the get/set """
     _font : Font = Font()
+    """ Private font specific to this widget. Use the TextFont getset variable. Do not use this. """
     _label : Label = Label()
+    """ Child label widget. Do not change the properties of this variable as the widget won't update. """
     _text : str = ""
+    """ represents the text shown on the widget. Kinda useless """
     _currentColor = [0,0,0,0]
+    """ current color used for Animations. This is automatically handled by the State get set """
     _wantedColor = [0,0,0,0]
+    """ wanted color used for Animations. This is automatically handled by the State get set """
     heightPadding = 30
+    """ How many pixels should seperate the text from the top and bottom of the button. Defaults to 30 """
     #endregion
-    #region   --------------------------- GET SET
+    # region   --------------------------- GET SET
     @property
     def State(self) -> int:
+        """ Returns the State in which the widget is in """
         return self._state
 
     @State.setter
     def State(self, newState:States) -> None:
+        """_summary_
+            Set the State of the widget to ones from the States class.
+            This will handle color changing and animations based of the new state
+        Args:
+            newState (States): _description_
+        """
         #Save new state in private variable
         self._state = newState
         self._UpdateColors(None,None)
     # ------------------------------------------------------
     @property
     def Text(self) -> str:
+        """ Gets you the current shown text above the widget """
         return self._text
 
     @Text.setter
     def Text(self, newText:str) -> None:
+        """ Sets the TextButton's shown text """
         self._text = newText
         self._label.text = self._text
     # ------------------------------------------------------
     @property
     def TextFont(self) -> Font:
+        """ Returns the button's Font class """
         return self._font
 
     @TextFont.setter
     def TextFont(self, newFont:Font) -> None:
+        """ Copies a font into the widget's label and saves it in the widget for references and drawings """
         self._font.GetFrom(thatFont = newFont)
         self._label.font_blended    = self._font.blended
         self._label.font_context    = self._font.context
@@ -86,15 +104,18 @@ class TextButton(ButtonBehavior, Widget):
         self.height = self._font.size
         self.size = (self.width, self.height + self.heightPadding)
     #endregion
-    #region   --------------------------- METHODS
+    # region   --------------------------- METHODS
     def _UpdateColors(self, instance, value):
+        """
+            Updates the color of the TextButton based on Kivy's state values 
+            (down or up). Do not call this function, it calls itself when
+            you set the widget's state or it is pressed.
+        """
         Debug.Start()
         if self.state == "down":  # if the button is being pressed
-            Debug.Warn("{} is pressed".format(self._label.text))
-            wantedColor = StatesColors.Pressed.GetColorFrom(self.State)
+            wantedColor       = StatesColors.Pressed.GetColorFrom(self.State)
             self._label.color = StatesColors.Text.GetColorFrom(self.State)
         else:
-            Debug.Warn("{} is released".format(self._label.text))
             wantedColor = StatesColors.Default.GetColorFrom(self.State)
             self._label.color = StatesColors.Text.GetColorFrom(self.State)
 
@@ -107,10 +128,14 @@ class TextButton(ButtonBehavior, Widget):
         Debug.End()
     # ------------------------------------------------------
     def _Animating(self, animation, value, theOtherOne):
+        """ Called when Animations are executed """
         self.color.rgba = self._currentColor
-        print(self._currentColor)
     # ------------------------------------------------------
     def _UpdateShape(self, *args):
+        """_summary_
+            Updates the shape of the widget whenever it's
+            attributes are changed. (pos/size)
+        """
         self.rect.pos = self.pos
         self.rect.size = self.size
         self.rect.radius = [self.radius, self.radius, self.radius, self.radius]

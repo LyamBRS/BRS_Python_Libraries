@@ -65,6 +65,7 @@ class Dial(Widget):
         """Updates the color based on the widget's State"""
         self.Track.color.rgba = StatesColors.Text.GetColorFrom(self._state)
         self.Filling.color.rgba = StatesColors.Default.GetColorFrom(self._state)
+
     def _UpdateShape(self, *args):
         """Updates the general shape of the widget."""
 
@@ -74,7 +75,6 @@ class Dial(Widget):
 
         self.Track.angle_end = self.Properties.endAngle
         self.Track.angle_start = self.Properties.startAngle
-
 
         self.Filling.angle_end = self.Properties.endAngle
         self.Filling.angle_start = self.Properties.startAngle
@@ -108,7 +108,6 @@ class Dial(Widget):
         self.Properties.value           = min
         self.Properties.endAngle        = endAngle
         self.Properties.startAngle      = startAngle
-        Debug.Log("Success")
         #endregion
         #region --------------------------- Set Canvas
         Debug.Log("Creating Canvas")
