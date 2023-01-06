@@ -58,6 +58,7 @@ class Bar(ProgressBar, Widget):
     #endregion
     #region   --------------------------- METHODS
     def _UpdateValue(self, dt):
+        print("PROGRESS BAR GO BR")
         if(self.value != self._wantedValue):
             if(self.value < self._wantedValue):
                 self.value = self.value + 1

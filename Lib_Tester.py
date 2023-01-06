@@ -7,7 +7,6 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.slider import Slider
 from kivy.core.window import Window
-from kivy.clock import Clock
 
 from BRS.GUI.Utilities.font import Font
 from BRS.GUI.Inputs.buttons import TextButton

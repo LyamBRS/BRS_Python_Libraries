@@ -9,6 +9,7 @@ from BRS.Utilities.states import States,StatesColors
 from BRS.GUI.Utilities.font import Font
 from BRS.Debug.consoleLog import Debug
 
+from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.behaviors import ButtonBehavior
@@ -38,6 +39,8 @@ class TextButton(ButtonBehavior, Widget):
     _font : Font = Font()
     _label : Label = Label()
     _text : str = ""
+    _currentColor = [0,0,0,0]
+    _wantedColor = [0,0,0,0]
     heightPadding = 30
     #endregion
     #region   --------------------------- GET SET
@@ -49,14 +52,7 @@ class TextButton(ButtonBehavior, Widget):
     def State(self, newState:States) -> None:
         #Save new state in private variable
         self._state = newState
-
-        #Set new colors to use depending on button's current Kivy state
-        if self.state == "down":  # if the button is being pressed
-            self.color.rgba = StatesColors.Pressed.GetColorFrom(self.State)
-            self._label.color = StatesColors.Text.GetColorFrom(self.State)
-        else:
-            self.color.rgba = StatesColors.Default.GetColorFrom(self.State)
-            self._label.color = StatesColors.Text.GetColorFrom(self.State)
+        self._UpdateColors(None,None)
     # ------------------------------------------------------
     @property
     def Text(self) -> str:
@@ -91,15 +87,30 @@ class TextButton(ButtonBehavior, Widget):
         self.size = (self.width, self.height + self.heightPadding)
     #endregion
     #region   --------------------------- METHODS
-    def UpdateColors(self, instance, value):
+    def _UpdateColors(self, instance, value):
+        Debug.Start()
         if self.state == "down":  # if the button is being pressed
-            self.color.rgba = StatesColors.Pressed.GetColorFrom(self.State)
+            Debug.Warn("{} is pressed".format(self._label.text))
+            wantedColor = StatesColors.Pressed.GetColorFrom(self.State)
             self._label.color = StatesColors.Text.GetColorFrom(self.State)
         else:
-            self.color.rgba = StatesColors.Default.GetColorFrom(self.State)
+            Debug.Warn("{} is released".format(self._label.text))
+            wantedColor = StatesColors.Default.GetColorFrom(self.State)
             self._label.color = StatesColors.Text.GetColorFrom(self.State)
+
+        self._wantedColor = wantedColor
+        self._currentColor = self.color.rgba
+
+        self.animation = Animation(_currentColor = self._wantedColor, duration = 0.1)
+        self.animation.bind(on_progress = self._Animating)
+        self.animation.start(self)
+        Debug.End()
     # ------------------------------------------------------
-    def UpdateShape(self, *args):
+    def _Animating(self, animation, value, theOtherOne):
+        self.color.rgba = self._currentColor
+        print(self._currentColor)
+    # ------------------------------------------------------
+    def _UpdateShape(self, *args):
         self.rect.pos = self.pos
         self.rect.size = self.size
         self.rect.radius = [self.radius, self.radius, self.radius, self.radius]
@@ -107,10 +118,9 @@ class TextButton(ButtonBehavior, Widget):
         self._label.pos = self.pos
     # ------------------------------------------------------
     #endregion
-    #region   --------------------------- CONSTRUCTOR
+    # region   --------------------------- CONSTRUCTOR
     def __init__(self, radius = 10, initialState = States.Disabled, initialFont = Font(), wantedText="", **kwargs):
         super(TextButton, self).__init__(**kwargs)
-        Debug.enableConsole = False
         Debug.Start()
         #region --------------------------- Set Variables
         Debug.Log("Setting Textbutton's variables...")
@@ -118,22 +128,26 @@ class TextButton(ButtonBehavior, Widget):
         self.height = self.height + self.heightPadding
         self._label = Label(pos = self.pos)
         self.radius = radius
-        Debug.Log("Success")
         #endregion
         #region --------------------------- Set Classes
         Debug.Log("Setting Textbutton's Classes...")
         #self.TextFont(self.font)
         #self.set_Label(wantedText)
-        Debug.Log("Success")
         #endregion
         #region --------------------------- Set Canvas
         Debug.Log("Setting Textbutton's Canvas...")
         with self.canvas:
-            self.color = Color(rgba = StatesColors.Default.GetColorFrom(self.State))  # set the initial color to green
+            # Color setups and variables
+            self.color = Color(rgba = StatesColors.Default.GetColorFrom(self._state))
+            self._currentColor = self.color.rgba
+            self._wantedColor = self.color.rgba
+
+            # Rectangle making
             self.rect = RoundedRectangle(size=self.size, pos=self.pos, radius=[self.radius, self.radius, self.radius, self.radius])
-            self.bind(pos=self.UpdateShape, size=self.UpdateShape)
-            self.bind(state=self.UpdateColors)  # bind the state property to the update_color method
-        Debug.Log("Success")
+
+            # Binding events 
+            self.bind(pos=self._UpdateShape, size=self._UpdateShape)
+            self.bind(state=self._UpdateColors)
         #endregion
         #region --------------------------- Set Widgets
         Debug.Log("Setting Textbutton's children widgets...")
@@ -146,10 +160,8 @@ class TextButton(ButtonBehavior, Widget):
         self.TextFont = initialFont
         self.Text = wantedText
         self.State = initialState
-        Debug.Log("Success")
-        Debug.Warn("End of TextButton's Constructor.")
+        Debug.Warn("TextButton successfully created")
         #endregion
         Debug.End()
-        Debug.enableConsole = True
     #endregion
     pass

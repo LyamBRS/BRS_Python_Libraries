@@ -63,21 +63,21 @@ class _StatesColor(States):
     '''
     #endregion
     #region --------------------------- MEMBERS
-    Disabled = [105/255, 105/255, 105/255, 1]
+    Disabled = (105/255., 105/255., 105/255., 1.)
     '''RGBA color when a device's states is Disabled. See States for full definition'''
-    Inactive = [170/255, 170/255, 170/255, 1]
+    Inactive = (170/255., 170/255., 170/255., 1.)
     '''RGBA color when a device's states is Inactive. See States for full definition'''
-    Active = [96/255, 241/255, 241/255, 1]
+    Active = (96/255., 241/255., 241/255., 1.)
     '''RGBA color when a device's states is Active. See States for full definition'''
-    Warning = [255/255, 237/255, 101/255, 1]
+    Warning = (255/255., 237/255., 101/255., 1.)
     '''RGBA color when a device's states is Warning. See States for full definition'''
-    Error = [255/255, 77/255, 77/255, 1]
+    Error = (255/255., 77/255., 77/255., 1.)
     '''RGBA color when a device's states is Error. See States for full definition'''
-    Unavailable = [221/255, 0, 0, 1]
+    Unavailable = (221/255., 0., 0., 1.)
     '''RGBA color when a device's states is Unavailable. See States for full definition'''
-    Locked = [255/255, 170/255, 105/255, 1]
+    Locked = (255/255., 170/255., 105/255., 1.)
     '''RGBA color when a device's states is Locked. See States for full definition'''
-    Good = [38/255, 80/255, 38/255, 1]
+    Good = (38/255., 80/255., 38/255., 1.)
     '''RGBA color when a device's states is Good. See States for full definition'''
     #endregion
     #region   --------------------------- METHODS
@@ -177,7 +177,7 @@ class StatesColors:
     #endregion
     #region   --------------------------- CONSTRUCTOR
     Default.MultiplyColorsBy(1)
-    Pressed.MultiplyColorsBy(0.75)
+    Pressed.MultiplyColorsBy(0.5)
     Text.MultiplyColorsBy(0.1)
     #endregion
     pass

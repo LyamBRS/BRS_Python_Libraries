@@ -31,6 +31,10 @@ from kivy.uix.label import Label
 class Dial(Widget):
     #region   --------------------------- DOCSTRING
     '''
+        This class allows you to create a Dial like widget which represents
+        a float value in between a starting angle and an ending angle.
+        Use .Property to set the dial's properties such as end and start angle.
+        Do not use Radians.
     '''
     #endregion
     #region   --------------------------- MEMBERS
@@ -41,11 +45,26 @@ class Dial(Widget):
     #region   --------------------------- GET SET
     #endregion
     #region   --------------------------- METHODS
-    def _UpdateColor(self, instance, value):
+    #region   -- Public
+    def GetFillingAngle(self):
+        """This function returns the end angle of the dial's filling in degrees"""
+        # [Step 0]: Get properties into local variables
+        _max = self.Properties.max
+        _min = self.Properties.min
+        _value = self.Properties.value
+
+        # [Step 1]: Get filling ratio
+        ratio = (_value - _min) / (_max - _min)
+
+        # [Step 2]: Return corresponding angle.
+        return (ratio * (_max - _min)) + _min
+
+    #endregion
+    #region   -- Private
+    def _UpdateColors(self, instance, value):
         """Updates the color based on the widget's State"""
         self.Track.color.rgba = StatesColors.Text.GetColorFrom(self._state)
         self.Filling.color.rgba = StatesColors.Default.GetColorFrom(self._state)
-
     def _UpdateShape(self, *args):
         """Updates the general shape of the widget."""
 
@@ -55,6 +74,8 @@ class Dial(Widget):
 
         self.Track.angle_end = self.Properties.endAngle
         self.Track.angle_start = self.Properties.startAngle
+
+
         self.Filling.angle_end = self.Properties.endAngle
         self.Filling.angle_start = self.Properties.startAngle
 
@@ -71,6 +92,7 @@ class Dial(Widget):
             self.Track.ellipse = (self.x, self.y, self.width - self.Properties.trackWidth, self.height - self.Properties.trackWidth)
             self.Track.width = self.Properties.trackWidth
     #endregion
+    #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, initialState=_state, trackWidth=Properties.trackWidth, fillingWidth=Properties.fillingWidth, min=Properties.min, max=Properties.max, startAngle=Properties.startAngle, endAngle=Properties.endAngle,  **kwargs):
         super(Dial, self).__init__(**kwargs)
@@ -79,28 +101,33 @@ class Dial(Widget):
         Debug.Log("Setting internal variables to new specified values")
         self._state = initialState
 
-        self.Properties.fillingWidth = fillingWidth
-        self.Properties.trackWidth = trackWidth
-        self.Properties.max = max
-        self.Properties.min = min
-        self.Properties.endAngle = endAngle
-        self.Properties.startAngle = startAngle
+        self.Properties.fillingWidth    = fillingWidth
+        self.Properties.trackWidth      = trackWidth
+        self.Properties.max             = max
+        self.Properties.min             = min
+        self.Properties.value           = min
+        self.Properties.endAngle        = endAngle
+        self.Properties.startAngle      = startAngle
         Debug.Log("Success")
         #endregion
         #region --------------------------- Set Canvas
         Debug.Log("Creating Canvas")
         with self.canvas:
-            self.color = Color(rgba = StatesColors.Default.GetColorFrom(self._state))  # set the initial color to green
-            self.rect = RoundedRectangle(size=self.size, pos=self.pos) #radius=[self.width, self.height, self.width, self.height])
+            Debug.Log("Creating drawings for dial widget's background")
+            self.color = Color(rgba = StatesColors.Pressed.GetColorFrom(self._state))
+            self.rect = RoundedRectangle(size=self.size, pos=self.pos)
 
-            if(self.Properties.showTrack):
+            Debug.Log("Creating dial's track")
+            if(self.Properties.showTrack == True):
                 self.Track = Line(size=self.size, pos=self.pos, ellipse=(self.x, self.y, self.width - self.Properties.trackWidth, self.height - self.Properties.trackWidth), width = self.Properties.trackWidth, angle_end = self.Properties.endAngle, angle_start = self.Properties.startAngle, color = Color(rgba=(StatesColors.Text.GetColorFrom(self._state))))
 
-            if(self.Properties.showFilling):
+            Debug.Log("Creating dial's filling")
+            if(self.Properties.showFilling == True):
                 self.Filling = Line(size=self.size, pos=self.pos, ellipse=(self.x, self.y, self.width - self.Properties.fillingWidth, self.height - self.Properties.fillingWidth), width = self.Properties.fillingWidth, angle_end = self.Properties.endAngle, angle_start = self.Properties.startAngle, color = Color(rgba=(StatesColors.Default.GetColorFrom(self._state))))
 
-            self.bind(pos=self._UpdateShape, size=self.UpdateShape)
-            self.bind(state=self._UpdateColors)  # bind the state property to the update_color method
+            Debug.Log("Binding events to dial")
+            self.bind(pos = self._UpdateShape, size = self._UpdateShape)
+            self.bind(state = self._UpdateColors)  # bind the state property to the update_color method
         Debug.Log("Success")
         #endregion
         Debug.End()
