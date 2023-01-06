@@ -297,9 +297,37 @@ class Animated:
 
         Only set this before starting your animation.
     """
+    _animated_fillingWidth        = 0
+    """
+        Private variable specifying the current width of the
+        widget's filling. Defaults to 0.
+
+        Set this before calling the Animation starter.
+    """
+    _animated_wantedFillingWidth  = 0
+    """
+        Private variable representing your widget's new Filling width.
+        Defaults to 0
+
+        Only set this before starting your animation.
+    """
+    _animated_trackWidth          = 0
+    """
+        Private variable specifying the current width of the
+        widget's track. Defaults to 0.
+
+        Set this before calling the Animation starter.
+    """
+    _animated_wantedTrackWidth    = 0
+    """
+        Private variable representing your widget's new Track width.
+        Defaults to 0
+
+        Only set this before starting your animation.
+    """
     #endregion
     #region   --------------------------- METHODS
-    def _StartShapeAnimation(self, duration=0.1, transition:str="in_out_cubic"):
+    def _StartShapeAnimation(self, duration:float=0.1, transition:str="in_out_cubic"):
         Debug.Start("StartShapeAnimation")
         """
             Call this instead of manually building your widget's
@@ -320,7 +348,9 @@ class Animated:
                         "_animated_size"          : self._animated_wantedSize,
                         "_animated_radius"        : self._animated_wantedRadius,
                         "_animated_endAngle"      : self._animated_wantedEndAngle,
-                        "_animated_startAngle"    : self._animated_wantedStartAngle
+                        "_animated_startAngle"    : self._animated_wantedStartAngle,
+                        "_animated_fillingWidth"  : self._animated_wantedFillingWidth,
+                        "_animated_trackWidth"  : self._animated_wantedTrackWidth
                     }
 
         comparator = {
@@ -329,16 +359,16 @@ class Animated:
                         "_animated_size"          : self._animated_size,
                         "_animated_radius"        : self._animated_radius,
                         "_animated_endAngle"      : self._animated_endAngle,
-                        "_animated_startAngle"    : self._animated_startAngle
+                        "_animated_startAngle"    : self._animated_startAngle,
+                        "_animated_fillingWidth"  : self._animated_fillingWidth,
+                        "_animated_trackWidth"    : self._animated_trackWidth
                     }
-        Debug.Log(str(arguments))
         # endregion
         # region --- [Step 1]: Pop arguments equal to themselves
         # Debug.Log("Removing unused arguments from argument list...")
         keys_to_remove = []
 
         for current, wanted in arguments.items():
-            Debug.Log("current: {}, wanted:{}".format(current,wanted))
             if arguments[current] == comparator[current]:
                 keys_to_remove.append(current)
 
@@ -348,10 +378,10 @@ class Animated:
         # Add duration and transition
         arguments["d"] = duration
         arguments["t"] = transition
+        Debug.Log(str(arguments))
         # Debug.Log("Success")
         # endregion
         # region --- [Step 2]: Build and return the Animation to execute
-        Debug.Log(str(arguments))
         animation = Animation(**arguments)
         animation.bind(on_progress = self._AnimatingShapes)
         animation.start(self)
@@ -424,6 +454,48 @@ class Animated:
 
         self._animated_endAngle = self._animated_wantedEndAngle
         self._animated_startAngle = self._animated_wantedStartAngle
+
+        self._animated_trackWidth = self._animated_wantedTrackWidth
+        self._animated_fillingWidth = self._animated_wantedFillingWidth
+    def _Animated_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
+        """
+            Transfer specified currently stored value of your class's
+            DrawingProperties into the Animated class for you if inherited.
+
+            theseProperties = DrawingProperties to copy from.
+
+            copy = from theseProperty, copy ("None","All","Colors","Shapes")
+        """
+
+        def Check(thisProperty):
+            return (thisProperty != None)
+
+        # [Step 0]: Checking if we are using that drawing property or our own.
+        if(fromTheseProperties != None):
+
+            # [Step 1]: Copying Current colors
+            if(type == "All" or type == "Colors"):
+                if(Check(self.backgroundColor)):
+                    self._animated_backgroundColor = self.backgroundColor
+
+                self._animated_fillingColor = fromTheseProperties.fillingColor
+                self._animated_trackColor   = fromTheseProperties.trackColor
+
+            # [Step 2]: Copying Current Shapes
+            if(type == "All" or type == "Shapes"):
+                self._animated_endAngle     = fromTheseProperties.endAngle
+                self._animated_startAngle   = fromTheseProperties.startAngle
+                self._animated_fillingWidth = fromTheseProperties.fillingWidth
+                self._animated_trackWidth   = fromTheseProperties.trackWidth
+                self._animated_value        = fromTheseProperties.value
+
+                if(Check(self.pos)):
+                    Debug.Log("========================= POS")
+                    self._animated_pos = self.pos
+
+                if(Check(self.size)):
+                    Debug.Log("========================= SIZE")
+                    self._animated_size = self.size
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion

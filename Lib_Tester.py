@@ -1,5 +1,4 @@
 #################################################################### IMPORTS
-from turtle import color
 from kivy.uix.widget import Widget
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -8,6 +7,7 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.slider import Slider
 from kivy.core.window import Window
 
+import random
 from BRS.GUI.Utilities.font import Font
 from BRS.GUI.Inputs.buttons import TextButton
 from BRS.GUI.Status.Progress import Bar
@@ -31,10 +31,12 @@ class MyGridLayout(GridLayout):
         Debug.Log("Initializing the main TextButton")
         self.rounded_button = TextButton()
 
-        self.rounded_button.Text = "Among us"
+        self.rounded_button.Text = "Test new coordinates"
+        self.rounded_button.width = 200
         x = (Window.width/2) - self.rounded_button.width/2
         y = (Window.height/2) - self.rounded_button.height/2
-        self.rounded_button.pos = x,y
+        self.rounded_button.pos = (x,y)
+        self.rounded_button.on_press = self.GetNewDialCoordinates
         self.add_widget(self.rounded_button)  # add the RoundedButton widget to the MyGridLayout widget
 
         #region - States Buttons
@@ -110,6 +112,19 @@ class MyGridLayout(GridLayout):
         Debug.End()
         #endregion
 
+    def GetNewDialCoordinates(self):
+        Debug.Start("GetNewDialCoordinates")
+        # x = random.randint(0,Window.width)
+        # y = random.randint(0,Window.height)
+
+        # self.dial.pos = (x,y)
+        track = random.randint(0,90)
+        filling = random.randint(0,90)
+        Debug.Log("filling = {}".format(filling))
+        self.dial.TrackWidth = track
+        self.dial.FillingWidth = filling
+        Debug.End()
+
     def SetStateTo_Disable(self):
         self.rounded_button.State = States.Disabled
         self.progressBar.Value = 0
@@ -147,6 +162,7 @@ class MyGridLayout(GridLayout):
         Debug.Start()
         Debug.Log(f"SliderMoving: New slider value: {self.slider.value}")
         self.progressBar.Value = self.slider.value
+        self.dial.Value = self.slider.value
         Debug.End()
 #################################################################### WIDGETS
 class MainWidget(Widget):

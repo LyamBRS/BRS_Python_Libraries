@@ -77,14 +77,54 @@ class Dial(Animated, Widget):
         """
 
         # [Step 0]: Save newValue
-        # Debug.Log("0: VALUE = {}".format(self.Properties.value))
         self._animated_value        = self.Properties.value
         self._animated_wantedValue  = newValue
-        # Debug.Log("1: VALUE = {}".format(self.Properties.value))
-        # Debug.Log("1: WANTEDVALUE = {}".format(self.Animating.wantedValue))
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape(None)
+    #endregion
+    #region   -- FillingWidth
+    @property
+    def FillingWidth(self) -> int:
+        """ Returns the current width of the filling aspect """
+        return self.Properties.fillingWidth
+
+    @FillingWidth.setter
+    def FillingWidth(self, newValue:int) -> None:
+        """_summary_
+            Sets the filling width of the dial.
+        Args:
+            newValue (float): the new width of the dial's filling
+        """
+        Debug.Start("FillingWidth")
+        # [Step 0]: Save newValue
+        self._animated_fillingWidth        = self.Properties.fillingWidth
+        self._animated_wantedFillingWidth  = newValue
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape(None)
+        Debug.End()
+    #endregion
+    #region   -- TrackWidth
+    @property
+    def TrackWidth(self) -> int:
+        """ Returns the current width of the filling aspect """
+        return self.Properties.fillingWidth
+
+    @TrackWidth.setter
+    def TrackWidth(self, newValue:int) -> None:
+        """_summary_
+            Sets the Track width of the dial.
+        Args:
+            newValue (float): the new width of the dial's track
+        """
+        Debug.Start("TrackWidth")
+        # [Step 0]: Save newValue
+        self._animated_wantedTrackWidth  = newValue
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape(None)
+        Debug.End()
     #endregion
     #endregion
     #region   --------------------------- METHODS
@@ -126,7 +166,7 @@ class Dial(Animated, Widget):
         # [Step 2]: Start animation
         # Debug.Log("[Step 2]:")
         if(self.animated):
-            self._StartColorAnimation(duration=0.5)
+            self._StartColorAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingColors(None, None, None)
@@ -140,22 +180,18 @@ class Dial(Animated, Widget):
         # Debug.Log("Updating the shape of the Dial")
 
         # Debug.Log("Setting animation parameters")
-        self._animated_wantedSize = self.size
-        self._animated_wantedPos  = self.pos
+        self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
         self._animated_pos = self.rect.pos
         self._animated_size = self.rect.size
 
-        self._animated_endAngle     = self.Properties.endAngle
-        self._animated_startAngle   = self.Properties.startAngle
-        self._animated_value        = self.Properties.value
-
-        # Debug.Log("2: VALUE = {}".format(self.Properties.value))
-        # Debug.Log("2: WANTEDVALUE = {}".format(self.Animating.wantedValue))
+        # Debug.Log("Set wanteds")
+        self._animated_wantedPos = self.pos
+        self._animated_wantedSize = self.size
 
         # Debug.Log("Launching shape animator")
         if(self.animated):
-            self._StartShapeAnimation(duration=0.5)
+            self._StartShapeAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingShapes(None, None, None)
@@ -164,12 +200,13 @@ class Dial(Animated, Widget):
     def _AnimatingShapes(self, animation, value, theOtherOne):
         """ Called when Animations are executed """
         Debug.Start("_AnimatingShapes")
-
         # [Step 0]: Save private values as actual values
         # Debug.Log("Value : {}".format(self.Animating.value))
         self.Properties.value         = self._animated_value
         self.Properties.endAngle      = self._animated_endAngle
         self.Properties.startAngle    = self._animated_startAngle
+        self.Properties.fillingWidth  = self._animated_fillingWidth
+        self.Properties.trackWidth    = self._animated_trackWidth
 
         # [Step 1]: Update drawings based on new values
         # Debug.Log("[Step 1]")
@@ -256,6 +293,11 @@ class Dial(Animated, Widget):
         self._animated_wantedEndAngle   = self.Properties.endAngle
         self._animated_startAngle       = self.Properties.startAngle
         self._animated_wantedStartAngle = self.Properties.startAngle
+        self._animated_fillingWidth         = self.Properties.fillingWidth
+        self._animated_trackWidth           = self.Properties.trackWidth
+        self._animated_wantedFillingWidth   = self.Properties.fillingWidth
+        self._animated_wantedTrackWidth     = self.Properties.trackWidth
+
         #endregion
         Debug.End()
     #endregion
