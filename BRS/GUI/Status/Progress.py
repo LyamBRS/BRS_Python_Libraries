@@ -64,7 +64,7 @@ class Bar(ProgressBar, Widget):
                 self.value = self.value + 1
             else:
                 self.value = self.value - 1
-            Clock.schedule_once(self._UpdateValue, 0.01)
+            Clock.schedule_once(self._UpdateValue, 0.01) 
 
 
     #endregion

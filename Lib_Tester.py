@@ -101,8 +101,9 @@ class MyGridLayout(GridLayout):
         Debug.Log("Success")
 
         Debug.Log("Adding BRS Dial")
-        self.dial = Dial()
-        self.pos = (500,500)
+        self.dial = Dial(min = 0, max = 70, startAngle=0, endAngle=360, trackWidth=10, fillingWidth=50)
+        self.dial.size = (200,200)
+        self.dial.pos = (400,400)
         self.add_widget(self.dial)
 
         Debug.End()
@@ -111,21 +112,36 @@ class MyGridLayout(GridLayout):
     def SetStateTo_Disable(self):
         self.rounded_button.State = States.Disabled
         self.progressBar.Value = 0
+        self.dial.Value = 0
     def SetStateTo_Inactive(self):
         self.rounded_button.State = States.Inactive
         self.progressBar.Value = 100
+        self.dial.Value = 30
+        self.dial.State = States.Inactive
     def SetStateTo_Active(self):
         self.rounded_button.State = States.Active
+        self.dial.State = States.Active
+        self.dial.Value = 20
     def SetStateTo_Error(self):
         self.rounded_button.State = States.Error
+        self.dial.State = States.Error
+        self.dial.Value = 40
     def SetStateTo_Locked(self):
         self.rounded_button.State = States.Locked
+        self.dial.State = States.Locked
+        self.dial.Value = 50
     def SetStateTo_Unavailable(self):
         self.rounded_button.State = States.Unavailable
+        self.dial.State = States.Unavailable
+        self.dial.Value = 60
     def SetStateTo_Warning(self):
         self.rounded_button.State = States.Warning
+        self.dial.State = States.Warning
+        self.dial.Value = 10
     def SetStateTo_Good(self):
         self.rounded_button.State = States.Good
+        self.dial.State = States.Good
+        self.dial.Value = 70
     def SliderMoving(self, a, b):
         Debug.Start()
         Debug.Log(f"SliderMoving: New slider value: {self.slider.value}")
