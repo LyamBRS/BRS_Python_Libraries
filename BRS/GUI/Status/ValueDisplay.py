@@ -15,8 +15,7 @@ from BRS.GUI.Utilities.drawings import GetEllipse
 from BRS.GUI.Utilities.drawings import UpdateEllipse
 
 from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.uix.behaviors import ButtonBehavior
+from kivy.animation import Animation
 from kivy.graphics import RoundedRectangle
 from kivy.graphics import Line
 from kivy.graphics import Color
@@ -41,6 +40,8 @@ class Dial(Widget):
     #endregion
     #region   --------------------------- MEMBERS
     _state = States.Disabled
+    _wantedValue = 0
+    _value = 0
 
     Properties = DrawingProperties()
     #endregion
@@ -78,7 +79,12 @@ class Dial(Widget):
             newValue (float): the new value (from min to max)
         """
         # [Step 0]: Save newValue
-        self.Properties.value = newValue
+        self._wantedValue = newValue
+
+        self.animation = Animation(_value = self._wantedValue, duration = 1, t='out_back')
+        self.animation.bind(on_progress = self._Animating)
+        self.animation.start(self)
+
         UpdateEllipse(self.Properties, self, "Track", self.Track)
         UpdateEllipse(self.Properties, self, "Filling", self.Filling)
 
@@ -125,6 +131,16 @@ class Dial(Widget):
 
         Debug.End()
         Debug.Log("Success")
+
+    def _Animating(self, animation, value, theOtherOne):
+        """ Called when Animations are executed """
+
+        self.Properties.value = self._value
+
+        UpdateEllipse(self.Properties, self, "Track", self.Track)
+        UpdateEllipse(self.Properties, self, "Filling", self.Filling)
+        self.Properties.trackColor.rgba = StatesColors.Pressed.GetColorFrom(self._state)
+        self.Properties.fillingColor.rgba = StatesColors.Default.GetColorFrom(self._state)
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
@@ -142,6 +158,9 @@ class Dial(Widget):
         self.Properties.value           = 50
         self.Properties.endAngle        = endAngle
         self.Properties.startAngle      = startAngle
+
+        self._value = self.Properties.value
+        self._wantedValue = self.Properties.value
 
         Debug.Log("the maximum is: {}".format(self.Properties.max))
         #endregion

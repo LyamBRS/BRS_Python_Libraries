@@ -136,3 +136,5 @@ class DrawingProperties:
     #endregion
     pass
 # --------------------------------------------------
+class Animated:
+    pass
