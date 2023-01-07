@@ -392,6 +392,8 @@ class PieChartDial(Animated, Widget):
         super(PieChartDial, self).__init__(**kwargs)
         Debug.Start("PieChartDial")
         #region --------------------------- Initial check ups
+        self.pos_hint = (0,0)
+        self.size_hint = (1,1)
         #endregion
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")

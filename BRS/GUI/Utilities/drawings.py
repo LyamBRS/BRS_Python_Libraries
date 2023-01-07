@@ -347,6 +347,30 @@ class Animated:
 
         Only set this before starting your animation.
     """
+    _animated_pos_hint            = (0,0)
+    """
+        Represents your widget's current position
+        (x,y).
+        Defaults to (0,0)
+
+        Use this to update the widget's
+        real position in your Animation binded on_progress function.
+    """
+    _animated_wantedPos_hint     = (0,0)
+    """
+        Represents the wanted new position of your widget.
+        Defaults to (0,0)
+
+        Only set this before starting your animation.
+    """
+    _animated_wantedSize_hint    = (0,0)
+    """
+        Private variable which represents the
+        new size to animate towards. (width, height)
+        Defaults to (0,0)
+
+        Only set this before starting your animation.
+    """
     #endregion
     #region   --------------------------- METHODS
     def _StartShapeAnimation(self, duration:float=0.1, transition:str="in_out_cubic"):
@@ -368,6 +392,8 @@ class Animated:
                         "_animated_value"         : self._animated_wantedValue,
                         "_animated_pos"           : self._animated_wantedPos,
                         "_animated_size"          : self._animated_wantedSize,
+                        "_animated_pos_hint"      : self._animated_wantedPos_hint,
+                        "_animated_size_hint"     : self._animated_wantedSize_hint,
                         "_animated_radius"        : self._animated_wantedRadius,
                         "_animated_endAngle"      : self._animated_wantedEndAngle,
                         "_animated_startAngle"    : self._animated_wantedStartAngle,
@@ -379,6 +405,8 @@ class Animated:
                         "_animated_value"         : self._animated_value,
                         "_animated_pos"           : self._animated_pos,
                         "_animated_size"          : self._animated_size,
+                        "_animated_pos_hint"      : self._animated_pos_hint,
+                        "_animated_size_hint"     : self._animated_size_hint,
                         "_animated_radius"        : self._animated_radius,
                         "_animated_endAngle"      : self._animated_endAngle,
                         "_animated_startAngle"    : self._animated_startAngle,
@@ -478,6 +506,8 @@ class Animated:
 
         self._animated_size = self._animated_wantedSize
         self._animated_pos = self._animated_wantedPos
+        self._animated_size_hint = self._animated_wantedSize_hint
+        self._animated_pos_hint = self._animated_wantedPos_hint
         self._animated_radius = self._animated_wantedRadius
         self._animated_value = self._animated_wantedValue
 

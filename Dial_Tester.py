@@ -194,17 +194,13 @@ class DialLayout(BoxLayout):
             Debug.Log("size_hint_min_y of layout: {}".format(self.size_hint_min_y))
             Debug.Log("parent: {}".format(str(self.parent)))
 
-            self.temporaryButton = Button()
-            self.temporaryButton.size_hint = (1,1)
-
-            # self.PieChartDial = PieChartDial(min=0, max=100, endAngle=360, startAngle=0)
+            self.PieChartDial = PieChartDial(min=0, max=100, endAngle=360, startAngle=0)
+            self.PieChartDial.animated = True
 
             with self.canvas:
                 Color(1, 0, 0, 1)  # red
 
-            self.add_widget(self.temporaryButton)
-            # self.add_widget(self.PieChartDial)
-            # self.PieChartDial.SetAttributesFromParent()
+            self.add_widget(self.PieChartDial)
             Debug.End()
     #endregion
 
@@ -278,11 +274,9 @@ class KivyUIApp(App):
         Debug.Warn("Kivy application called the run function")
         Debug.End()
         return super().run()
-    
+
     def on_start(self):
         Debug.Start("on_start")
-        Debug.Log("Button's X: {}".format(self.windowLayout.dials.temporaryButton.pos))
-        self.windowLayout.dials.temporaryButton.pos = (0,0)
         Debug.End()
 #====================================================================#
 # Application Running
