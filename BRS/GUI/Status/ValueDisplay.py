@@ -28,12 +28,12 @@ from kivy.uix.label import Label
 #====================================================================#
 # Classes
 #====================================================================#
-class Dial(Animated, Widget):
+class PieChartDial(Animated, Widget):
     #region   --------------------------- DOCSTRING
     '''
-        This class allows you to create a Dial like widget which represents
+        This class allows you to create a PieChartDial like widget which represents
         a float value in between a starting angle and an ending angle.
-        Use .Property to set the dial's properties such as end and start angle.
+        Use .Property to set the PieChartDial's properties such as end and start angle.
         Do not use Radians.
     '''
     #endregion
@@ -70,7 +70,7 @@ class Dial(Animated, Widget):
     @Value.setter
     def Value(self, newValue:float) -> None:
         """_summary_
-            Sets the value of the Dial. It will automatically
+            Sets the value of the PieChartDial. It will automatically
             adjusts itself to be within the Propertie's range
         Args:
             newValue (float): the new value (from min to max)
@@ -78,10 +78,11 @@ class Dial(Animated, Widget):
 
         # [Step 0]: Save newValue
         self._animated_value        = self.Properties.value
-        self._animated_wantedValue  = newValue
+        self._animated_wantedValue  = self.Properties.TestValue(newValue)
 
         # [Step 1]: Update the shape based on the new value
-        self._UpdateShape(None)
+        if(newValue != self._animated_value):
+            self._UpdateShape(None)
     #endregion
     #region   -- FillingWidth
     @property
@@ -92,9 +93,9 @@ class Dial(Animated, Widget):
     @FillingWidth.setter
     def FillingWidth(self, newValue:int) -> None:
         """_summary_
-            Sets the filling width of the dial.
+            Sets the filling width of the PieChartDial.
         Args:
-            newValue (float): the new width of the dial's filling
+            newValue (float): the new width of the PieChartDial's filling
         """
         Debug.Start("FillingWidth")
         # [Step 0]: Save newValue
@@ -114,9 +115,9 @@ class Dial(Animated, Widget):
     @TrackWidth.setter
     def TrackWidth(self, newValue:int) -> None:
         """_summary_
-            Sets the Track width of the dial.
+            Sets the Track width of the PieChartDial.
         Args:
-            newValue (float): the new width of the dial's track
+            newValue (float): the new width of the PieChartDial's track
         """
         Debug.Start("TrackWidth")
         # [Step 0]: Save newValue
@@ -135,7 +136,7 @@ class Dial(Animated, Widget):
     @Size.setter
     def Size(self, newValue:int) -> None:
         """_summary_
-            Sets the Size of the dial.
+            Sets the Size of the PieChartDial.
         Args:
             newValue (float): the new size of the widget
         """
@@ -156,9 +157,9 @@ class Dial(Animated, Widget):
     @Pos.setter
     def Pos(self, newValue:int) -> None:
         """_summary_
-            Sets the position of the dial.
+            Sets the position of the PieChartDial.
         Args:
-            newValue (float): the new position of the dial (x,y)
+            newValue (float): the new position of the PieChartDial (x,y)
         """
         Debug.Start("Pos")
         # [Step 0]: Save newValue
@@ -168,12 +169,75 @@ class Dial(Animated, Widget):
         self._UpdateShape(None)
         Debug.End()
     #endregion
+    #region   -- ShowTrack
+    @property
+    def ShowTrack(self) -> bool:
+        """ Returns wether the track is shown or not """
+        return self.Properties.showTrack
+
+    @ShowTrack.setter
+    def ShowTrack(self, newValue:bool) -> None:
+        """_summary_
+            Sets wether the track is shown or not
+        Args:
+            newValue (bool): the new showing or not
+        """
+        Debug.Start("ShowTrack")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self.Properties.showTrack):
+            self.Properties.showTrack = newValue
+            self._UpdateColors(None,None)
+        Debug.End()
+    #endregion
+    #region   -- ShowFilling
+    @property
+    def ShowFilling(self) -> bool:
+        """ Returns wether the fillinf is shown or not """
+        return self.Properties.showFilling
+
+    @ShowFilling.setter
+    def ShowFilling(self, newValue:bool) -> None:
+        """_summary_
+            Sets wether the filling is shown or not
+        Args:
+            newValue (bool): the new showing or not
+        """
+        Debug.Start("ShowFilling")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self.Properties.showFilling):
+            self.Properties.showFilling = newValue
+            self._UpdateColors(None,None)
+        Debug.End()
+    #endregion
+    #region   -- ShowBackground
+    @property
+    def ShowBackground(self) -> bool:
+        """ Returns wether the background is shown or not """
+        return self.Properties.showBackground
+
+    @ShowBackground.setter
+    def ShowBackground(self, newValue:bool) -> None:
+        """_summary_
+            Sets wether the background is shown or not
+        Args:
+            newValue (bool): the new showing or not
+        """
+        Debug.Start("ShowBackground")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self.Properties.showBackground):
+            self.Properties.showBackground = newValue
+            self._UpdateColors(None,None)
+        Debug.End()
+    #endregion
     #endregion
     #region   --------------------------- METHODS
     #region   -- Public
     def GetFillingAngle(self):
         """
-            This function returns the end angle of the dial's filling in degrees
+            This function returns the end angle of the PieChartDial's filling in degrees
         """
         # [Step 0]: Get properties into local variables
         _max = self.Properties.max
@@ -186,7 +250,7 @@ class Dial(Animated, Widget):
         # [Step 2]: Return corresponding angle.
         return (ratio * (_max - _min)) + _min
 
-    def SetAttributes(self, TrackWidth=Properties.trackWidth, FillingWidth=Properties.fillingWidth, position=None, size=None):
+    def SetAttributes(self, TrackWidth=Properties.trackWidth, FillingWidth=Properties.fillingWidth, position=None, size=None, endAngle=Properties.endAngle, startAngle=Properties.startAngle, value=Properties.value, showTrack=Properties.showTrack, showBackground=Properties.showBackground, showFilling=Properties.showFilling):
         """
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
         """
@@ -199,6 +263,13 @@ class Dial(Animated, Widget):
         self._animated_wantedTrackWidth   = TrackWidth
         self._animated_wantedPos          = position
         self._animated_wantedSize         = size
+        self._animated_wantedStartAngle   = startAngle
+        self._animated_wantedEndAngle     = endAngle
+        self._animated_wantedValue        = self.Properties.TestValue(value)
+
+        self.Properties.showFilling = showFilling
+        self.Properties.showTrack = showTrack
+        self.Properties.showBackground = showBackground
 
         self._UpdateShape(None)
     #endregion
@@ -210,15 +281,15 @@ class Dial(Animated, Widget):
         Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         # Debug.Log("[Step 0]:")
-        self._animated_wantedFillingColor   = StatesColors.Default.GetColorFrom(self._state)
-        self._animated_wantedTrackColor     = StatesColors.Pressed.GetColorFrom(self._state)
-        self._animated_wantedBackgroundColor= StatesColors.Text.GetColorFrom(self._state)
+        self._animated_wantedFillingColor   = StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling else (0,0,0,0)
+        self._animated_wantedTrackColor     = StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack else (0,0,0,0)
+        self._animated_wantedBackgroundColor= StatesColors.Text.GetColorFrom(self._state) if self.Properties.showBackground else (0,0,0,0)
 
         # [Step 1]: Set animation's current values
         # Debug.Log("[Step 1]:")
         self._animated_fillingColor     = self.Properties.fillingColor.rgba
         self._animated_trackColor       = self.Properties.trackColor.rgba
-        self._animated_backgroundColor  = self.backgroundColor.rgba
+        self._animated_backgroundColor  = self.Properties.backgroundColor.rgba
 
         # [Step 2]: Start animation
         # Debug.Log("[Step 2]:")
@@ -234,7 +305,7 @@ class Dial(Animated, Widget):
             Updates the general shape of the widget.
         """
         Debug.Start("_UpdateShape")
-        # Debug.Log("Updating the shape of the Dial")
+        # Debug.Log("Updating the shape of the PieChartDial")
 
         # Debug.Log("Setting animation parameters")
         self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
@@ -282,14 +353,14 @@ class Dial(Animated, Widget):
         # [Step 0]: Save private values as actual values
         self.Properties.trackColor.rgba   = self._animated_trackColor
         self.Properties.fillingColor.rgba = self._animated_fillingColor
-        self.backgroundColor.rgba         = self._animated_backgroundColor
+        self.Properties.backgroundColor.rgba = self._animated_backgroundColor
         Debug.End()
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, initialState=_state, trackWidth=Properties.trackWidth, fillingWidth=Properties.fillingWidth, min=Properties.min, max=Properties.max, startAngle=Properties.startAngle, endAngle=Properties.endAngle,  **kwargs):
-        super(Dial, self).__init__(**kwargs)
-        Debug.Start("Dial")
+        super(PieChartDial, self).__init__(**kwargs)
+        Debug.Start("PieChartDial")
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")
         self._state = initialState
@@ -310,36 +381,32 @@ class Dial(Animated, Widget):
         #region --------------------------- Set Canvas
         Debug.Log("Creating Canvas")
         with self.canvas:
-            Debug.Log("Creating drawings for dial widget's background")
-            self.backgroundColor = Color(rgba = (1,1,1,1))#Color(rgba = StatesColors.Text.GetColorFrom(self._state))
+            Debug.Log("Creating drawings for PieChartDial widget's background")
+            self.Properties.backgroundColor = Color(rgba = (StatesColors.Text.GetColorFrom(self._state) if self.Properties.showBackground else (0,0,0,0)))
             self.rect = RoundedRectangle(size=self.size, pos=self.pos)
 
-            Debug.Log("Creating dial's track")
-            if(self.Properties.showTrack == True):
-                self.Properties.trackColor = Color(rgba = StatesColors.Pressed.GetColorFrom(self._state))
-                # self.Track = Line(pos=self.pos, ellipse=(self.x, self.y, self.width - self.Properties.trackWidth, self.height - self.Properties.trackWidth), width = self.Properties.trackWidth, angle_end = self.Properties.endAngle, angle_start = self.Properties.startAngle)
-                self.Track = GetEllipse(self.Properties, self, "Track")
+            Debug.Log("Creating PieChartDial's track")
+            self.Properties.trackColor = Color(rgba = (StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack else (0,0,0,0)))
+            self.Track = GetEllipse(self.Properties, self, "Track")
 
-            Debug.Log("Creating dial's filling")
-            if(self.Properties.showFilling == True):
-                self.Properties.fillingColor = Color(rgba = StatesColors.Default.GetColorFrom(self._state))
-                # self.Filling = Line(pos=self.pos, ellipse=(self.x, self.y, self.width - self.Properties.fillingWidth, self.height - self.Properties.fillingWidth), width = self.Properties.fillingWidth, angle_end = self.Properties.endAngle/2, angle_start = self.Properties.startAngle)
-                self.Filling = GetEllipse(self.Properties, self, "Filling")
+            Debug.Log("Creating PieChartDial's filling")
+            self.Properties.fillingColor = Color(rgba = (StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling else (0,0,0,0)))
+            self.Filling = GetEllipse(self.Properties, self, "Filling")
 
-            Debug.Log("Binding events to dial")
-            # self.bind(pos = self._UpdateShape, size = self._UpdateShape)
-            # self.bind(_state = self._UpdateColors)  # bind the state property to the update_color method
+            # Debug.Log("Binding events to PieChartDial")
+            #self.bind(Properties.showTrack = self._UpdateShape, size = self._UpdateShape)
+
         #endregion
         #region --------------------------- Set Animation Properties
-        Debug.Log("Setting dial's color animation properties")
-        self._animated_backgroundColor      = self.backgroundColor.rgba
-        self._animated_wantedBackgroundColor= self.backgroundColor.rgba
+        Debug.Log("Setting PieChartDial's color animation properties")
+        self._animated_backgroundColor      = self.Properties.backgroundColor.rgba
+        self._animated_wantedBackgroundColor= self.Properties.backgroundColor.rgba
         self._animated_fillingColor         = self.Properties.fillingColor.rgba
         self._animated_wantedFillingColor   = self.Properties.fillingColor.rgba
         self._animated_trackColor           = self.Properties.trackColor.rgba
         self._animated_wantedTrackColor     = self.Properties.trackColor.rgba
 
-        Debug.Log("Setting dial's shape animation properties")
+        Debug.Log("Setting PieChartDial's shape animation properties")
         self._animated_pos                  = self.pos
         self._animated_pos                  = self.pos
         self._animated_size                 = self.size

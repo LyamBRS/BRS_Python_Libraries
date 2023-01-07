@@ -5,7 +5,9 @@
 #====================================================================#
 # Imports
 #====================================================================#
+from ctypes import sizeof
 import math
+from tracemalloc import start
 from BRS.Debug.consoleLog import Debug
 from kivy.clock import Clock
 from kivy.graphics import Ellipse
@@ -123,12 +125,35 @@ class DrawingProperties:
     fillingWidth : float = 5
     """The width of the filling above the track (diameter)"""
 
+    showBackground : bool = False
+    """ Defines wether the background of the widget should be shown or not. Defaults to False """
+
     trackColor = [0,0,0,0]
     """The current track color. The track is underneath the filling. """
     fillingColor = [0,0,0,0]
     """The current filling color. The filling is shown above the track and represents the displayed value"""
+    backgroundColor = [0,0,0,0]
+    """The widget's background color defined by it's boundaries. Defaults to [0,0,0,0]"""
     #endregion
     #region   --------------------------- METHODS
+    def TestValue(self, valueToTest) -> float:
+        """
+            This function allows you to do a quick verification of your
+            DrawingProperties. if some members of this class get weird
+            data, they'll be automatically capped by this function.
+
+            returns the corrected value
+        """
+        result = True
+
+        # Check Value
+        if(valueToTest > self.max):
+            return self.max
+
+        if(valueToTest < self.min):
+            return self.min
+
+        return valueToTest
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -372,6 +397,9 @@ class Animated:
         for key in keys_to_remove:
             arguments.pop(key)
 
+        if(len(arguments) == 0):
+            Debug.Warn("No animations were made due to no attributes needing change")
+            return
         # Add duration and transition
         arguments["d"] = duration
         arguments["t"] = transition
@@ -423,6 +451,10 @@ class Animated:
 
         for key in keys_to_remove:
             arguments.pop(key)
+
+        if(len(arguments) == 0):
+            Debug.Warn("No animations were made due to no attributes needing change")
+            return
 
         # Add duration and transition
         arguments["d"] = duration

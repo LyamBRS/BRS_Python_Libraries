@@ -13,7 +13,7 @@ from BRS.GUI.Inputs.buttons import TextButton
 from BRS.GUI.Status.Progress import Bar
 from BRS.Utilities.states import States
 from BRS.Debug.consoleLog import Debug
-from BRS.GUI.Status.ValueDisplay import Dial
+from BRS.GUI.Status.ValueDisplay import PieChartDial
 #################################################################### Configs
 amogusFont = Font()
 amogusFont.isBold = True
@@ -102,12 +102,12 @@ class MyGridLayout(GridLayout):
         self.add_widget(self.slider)
         Debug.Log("Success")
 
-        Debug.Log("Adding BRS Dial")
-        self.dial = Dial(min = 0, max = 70, startAngle=0, endAngle=360, trackWidth=10, fillingWidth=50)
-        self.dial.Size = (200,200)
-        self.dial.Pos = (400,400)
-        self.add_widget(self.dial)
-        self.dial.animated = True
+        Debug.Log("Adding BRS PieChartDial")
+        self.PieChartDial = PieChartDial(min = 0, max = 70, startAngle=0, endAngle=360, trackWidth=10, fillingWidth=50)
+        self.PieChartDial.Size = (200,200)
+        self.PieChartDial.Pos = (400,400)
+        self.add_widget(self.PieChartDial)
+        self.PieChartDial.animated = True
 
         Debug.End()
         #endregion
@@ -124,50 +124,54 @@ class MyGridLayout(GridLayout):
         filling = random.randint(0,90)
         Debug.Log("filling = {}".format(filling))
 
-        self.dial.SetAttributes(position=(x,y), TrackWidth=track, FillingWidth=filling)
+        self.PieChartDial.SetAttributes(position=(x,y), TrackWidth=track, FillingWidth=filling, startAngle=start, endAngle=end)
         Debug.End()
 
     def SetStateTo_Disable(self):
         self.rounded_button.State = States.Disabled
         self.progressBar.Value = 0
-        self.dial.Value = 0
+        self.PieChartDial.Value = 0
+        self.PieChartDial.State = States.Disabled
     def SetStateTo_Inactive(self):
         self.rounded_button.State = States.Inactive
         self.progressBar.Value = 100
-        self.dial.Value = 30
-        self.dial.State = States.Inactive
+        self.PieChartDial.Value = 30
+        self.PieChartDial.State = States.Inactive
     def SetStateTo_Active(self):
         self.rounded_button.State = States.Active
-        self.dial.State = States.Active
-        self.dial.Value = 20
+        self.PieChartDial.State = States.Active
+        self.PieChartDial.Value = 20
     def SetStateTo_Error(self):
         self.rounded_button.State = States.Error
-        self.dial.State = States.Error
-        self.dial.Value = 40
+        self.PieChartDial.State = States.Error
+        self.PieChartDial.Value = 40
     def SetStateTo_Locked(self):
         self.rounded_button.State = States.Locked
-        self.dial.State = States.Locked
-        self.dial.Value = 50
+        self.PieChartDial.State = States.Locked
+        self.PieChartDial.Value = 50
+        self.PieChartDial.ShowBackground = not self.PieChartDial.ShowBackground
     def SetStateTo_Unavailable(self):
         self.rounded_button.State = States.Unavailable
-        self.dial.State = States.Unavailable
-        self.dial.Value = 60
+        self.PieChartDial.State = States.Unavailable
+        self.PieChartDial.Value = 60
+        self.PieChartDial.ShowTrack = not self.PieChartDial.ShowTrack
     def SetStateTo_Warning(self):
         self.rounded_button.State = States.Warning
-        self.dial.State = States.Warning
-        self.dial.Value = 10
+        self.PieChartDial.State = States.Warning
+        self.PieChartDial.Value = 10
     def SetStateTo_Good(self):
         self.rounded_button.State = States.Good
-        self.dial.State = States.Good
-        self.dial.Value = 70
+        self.PieChartDial.State = States.Good
+        self.PieChartDial.Value = 70
+        self.PieChartDial.ShowFilling = not self.PieChartDial.ShowFilling
     def SliderMoving(self, a, b):
         Debug.Start()
         Debug.Log(f"SliderMoving: New slider value: {self.slider.value}")
         self.progressBar.Value = self.slider.value
 
-        self.dial.animated = False
-        self.dial.Value = self.slider.value
-        self.dial.animated = True
+        self.PieChartDial.animated = False
+        self.PieChartDial.Value = self.slider.value
+        self.PieChartDial.animated = True
         Debug.End()
 #################################################################### WIDGETS
 class MainWidget(Widget):
