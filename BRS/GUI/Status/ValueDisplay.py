@@ -41,6 +41,7 @@ class PieChartDial(Animated, Widget):
     _state = States.Disabled
     animated : bool = False
     Properties = DrawingProperties()
+    _use_hint = False
     #endregion
     #region   --------------------------- GET SET
     #region   -- State
@@ -249,7 +250,7 @@ class PieChartDial(Animated, Widget):
 
         # [Step 2]: Return corresponding angle.
         return (ratio * (_max - _min)) + _min
-
+    # -------------------------------------------
     def SetAttributes(self, TrackWidth=Properties.trackWidth, FillingWidth=Properties.fillingWidth, position=None, size=None, endAngle=Properties.endAngle, startAngle=Properties.startAngle, value=Properties.value, showTrack=Properties.showTrack, showBackground=Properties.showBackground, showFilling=Properties.showFilling):
         """
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
@@ -272,6 +273,35 @@ class PieChartDial(Animated, Widget):
         self.Properties.showBackground = showBackground
 
         self._UpdateShape(None)
+    # -------------------------------------------
+    def SetAttributesFromParent(self):
+        """
+            This is called after the widget is added to the layout.
+            It is impossible for the code to know that sort of shit in the __init__
+            so this will make your widget relative in the parents layout area.
+        """
+        Debug.Start("SetAttributesFromParent")
+        Debug.Log("Automatically positioning widget based off parent's informations")
+
+        # - Step 0 - Pos and sizes
+        Debug.Log("Size of Parent: {}".format(self.parent.size))
+        Debug.Log("Pos of Parent: {}".format(self.parent.pos))
+        Debug.Log("size_hint_max of Parent: {}".format(self.parent.size_hint_max))
+        Debug.Log("size_hint_min of Parent: {}".format(self.parent.size_hint_min))
+        Debug.Log("pos_hint of Parent: {}".format(self.parent.pos_hint))
+        Debug.Log("size_hint_x of Parent: {}".format(self.parent.size_hint_x))
+        Debug.Log("size_hint_y of Parent: {}".format(self.parent.size_hint_y))
+        Debug.Log("size_hint_max_x of Parent: {}".format(self.parent.size_hint_max_x))
+        Debug.Log("size_hint_max_y of Parent: {}".format(self.parent.size_hint_max_y))
+        Debug.Log("size_hint_min_x of Parent: {}".format(self.parent.size_hint_min_x))
+        Debug.Log("size_hint_min_y of Parent: {}".format(self.parent.size_hint_min_y))
+        # self._animated_wantedPos = self.to_parent(self.pos)
+        # self._animated_wantedSize = self.to_parent(self.size)
+
+        # - Instant animation to put the widget back to where it should've been by default.
+        self._InstantAnimation()
+        self._UpdateShape()
+        Debug.End()
     #endregion
     #region   -- Private
     def _UpdateColors(self, instance, value):
@@ -361,6 +391,8 @@ class PieChartDial(Animated, Widget):
     def __init__(self, initialState=_state, trackWidth=Properties.trackWidth, fillingWidth=Properties.fillingWidth, min=Properties.min, max=Properties.max, startAngle=Properties.startAngle, endAngle=Properties.endAngle,  **kwargs):
         super(PieChartDial, self).__init__(**kwargs)
         Debug.Start("PieChartDial")
+        #region --------------------------- Initial check ups
+        #endregion
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")
         self._state = initialState

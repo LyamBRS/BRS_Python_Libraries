@@ -125,7 +125,7 @@ class DrawingProperties:
     fillingWidth : float = 5
     """The width of the filling above the track (diameter)"""
 
-    showBackground : bool = False
+    showBackground : bool = True
     """ Defines wether the background of the widget should be shown or not. Defaults to False """
 
     trackColor = [0,0,0,0]
