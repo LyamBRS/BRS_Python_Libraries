@@ -17,8 +17,13 @@ class Debug:
     def End():
         '''Closes an indentation when debugging. Put this at the end of debugged functions, along with a start at the top'''
         if Debug.enableConsole == True and Debug._currentDepth > 0:
-            Debug.Log("")
+            indentation = ""
+
             Debug._currentDepth = Debug._currentDepth - 1
+            if Debug._currentDepth > 0:
+                for x in range(0, Debug._currentDepth):
+                    indentation = indentation + Debug._indentationStyle
+            print(indentation + "-")
         pass
 
     def Log(logged:str):

@@ -5,8 +5,8 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from distutils.log import debug
-from email.policy import default
+from cgitb import text
+from multiprocessing.reduction import steal_handle
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.app import App
@@ -48,53 +48,35 @@ class ButtonLayout(BoxLayout):
     #region   --------------------------- MEMBERS
     #endregion
     #region   --------------------------- METHODS
-    def getMeTheFuckingValues(self):
-        Debug.Log("Size of layout: {}".format(self.size))
-        Debug.Log("Pos of layout: {}".format(self.pos))
-        Debug.Log("size_hint_max of layout: {}".format(self.size_hint_max))
-        Debug.Log("size_hint_min of layout: {}".format(self.size_hint_min))
-        Debug.Log("pos_hint of layout: {}".format(self.pos_hint))
-        Debug.Log("size_hint_x of layout: {}".format(self.size_hint_x))
-        Debug.Log("size_hint_y of layout: {}".format(self.size_hint_y))
-        Debug.Log("size_hint_max_x of layout: {}".format(self.size_hint_max_x))
-        Debug.Log("size_hint_max_y of layout: {}".format(self.size_hint_max_y))
-        Debug.Log("size_hint_min_x of layout: {}".format(self.size_hint_min_x))
-        Debug.Log("size_hint_min_y of layout: {}".format(self.size_hint_min_y))
-        Debug.Log("parent: {}".format(str(self.parent)))
+    def showTrack(self):
+        """ Called when the Show track button is pressed """
+
+        # Increase the valueSlider's value here
+
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, **kwargs):
             Debug.Start("ButtonLayout")
             super(ButtonLayout, self).__init__(**kwargs)
 
-            Debug.Log("Size of layout: {}".format(self.size))
-            Debug.Log("Pos of layout: {}".format(self.pos))
-            Debug.Log("size_hint_max of layout: {}".format(self.size_hint_max))
-            Debug.Log("size_hint_min of layout: {}".format(self.size_hint_min))
-            Debug.Log("pos_hint of layout: {}".format(self.pos_hint))
-            Debug.Log("size_hint_x of layout: {}".format(self.size_hint_x))
-            Debug.Log("size_hint_y of layout: {}".format(self.size_hint_y))
-            Debug.Log("size_hint_max_x of layout: {}".format(self.size_hint_max_x))
-            Debug.Log("size_hint_max_y of layout: {}".format(self.size_hint_max_y))
-            Debug.Log("size_hint_min_x of layout: {}".format(self.size_hint_min_x))
-            Debug.Log("size_hint_min_y of layout: {}".format(self.size_hint_min_y))
-            Debug.Log("parent: {}".format(str(self.parent)))
-
             self.orientation = "vertical"
-            self.padding = 50
-            self.spacing = 25
+            self.padding = 25
+            self.spacing = 50
 
             self.showTrack = TextButton(initialFont = ButtonFont, wantedText = "Hide Track")
             self.showFilling = TextButton(initialFont = ButtonFont, wantedText = "Hide Filling")
             self.showBackground = TextButton(initialFont = ButtonFont, wantedText = "Hide Background")
             self.switchState    = TextButton(initialFont = ButtonFont, wantedText = "Switch State")
 
-            self.showTrack.on_press = self.getMeTheFuckingValues
-
             self.add_widget(self.showTrack)
             self.add_widget(self.showFilling)
             self.add_widget(self.showBackground)
             self.add_widget(self.switchState)
+
+            self.showTrack.State = States.Active
+            self.showFilling.State = States.Active
+            self.showBackground.State = States.Active
+            self.switchState.State = States.Active
 
             with self.canvas:
                 self.color = Color(0, 0, 1, 1)  # red
@@ -115,27 +97,13 @@ class SliderLayout(BoxLayout):
             Debug.Start("SliderLayout")
             super(SliderLayout, self).__init__(**kwargs)
 
-            Debug.Log("Size of layout: {}".format(self.size))
-            Debug.Log("Pos of layout: {}".format(self.pos))
-            Debug.Log("size_hint_max of layout: {}".format(self.size_hint_max))
-            Debug.Log("size_hint_min of layout: {}".format(self.size_hint_min))
-            Debug.Log("pos_hint of layout: {}".format(self.pos_hint))
-            Debug.Log("size_hint_x of layout: {}".format(self.size_hint_x))
-            Debug.Log("size_hint_y of layout: {}".format(self.size_hint_y))
-            Debug.Log("size_hint_max_x of layout: {}".format(self.size_hint_max_x))
-            Debug.Log("size_hint_max_y of layout: {}".format(self.size_hint_max_y))
-            Debug.Log("size_hint_min_x of layout: {}".format(self.size_hint_min_x))
-            Debug.Log("size_hint_min_y of layout: {}".format(self.size_hint_min_y))
-
-            Debug.Log("parent: {}".format(str(self.parent)))
-
             self.padding = 50
             self.spacing = 25
 
             self.valueSlider    = Slider(min = 0, max = 100)
-            self.fillingWidth   = Slider(min = 10, max = 100)
-            self.trackWidth     = Slider(min = 10, max = 100)
-            self.startAngle     = Slider(min = -180, max = 180)
+            self.fillingWidth   = Slider(min = 0, max = 100)
+            self.trackWidth     = Slider(min = 0, max = 100)
+            self.startAngle     = Slider(min = -360, max = 360)
             self.endAngle       = Slider(min = -360, max = 360)
 
             self.valueSlider.orientation = "vertical"
@@ -181,25 +149,18 @@ class DialLayout(BoxLayout):
             Debug.Start("DialLayout")
             super(DialLayout, self).__init__(**kwargs)
 
-            Debug.Log("Size of layout: {}".format(self.size))
-            Debug.Log("Pos of layout: {}".format(self.pos))
-            Debug.Log("size_hint_max of layout: {}".format(self.size_hint_max))
-            Debug.Log("size_hint_min of layout: {}".format(self.size_hint_min))
-            Debug.Log("pos_hint of layout: {}".format(self.pos_hint))
-            Debug.Log("size_hint_x of layout: {}".format(self.size_hint_x))
-            Debug.Log("size_hint_y of layout: {}".format(self.size_hint_y))
-            Debug.Log("size_hint_max_x of layout: {}".format(self.size_hint_max_x))
-            Debug.Log("size_hint_max_y of layout: {}".format(self.size_hint_max_y))
-            Debug.Log("size_hint_min_x of layout: {}".format(self.size_hint_min_x))
-            Debug.Log("size_hint_min_y of layout: {}".format(self.size_hint_min_y))
-            Debug.Log("parent: {}".format(str(self.parent)))
+            self.padding = 50
+            self.spacing = 50
+            self.orientation = "vertical"
 
             self.PieChartDial = PieChartDial(min=0, max=100, endAngle=360, startAngle=0)
             self.PieChartDial.animated = True
 
-            with self.canvas:
-                Color(1, 0, 0, 1)  # red
+            self.Information = TextButton(initialFont=ButtonFont)
+            self.Information.Text = "PieChartDial"
 
+
+            self.add_widget(self.Information)
             self.add_widget(self.PieChartDial)
             Debug.End()
     #endregion
@@ -212,24 +173,96 @@ class WindowLayout(BoxLayout):
     #region   --------------------------- MEMBERS
     #endregion
     #region   --------------------------- METHODS
+    def HideTrack(self):
+        if(self.dials.PieChartDial.ShowTrack):
+            self.dials.PieChartDial.ShowTrack = False
+            self.buttons.showTrack.State = States.Inactive
+            self.buttons.showTrack.Text  = "Show track"
+        else:
+            self.dials.PieChartDial.ShowTrack = True
+            self.buttons.showTrack.State = States.Active
+            self.buttons.showTrack.Text  = "Hide track"
+    def HideFilling(self):
+        if(self.dials.PieChartDial.ShowFilling):
+            self.dials.PieChartDial.ShowFilling = False
+            self.buttons.showFilling.State = States.Inactive
+            self.buttons.showFilling.Text  = "Show Filling"
+        else:
+            self.dials.PieChartDial.ShowFilling = True
+            self.buttons.showFilling.State = States.Active
+            self.buttons.showFilling.Text  = "Hide Filling"
+    def HideBackground(self):
+        if(self.dials.PieChartDial.ShowBackground):
+            self.dials.PieChartDial.ShowBackground = False
+            self.buttons.showBackground.State = States.Inactive
+            self.buttons.showBackground.Text  = "Show Background"
+        else:
+            self.dials.PieChartDial.ShowBackground = True
+            self.buttons.showBackground.State = States.Active
+            self.buttons.showBackground.Text  = "Hide Background"
+    def SwitchState(self):
+        state = self.dials.PieChartDial.State
+
+        if(state == 7):
+            self.dials.PieChartDial.State = States.Disabled
+            self.dials.Information.State = States.Disabled
+            self.dials.Information.Text = "State: Disabled"
+        else:
+            state += 1
+
+            if state == States.Active:
+                self.dials.Information.Text = "State: Active"
+            if state == States.Inactive:
+                self.dials.Information.Text = "State: Inactive"
+            if state == States.Warning:
+                self.dials.Information.Text = "State: Warning"
+            if state == States.Warning:
+                self.dials.Information.Text = "State: Warning"
+            if state == States.Error:
+                self.dials.Information.Text = "State: Error"
+            if state == States.Locked:
+                self.dials.Information.Text = "State: Locked"
+            if state == States.Unavailable:
+                self.dials.Information.Text = "State: Unavailable"
+            if state == States.Good:
+                self.dials.Information.Text = "State: Good"
+
+            self.dials.Information.State = state
+            self.dials.PieChartDial.State = state
+    def SetValue(self, *args):
+        self.dials.PieChartDial.animated = False
+        self.dials.PieChartDial.Value = self.sliders.valueSlider.value
+        self.dials.Information.Text = "Value: {}".format(int(self.sliders.valueSlider.value))
+        self.dials.PieChartDial.animated = True
+
+    def SetEnd(self, *args):
+        self.dials.PieChartDial.animated = False
+        self.dials.PieChartDial.SetAttributes(endAngle = self.sliders.endAngle.value, startAngle= self.sliders.startAngle.value)
+        self.dials.Information.Text = "End angle: {}".format(int(self.sliders.endAngle.value))
+        self.dials.PieChartDial.animated = True
+
+    def SetStart(self, *args):
+        self.dials.PieChartDial.animated = False
+        self.dials.PieChartDial.SetAttributes(startAngle= self.sliders.startAngle.value, endAngle=self.sliders.endAngle.value)
+        self.dials.Information.Text = "Start angle: {}".format(int(self.sliders.startAngle.value))
+        self.dials.PieChartDial.animated = True
+
+    def SetTrackWidth(self, *args):
+        self.dials.PieChartDial.animated = False
+        self.dials.PieChartDial.SetAttributes(TrackWidth=self.sliders.trackWidth.value)
+        self.dials.Information.Text = "Track: {}".format(int(self.sliders.trackWidth.value))
+        self.dials.PieChartDial.animated = True
+
+    def SetFillingWidth(self, *args):
+        self.dials.PieChartDial.animated = False
+        self.dials.PieChartDial.SetAttributes(FillingWidth=self.sliders.fillingWidth.value)
+        self.dials.Information.Text = "Filling: {}".format(int(self.sliders.fillingWidth.value))
+        self.dials.PieChartDial.animated = True
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, **kwargs):
             Debug.Start("WindowLayout")
             super(WindowLayout, self).__init__(**kwargs)
-
-            Debug.Log("Size of layout: {}".format(self.size))
-            Debug.Log("Pos of layout: {}".format(self.pos))
-            Debug.Log("size_hint_max of layout: {}".format(self.size_hint_max))
-            Debug.Log("size_hint_min of layout: {}".format(self.size_hint_min))
-            Debug.Log("pos_hint of layout: {}".format(self.pos_hint))
-            Debug.Log("size_hint_x of layout: {}".format(self.size_hint_x))
-            Debug.Log("size_hint_y of layout: {}".format(self.size_hint_y))
-            Debug.Log("size_hint_max_x of layout: {}".format(self.size_hint_max_x))
-            Debug.Log("size_hint_max_y of layout: {}".format(self.size_hint_max_y))
-            Debug.Log("size_hint_min_x of layout: {}".format(self.size_hint_min_x))
-            Debug.Log("size_hint_min_y of layout: {}".format(self.size_hint_min_y))
-            Debug.Log("parent: {}".format(str(self.parent)))
 
             self.buttons = ButtonLayout()
             self.dials   = DialLayout()
@@ -238,6 +271,24 @@ class WindowLayout(BoxLayout):
             self.add_widget(self.buttons)
             self.add_widget(self.dials)
             self.add_widget(self.sliders)
+
+            self.buttons.switchState.on_press = self.SwitchState
+            self.buttons.showTrack.on_press = self.HideTrack
+            self.buttons.showFilling.on_press = self.HideFilling
+            self.buttons.showBackground.on_press = self.HideBackground
+
+            self.sliders.valueSlider.bind(value = self.SetValue)
+            self.sliders.startAngle.bind(value = self.SetStart)
+            self.sliders.endAngle.bind(value = self.SetEnd)
+            self.sliders.trackWidth.bind(value = self.SetTrackWidth)
+            self.sliders.fillingWidth.bind(value = self.SetFillingWidth)
+
+            self.sliders.valueSlider.value = self.dials.PieChartDial.Value
+            self.sliders.startAngle.value = self.dials.PieChartDial.Properties.startAngle
+            self.sliders.endAngle.value = self.dials.PieChartDial.Properties.endAngle
+            self.sliders.trackWidth.value = self.dials.PieChartDial.Properties.trackWidth
+            self.sliders.fillingWidth.value = self.dials.PieChartDial.Properties.fillingWidth
+
             Debug.End()
     #endregion
 
@@ -264,9 +315,9 @@ class KivyUIApp(App):
         Window.fullscreen = 'auto'
         #---------------------------------------------------------#
         Debug.Log("Building layouts")
-        Debug.End()
 
         self.windowLayout = WindowLayout()
+        Debug.End()
         return self.windowLayout
 
     def run(self):

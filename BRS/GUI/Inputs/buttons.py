@@ -136,11 +136,15 @@ class TextButton(ButtonBehavior, Widget):
             Updates the shape of the widget whenever it's
             attributes are changed. (pos/size)
         """
+        Debug.Start("TextButton: _UpdateShape")
+        
+        Debug.Log("pos: {}".format(self.pos))
         self.rect.pos = self.pos
         self.rect.size = self.size
         self.rect.radius = [self.radius, self.radius, self.radius, self.radius]
         self._label.size = self.size
         self._label.pos = self.pos
+        Debug.End()
     # ------------------------------------------------------
     #endregion
     # region   --------------------------- CONSTRUCTOR

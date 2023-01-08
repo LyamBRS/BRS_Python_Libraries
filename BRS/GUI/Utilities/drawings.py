@@ -5,9 +5,6 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from ctypes import sizeof
-import math
-from tracemalloc import start
 from BRS.Debug.consoleLog import Debug
 from kivy.clock import Clock
 from kivy.graphics import Ellipse
@@ -22,10 +19,10 @@ def UpdateEllipse(Properties, widget, type:str, ellipse):
 
     if(type == "Track"):
         # Debug.Log("\nGetting Track ellipse")
-        ellipse.pos  = (widget.pos[0] + Properties.trackWidth/2,
-                        widget.pos[1] + Properties.trackWidth/2)
-        ellipse.size = (widget.size[0] - Properties.trackWidth,
-                        widget.size[1] - Properties.trackWidth)
+        ellipse.pos  = (Properties.pos[0] + Properties.trackWidth/2,
+                        Properties.pos[1] + Properties.trackWidth/2)
+        ellipse.size = (Properties.size[0] - Properties.trackWidth,
+                        Properties.size[1] - Properties.trackWidth)
 
         ellipse.angle_start = Properties.startAngle
         ellipse.angle_end   = Properties.endAngle
@@ -37,10 +34,10 @@ def UpdateEllipse(Properties, widget, type:str, ellipse):
         # Debug.Log("Max = {}".format(Properties.max))
     else:
         # Debug.Log("\nGetting Filling ellipse")
-        ellipse.pos  = (widget.pos[0] + Properties.fillingWidth/2,
-                        widget.pos[1] + Properties.fillingWidth/2)
-        ellipse.size = (widget.size[0] - Properties.fillingWidth,
-                        widget.size[1] - Properties.fillingWidth)
+        ellipse.pos  = (Properties.pos[0] + Properties.fillingWidth/2,
+                        Properties.pos[1] + Properties.fillingWidth/2)
+        ellipse.size = (Properties.size[0] - Properties.fillingWidth,
+                        Properties.size[1] - Properties.fillingWidth)
 
         ratio = (Properties.value - Properties.min) / (Properties.max - Properties.min)
         ellipse.angle_start = Properties.startAngle
@@ -79,7 +76,7 @@ def GetEllipse(Properties, widget, type:str):
         # Debug.Log("Start angle: {}".format(startAngle))
         # Debug.Log("End angle: {}".format(endAngle))
 
-    position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
+    position = (Properties.pos[0] + ellipseWidth, Properties.pos[1] + ellipseWidth)
 
     width   = widget.size[0] - (Properties.fillingWidth * 2)
     height  = widget.size[1] - (Properties.trackWidth * 2)
@@ -134,6 +131,15 @@ class DrawingProperties:
     """The current filling color. The filling is shown above the track and represents the displayed value"""
     backgroundColor = [0,0,0,0]
     """The widget's background color defined by it's boundaries. Defaults to [0,0,0,0]"""
+
+    pos = (0,0)
+    """ The widgets position property. Do not use the widget's actual position as it sets itself when inside of layouts
+        Defaults to 0,0
+    """
+    size = (100,100)
+    """ The widgets size property. Do not use the widget's actual size as it sets itself when inside of layouts
+        Defaults to 100,100
+    """
     #endregion
     #region   --------------------------- METHODS
     def TestValue(self, valueToTest) -> float:
@@ -387,7 +393,7 @@ class Animated:
             Will automatically start the animation
         """
         # region --- [Step 0]: Build argument dictionary
-        # Debug.Log("Building original arguments for Animation")
+        Debug.Log("Building original arguments for Animation")
         arguments = {
                         "_animated_value"         : self._animated_wantedValue,
                         "_animated_pos"           : self._animated_wantedPos,
@@ -398,7 +404,7 @@ class Animated:
                         "_animated_endAngle"      : self._animated_wantedEndAngle,
                         "_animated_startAngle"    : self._animated_wantedStartAngle,
                         "_animated_fillingWidth"  : self._animated_wantedFillingWidth,
-                        "_animated_trackWidth"  : self._animated_wantedTrackWidth
+                        "_animated_trackWidth"    : self._animated_wantedTrackWidth
                     }
 
         comparator = {
@@ -413,9 +419,12 @@ class Animated:
                         "_animated_fillingWidth"  : self._animated_fillingWidth,
                         "_animated_trackWidth"    : self._animated_trackWidth
                     }
+
+        Debug.Log("Arguments before pop: {}".format(arguments))
+        Debug.Log("comparator before pop: {}".format(comparator))
         # endregion
         # region --- [Step 1]: Pop arguments equal to themselves
-        # Debug.Log("Removing unused arguments from argument list...")
+        Debug.Log("Removing unused arguments from argument list...")
         keys_to_remove = []
 
         for current, wanted in arguments.items():
@@ -432,7 +441,7 @@ class Animated:
         arguments["d"] = duration
         arguments["t"] = transition
         Debug.Log(str(arguments))
-        # Debug.Log("Success")
+        Debug.Log("Success")
         # endregion
         # region --- [Step 2]: Build and return the Animation to execute
         animation = Animation(**arguments)
@@ -500,14 +509,15 @@ class Animated:
         pass
     def _InstantAnimation(self):
         """ Will make all values equal to their wanted equivalent """
+        Debug.Start("_InstantAnimation")
         self._animated_backgroundColor = self._animated_wantedBackgroundColor
         self._animated_fillingColor = self._animated_wantedFillingColor
         self._animated_trackColor = self._animated_wantedTrackColor
 
-        self._animated_size = self._animated_wantedSize
-        self._animated_pos = self._animated_wantedPos
-        self._animated_size_hint = self._animated_wantedSize_hint
-        self._animated_pos_hint = self._animated_wantedPos_hint
+        self._animated_size = (self._animated_wantedSize[0], self._animated_wantedSize[1])
+        self._animated_pos  = (self._animated_wantedPos[0], self._animated_wantedPos[1])
+        self._animated_size_hint    = (self._animated_wantedSize_hint[0], self._animated_wantedSize_hint[1])
+        self._animated_pos_hint     = (self._animated_wantedPos_hint[0], self._animated_wantedPos_hint[1])
         self._animated_radius = self._animated_wantedRadius
         self._animated_value = self._animated_wantedValue
 
@@ -516,6 +526,7 @@ class Animated:
 
         self._animated_trackWidth = self._animated_wantedTrackWidth
         self._animated_fillingWidth = self._animated_wantedFillingWidth
+        Debug.End()
     def _Animated_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
         """
             Transfer specified currently stored value of your class's
@@ -525,7 +536,7 @@ class Animated:
 
             copy = from theseProperty, copy ("None","All","Colors","Shapes")
         """
-
+        Debug.Start("_Animated_Get")
         def Check(thisProperty):
             return (thisProperty != None)
 
@@ -549,12 +560,13 @@ class Animated:
                 self._animated_value        = fromTheseProperties.value
 
                 if(Check(self.pos)):
-                    Debug.Log("========================= POS")
-                    self._animated_pos = self.pos
+                    Debug.Log("Gotten pos: {}".format(self.pos))
+                    # self._animated_pos = (self.pos[0], self.pos[1])
 
                 if(Check(self.size)):
-                    Debug.Log("========================= SIZE")
-                    self._animated_size = self.size
+                    Debug.Log("Gotten size: {}".format(self.size))
+                    # self._animated_size = (self.size[0], self.size[1])
+        Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
