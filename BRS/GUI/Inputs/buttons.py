@@ -49,6 +49,8 @@ class TextButton(ButtonBehavior, Widget):
     """ wanted color used for Animations. This is automatically handled by the State get set """
     heightPadding = 30
     """ How many pixels should seperate the text from the top and bottom of the button. Defaults to 30 """
+    animation = Animation()
+    """Represents the TextButton's animation object"""
     #endregion
     # region   --------------------------- GET SET
     @property
@@ -124,6 +126,7 @@ class TextButton(ButtonBehavior, Widget):
         self._wantedColor = wantedColor
         self._currentColor = self.color.rgba
 
+        self.animation.stop_all(self)
         self.animation = Animation(_currentColor = self._wantedColor, duration = duration)
         self.animation.bind(on_progress = self._Animating)
         self.animation.start(self)

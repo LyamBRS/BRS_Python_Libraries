@@ -264,56 +264,23 @@ class PieChartDial(Animated, Widget):
                         showFilling = None):
         """
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
+            This will only call UpdateShapes Once.
         """
 
-        if position == None:
-            position = (self._animated_pos[0], self._animated_pos[1])
+        # [Step 0]: Set wanted animation goals
+        self._animated_wantedFillingWidth = self._animated_fillingWidth if (FillingWidth == None)   else FillingWidth
+        self._animated_wantedTrackWidth   = self._animated_trackWidth   if (TrackWidth == None)     else TrackWidth
+        self._animated_wantedStartAngle   = self._animated_startAngle   if (startAngle == None)     else startAngle
+        self._animated_wantedEndAngle     = self._animated_endAngle     if (endAngle == None)       else endAngle
+        self._animated_wantedValue        = self._animated_value        if (value == None)          else self.Properties.TestValue(value)
+        self._animated_wantedPos          = (self._animated_wantedPos[0],self._animated_wantedPos[1]) if (position == None) else (position[0],position[1])
+        self._animated_wantedSize         = (self._animated_wantedSize[0],self._animated_wantedSize[1]) if (size == None) else (size[0],size[1])
 
-        if size == None:
-            size = (self._animated_size[0], self._animated_size[1])
-
-        self._animated_wantedFillingWidth = self._animated_fillingWidth if FillingWidth==None else FillingWidth
-        self._animated_wantedTrackWidth   = self._animated_trackWidth if TrackWidth==None else TrackWidth
-        self._animated_wantedPos          = (self._animated_wantedPos[0],self._animated_wantedPos[1]) if position==None else (position[0],position[1])
-        self._animated_wantedSize         = (self._animated_wantedSize[0],self._animated_wantedSize[1]) if size==None else (size[0],size[1])
-        self._animated_wantedStartAngle   = self._animated_startAngle if startAngle==None else startAngle
-        self._animated_wantedEndAngle     = self._animated_endAngle if endAngle==None else endAngle
-        self._animated_wantedValue        = self._animated_value if value==None else self.Properties.TestValue(value)
-
-        self.Properties.showFilling = self.Properties.showFilling if showFilling==None else showFilling
-        self.Properties.showTrack = self.Properties.showTrack if showTrack==None else showTrack
-        self.Properties.showBackground = self.Properties.showBackground if showBackground==None else showBackground
+        self.Properties.showFilling     = self.Properties.showFilling       if (showFilling == None)    else showFilling
+        self.Properties.showTrack       = self.Properties.showTrack         if (showTrack == None)      else showTrack
+        self.Properties.showBackground  = self.Properties.showBackground    if (showBackground == None) else showBackground
 
         self._UpdateShape()
-    # -------------------------------------------
-    def SetAttributesFromParent(self):
-        """
-            This is called after the widget is added to the layout.
-            It is impossible for the code to know that sort of shit in the __init__
-            so this will make your widget relative in the parents layout area.
-        """
-        Debug.Start("SetAttributesFromParent")
-        Debug.Log("Automatically positioning widget based off parent's informations")
-
-        # - Step 0 - Pos and sizes
-        Debug.Log("Size of Parent: {}".format(self.parent.size))
-        Debug.Log("Pos of Parent: {}".format(self.parent.pos))
-        Debug.Log("size_hint_max of Parent: {}".format(self.parent.size_hint_max))
-        Debug.Log("size_hint_min of Parent: {}".format(self.parent.size_hint_min))
-        Debug.Log("pos_hint of Parent: {}".format(self.parent.pos_hint))
-        Debug.Log("size_hint_x of Parent: {}".format(self.parent.size_hint_x))
-        Debug.Log("size_hint_y of Parent: {}".format(self.parent.size_hint_y))
-        Debug.Log("size_hint_max_x of Parent: {}".format(self.parent.size_hint_max_x))
-        Debug.Log("size_hint_max_y of Parent: {}".format(self.parent.size_hint_max_y))
-        Debug.Log("size_hint_min_x of Parent: {}".format(self.parent.size_hint_min_x))
-        Debug.Log("size_hint_min_y of Parent: {}".format(self.parent.size_hint_min_y))
-        # self._animated_wantedPos = self.to_parent(self.pos)
-        # self._animated_wantedSize = self.to_parent(self.size)
-
-        # - Instant animation to put the widget back to where it should've been by default.
-        self._InstantAnimation()
-        self._UpdateShape()
-        Debug.End()
     #endregion
     #region   -- Private
     def _UpdateColors(self, instance, value):
@@ -323,12 +290,13 @@ class PieChartDial(Animated, Widget):
         Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         # Debug.Log("[Step 0]:")
-        self._animated_wantedFillingColor   = StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling else (0,0,0,0)
-        self._animated_wantedTrackColor     = StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack else (0,0,0,0)
-        self._animated_wantedBackgroundColor= StatesColors.Text.GetColorFrom(self._state) if self.Properties.showBackground else (0,0,0,0)
+        self._animated_wantedFillingColor    = StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling    else (0,0,0,0)
+        self._animated_wantedTrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack      else (0,0,0,0)
+        self._animated_wantedBackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self.Properties.showBackground else (0,0,0,0)
 
         # [Step 1]: Set animation's current values
         # Debug.Log("[Step 1]:")
+        Debug.Log("Color : {}".format(self.Properties.fillingColor.rgba))
         self._animated_fillingColor     = self.Properties.fillingColor.rgba
         self._animated_trackColor       = self.Properties.trackColor.rgba
         self._animated_backgroundColor  = self.Properties.backgroundColor.rgba
@@ -344,52 +312,41 @@ class PieChartDial(Animated, Widget):
         Debug.End()
     # ------------------------------------------------------
     def _UpdatePos(self, *args):
+        """
+            Called when the pos property is changed. This is called by
+            itself, do not call this function yourself.
+
+            *args = [object, (x,y)]
+        """
         Debug.Start("[PieChartDial]: _UpdatePos")
-        Debug.Log("_animated_wantedPos : {}".format(self._animated_wantedPos))
-        Debug.Log("_animated_wantedSize : {}".format(self._animated_wantedSize))
-        Debug.Log("_animated_pos : {}".format(self._animated_pos))
-        Debug.Log("_animated_size : {}".format(self._animated_size))
         self._animated_wantedPos = (args[1][0], args[1][1])
-        Debug.Log("_animated_wantedPos : {}".format(self._animated_wantedPos))
-        Debug.Log("_animated_wantedSize : {}".format(self._animated_wantedSize))
-        Debug.Log("_animated_pos : {}".format(self._animated_pos))
-        Debug.Log("_animated_size : {}".format(self._animated_size))
         self._UpdateShape()
         Debug.End()
     # ------------------------------------------------------
     def _UpdateSize(self, *args):
+        """
+            Called when the size property is changed. This is called by
+            itself, do not call this function yourself.
+
+            *args = [object, (width,height)]
+        """
         Debug.Start("[PieChartDial]: _UpdateSize")
-        Debug.Log("_animated_wantedPos : {}".format(self._animated_wantedPos))
-        Debug.Log("_animated_wantedSize : {}".format(self._animated_wantedSize))
-        Debug.Log("_animated_pos : {}".format(self._animated_pos))
-        Debug.Log("_animated_size : {}".format(self._animated_size))
         self._animated_wantedSize = (args[1][0], args[1][1])
-        Debug.Log("_animated_wantedPos : {}".format(self._animated_wantedPos))
-        Debug.Log("_animated_wantedSize : {}".format(self._animated_wantedSize))
-        Debug.Log("_animated_pos : {}".format(self._animated_pos))
-        Debug.Log("_animated_size : {}".format(self._animated_size))
         self._UpdateShape()
         Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self):
         """
-            Updates the general shape of the widget.
+            Function called to setup the Animations and variables
+            needed to update the widget's shape.
+
+            Do not call this function outside of this widget
         """
         Debug.Start("_UpdateShape")
-        # Debug.Log("Updating the shape of the PieChartDial")
-        Debug.Log("_animated_wantedPos : {}".format(self._animated_wantedPos))
-        Debug.Log("_animated_wantedSize : {}".format(self._animated_wantedSize))
-        Debug.Log("_animated_pos : {}".format(self._animated_pos))
-        Debug.Log("_animated_size : {}".format(self._animated_size))
-        # Debug.Log("Setting animation parameters")
+        # [Step 0]: Getting valus from widget properties
         self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
-        Debug.Log("_animated_wantedPos : {}".format(self._animated_wantedPos))
-        Debug.Log("_animated_wantedSize : {}".format(self._animated_wantedSize))
-        Debug.Log("_animated_pos : {}".format(self._animated_pos))
-        Debug.Log("_animated_size : {}".format(self._animated_size))
-
-        # Debug.Log("Launching shape animator")
+        # [Step 1]: Checking if widget should have animations or not
         if(self.animated):
             self._StartShapeAnimation()
         else:
@@ -400,8 +357,8 @@ class PieChartDial(Animated, Widget):
     def _AnimatingShapes(self, animation, value, theOtherOne):
         """ Called when Animations are executed """
         Debug.Start("_AnimatingShapes")
-        # [Step 0]: Save private values as actual values
-        # Debug.Log("Value : {}".format(self.Animating.value))
+
+        # [Step 0]: Save private values as actual Widget properties
         self.Properties.value         = self._animated_value
         self.Properties.endAngle      = self._animated_endAngle
         self.Properties.startAngle    = self._animated_startAngle
@@ -409,16 +366,13 @@ class PieChartDial(Animated, Widget):
         self.Properties.trackWidth    = self._animated_trackWidth
         self.Properties.pos           = (self._animated_pos[0], self._animated_pos[1])
         self.Properties.size          = (self._animated_size[0], self._animated_size[1])
-
-        Debug.Log("Property = {}".format(self.Properties.pos))
+        # Debug.Log("Property = {}".format(self.Properties.pos))
 
         # [Step 1]: Update drawings based on new values
-        # Debug.Log("[Step 1]")
         UpdateEllipse(self.Properties, self, "Track", self.Track)
         UpdateEllipse(self.Properties, self, "Filling", self.Filling)
 
         # [Step 2]: Update background's positions
-        # Debug.Log("[Step 2]")
         self.rect.pos   = (self._animated_pos[0], self._animated_pos[1])
         self.rect.size  = (self._animated_size[0], self._animated_size[1])
         Debug.End()
@@ -426,7 +380,8 @@ class PieChartDial(Animated, Widget):
     def _AnimatingColors(self, animation, value, theOtherOne):
         """ Called when color related animations are executed """
         Debug.Start("_AnimatingColors")
-        # [Step 0]: Save private values as actual values
+
+        # [Step 0]: Update widget's colors with these colors
         self.Properties.trackColor.rgba   = self._animated_trackColor
         self.Properties.fillingColor.rgba = self._animated_fillingColor
         self.Properties.backgroundColor.rgba = self._animated_backgroundColor

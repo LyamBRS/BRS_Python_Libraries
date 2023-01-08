@@ -240,6 +240,7 @@ class WindowLayout(BoxLayout):
         self.sliders.endAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
         self.sliders.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
         self.sliders.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
+
     def SetValue(self, *args):
         self.dials.PieChartDial.animated = False
         self.dials.PieChartDial.Value = self.sliders.valueSlider.value
