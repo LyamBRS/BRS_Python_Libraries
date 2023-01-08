@@ -5,8 +5,6 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from cgitb import text
-from multiprocessing.reduction import steal_handle
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.app import App
