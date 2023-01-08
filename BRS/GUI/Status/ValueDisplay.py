@@ -72,21 +72,21 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         Debug.Start("_AnimatingShapes")
 
         # [Step 0]: Save private values as actual Widget properties
-        self.Properties.value         = self._animated_value
-        self.Properties.endAngle      = self._animated_endAngle
-        self.Properties.startAngle    = self._animated_startAngle
-        self.Properties.fillingWidth  = self._animated_fillingWidth
-        self.Properties.trackWidth    = self._animated_trackWidth
-        self.Properties.pos           = (self._animated_pos[0], self._animated_pos[1])
-        self.Properties.size          = (self._animated_size[0], self._animated_size[1])
+        self.Properties.value         = self._current_value
+        self.Properties.endAngle      = self._current_endAngle
+        self.Properties.startAngle    = self._current_startAngle
+        self.Properties.fillingWidth  = self._current_fillingWidth
+        self.Properties.trackWidth    = self._current_trackWidth
+        self.Properties.pos           = (self._current_pos[0], self._current_pos[1])
+        self.Properties.size          = (self._current_size[0], self._current_size[1])
 
         # [Step 1]: Update drawings based on new values
         UpdateEllipse(self.Properties, self, "Track", self.Track)
         UpdateEllipse(self.Properties, self, "Filling", self.Filling)
 
         # [Step 2]: Update background's positions
-        self.rect.pos   = (self._animated_pos[0], self._animated_pos[1])
-        self.rect.size  = (self._animated_size[0], self._animated_size[1])
+        self.rect.pos   = (self._current_pos[0], self._current_pos[1])
+        self.rect.size  = (self._current_size[0], self._current_size[1])
         Debug.End()
     # ------------------------------------------------------
     def _AnimatingColors(self, animation, value, theOtherOne):
@@ -94,9 +94,9 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         Debug.Start("_AnimatingColors")
 
         # [Step 0]: Update widget's colors with these colors
-        self.trackColor.rgba   = self._animated_trackColor
-        self.fillingColor.rgba = self._animated_fillingColor
-        self.backgroundColor.rgba = self._animated_backgroundColor
+        self.trackColor.rgba   = self._current_trackColor
+        self.fillingColor.rgba = self._current_fillingColor
+        self.backgroundColor.rgba = self._current_backgroundColor
         Debug.End()
     #endregion
     #endregion
@@ -151,43 +151,43 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         #endregion
         #region --------------------------- Set Animation Properties
         Debug.Log("Setting PieChartDial's color animation properties")
-        # self._animated_backgroundColor      = self.Properties.backgroundColor.rgba
-        # self._animated_wantedBackgroundColor= self.Properties.backgroundColor.rgba
-        # self._animated_fillingColor         = self.Properties.fillingColor.rgba
-        # self._animated_wantedFillingColor   = self.Properties.fillingColor.rgba
-        # self._animated_trackColor           = self.Properties.trackColor.rgba
-        # self._animated_wantedTrackColor     = self.Properties.trackColor.rgba
+        # self._current_backgroundColor      = self.Properties.backgroundColor.rgba
+        # self._wanted_BackgroundColor= self.Properties.backgroundColor.rgba
+        # self._current_fillingColor         = self.Properties.fillingColor.rgba
+        # self._wanted_FillingColor   = self.Properties.fillingColor.rgba
+        # self._current_trackColor           = self.Properties.trackColor.rgba
+        # self._wanted_TrackColor     = self.Properties.trackColor.rgba
 
-        self._animated_backgroundColor       = self.backgroundColor.rgba
-        self._animated_wantedBackgroundColor = self.backgroundColor.rgba
-        self._animated_fillingColor          = self.fillingColor.rgba
-        self._animated_wantedFillingColor    = self.fillingColor.rgba
-        self._animated_trackColor            = self.trackColor.rgba
-        self._animated_wantedTrackColor      = self.trackColor.rgba
+        self._current_backgroundColor       = self.backgroundColor.rgba
+        self._wanted_BackgroundColor = self.backgroundColor.rgba
+        self._current_fillingColor          = self.fillingColor.rgba
+        self._wanted_FillingColor    = self.fillingColor.rgba
+        self._current_trackColor            = self.trackColor.rgba
+        self._wanted_TrackColor      = self.trackColor.rgba
 
         Debug.Log("Setting PieChartDial's shape animation properties")
-        self._animated_pos                 = (self.pos[0], self.pos[1])
-        self._animated_wantedPos           = (self.pos[0], self.pos[1])
+        self._current_pos                 = (self.pos[0], self.pos[1])
+        self._wanted_Pos           = (self.pos[0], self.pos[1])
 
-        self._animated_size                 = (self.size[0], self.size[1])
-        self._animated_wantedSize           = (self.size[0], self.size[1])
+        self._current_size                 = (self.size[0], self.size[1])
+        self._wanted_Size           = (self.size[0], self.size[1])
 
-        self._animated_pos_hint             = (self.pos[0], self.pos[1])
-        self._animated_wantedPos_hint       = (self.pos[0], self.pos[1])
+        self._current_pos_hint             = (self.pos[0], self.pos[1])
+        self._wanted_Pos_hint       = (self.pos[0], self.pos[1])
 
-        self._animated_size_hint            = (self.size[0], self.size[1])
-        self._animated_wantedSize_hint      = (self.size[0], self.size[1])
+        self._current_size_hint            = (self.size[0], self.size[1])
+        self._wanted_Size_hint      = (self.size[0], self.size[1])
 
-        self._animated_value                = self.Properties.value
-        self._animated_wantedValue          = self.Properties.value
-        self._animated_endAngle             = self.Properties.endAngle
-        self._animated_wantedEndAngle       = self.Properties.endAngle
-        self._animated_startAngle           = self.Properties.startAngle
-        self._animated_wantedStartAngle     = self.Properties.startAngle
-        self._animated_fillingWidth         = self.Properties.fillingWidth
-        self._animated_trackWidth           = self.Properties.trackWidth
-        self._animated_wantedFillingWidth   = self.Properties.fillingWidth
-        self._animated_wantedTrackWidth     = self.Properties.trackWidth
+        self._current_value                = self.Properties.value
+        self._wanted_Value          = self.Properties.value
+        self._current_endAngle             = self.Properties.endAngle
+        self._wanted_EndAngle       = self.Properties.endAngle
+        self._current_startAngle           = self.Properties.startAngle
+        self._wanted_StartAngle     = self.Properties.startAngle
+        self._current_fillingWidth         = self.Properties.fillingWidth
+        self._current_trackWidth           = self.Properties.trackWidth
+        self._wanted_FillingWidth   = self.Properties.fillingWidth
+        self._wanted_TrackWidth     = self.Properties.trackWidth
 
 
         #endregion

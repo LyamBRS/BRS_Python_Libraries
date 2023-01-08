@@ -202,14 +202,14 @@ class Animated:
         The animation's duration in seconds
     """
 
-    _animated_wantedBackgroundColor         = [0,0,0,0]
+    _wanted_BackgroundColor     = [0,0,0,0]
     """
         Private variable used to store the wanted primary color of
         the widget. Defaults to [0,0,0,0].
 
         Only set this before starting your animation.
     """
-    _animated_backgroundColor               = [0,0,0,0]
+    _current_backgroundColor    = [0,0,0,0]
     """
         Private variable used to store the current primary color of
         the widget. Defaults to [0,0,0,0].
@@ -217,14 +217,14 @@ class Animated:
         Use this to update the widget's
         real primary color in your Animation binded on_progress function.
     """
-    _animated_wantedTrackColor    = [0,0,0,0]
+    _wanted_TrackColor          = [0,0,0,0]
     """
         Private variable used to store the wanted color of the widget's
         Track. Defaults to [0,0,0,0].
 
         Only set this before starting your animation.
     """
-    _animated_trackColor          = [0,0,0,0]
+    _current_trackColor         = [0,0,0,0]
     """
         Private variable used to store the current color of the widget's
         Track. Defaults to [0,0,0,0].
@@ -232,14 +232,14 @@ class Animated:
         Use this to update the widget's
         real Track color in your Animation binded on_progress function.
     """
-    _animated_wantedFillingColor  = [0,0,0,0]
+    _wanted_FillingColor        = [0,0,0,0]
     """
         Private variable used to store the wanted color of the widget's
         Filling. Defaults to [0,0,0,0].
 
         Only set this before starting your animation.
     """
-    _animated_fillingColor        = [0,0,0,0]
+    _current_fillingColor       = [0,0,0,0]
     """
         Private variable used to store the current color of the widget's
         Filling. Defaults to [0,0,0,0].
@@ -247,21 +247,21 @@ class Animated:
         Use this to update the widget's
         real filling color in your Animation binded on_progress function.
     """
-    _animated_wantedValue         = 0
+    _wanted_Value               = 0
     """
         Used to Animate the transition between your widget's current
         value and a new value.
 
         Only set this before starting your animation.
     """
-    _animated_value               = 0
+    _current_value              = 0
     """
         Represents the current value of your widget.
 
         Use this to set your Widget's real Value variable when
         the Animation's on_progress is called
     """
-    _animated_pos                 = (0,0)
+    _current_pos                = (0,0)
     """
         Represents your widget's current position
         (x,y).
@@ -270,14 +270,14 @@ class Animated:
         Use this to update the widget's
         real position in your Animation binded on_progress function.
     """
-    _animated_wantedPos           = (0,0)
+    _wanted_Pos                 = (0,0)
     """
         Represents the wanted new position of your widget.
         Defaults to (0,0)
 
         Only set this before starting your animation.
     """
-    _animated_size                = (0,0)
+    _current_size               = (0,0)
     """
         Private variable representing your widget's current
         size. (width, height).
@@ -286,7 +286,7 @@ class Animated:
         Use this to update the widget's
         real size in your Animation binded on_progress function.
     """
-    _animated_wantedSize          = (0,0)
+    _wanted_Size                = (0,0)
     """
         Private variable which represents the
         new size to animate towards. (width, height)
@@ -294,7 +294,7 @@ class Animated:
 
         Only set this before starting your animation.
     """
-    _animated_radius              = 0
+    _current_radius             = 0
     """
         Private variable which represents your widget's real
         radius. Defaults to 0.
@@ -302,14 +302,14 @@ class Animated:
         Use this to update the widget's
         real radius in your Animation binded on_progress function.
     """
-    _animated_wantedRadius        = 0
+    _wanted_Radius              = 0
     """
         Private variable representing the new radius needed for your
         widget. Defaults to 0.
 
         Only set this before starting your animation.
     """
-    _animated_startAngle          = 0
+    _current_startAngle         = 0
     """
         Private variable representing your widget's starting angle
         in degrees. Defaults to 0.
@@ -317,14 +317,14 @@ class Animated:
         Use this to update the widget's
         real startAngle in your Animation binded on_progress function.
     """
-    _animated_wantedStartAngle    = 0
+    _wanted_StartAngle          = 0
     """
         Private variable representing your widget's new startAngle.
         Defaults to 0.
 
         Only set this before starting your animation.
     """
-    _animated_endAngle            = 0
+    _current_endAngle           = 0
     """
         Private variable representing your widget's end angle in
         degrees. Defaults to 0.
@@ -332,42 +332,42 @@ class Animated:
         Use this to update the widget's
         real endAngle in your Animation binded on_progress function.
     """
-    _animated_wantedEndAngle      = 0
+    _wanted_EndAngle            = 0
     """
         Private variable representing your widget's new startAngle.
         Defaults to 0.
 
         Only set this before starting your animation.
     """
-    _animated_fillingWidth        = 0
+    _current_fillingWidth       = 0
     """
         Private variable specifying the current width of the
         widget's filling. Defaults to 0.
 
         Set this before calling the Animation starter.
     """
-    _animated_wantedFillingWidth  = 0
+    _wanted_FillingWidth        = 0
     """
         Private variable representing your widget's new Filling width.
         Defaults to 0
 
         Only set this before starting your animation.
     """
-    _animated_trackWidth          = 0
+    _current_trackWidth         = 0
     """
         Private variable specifying the current width of the
         widget's track. Defaults to 0.
 
         Set this before calling the Animation starter.
     """
-    _animated_wantedTrackWidth    = 0
+    _wanted_TrackWidth          = 0
     """
         Private variable representing your widget's new Track width.
         Defaults to 0
 
         Only set this before starting your animation.
     """
-    _animated_pos_hint            = (0,0)
+    _current_pos_hint           = (0,0)
     """
         Represents your widget's current position
         (x,y).
@@ -376,14 +376,14 @@ class Animated:
         Use this to update the widget's
         real position in your Animation binded on_progress function.
     """
-    _animated_wantedPos_hint     = (0,0)
+    _wanted_Pos_hint            = (0,0)
     """
         Represents the wanted new position of your widget.
         Defaults to (0,0)
 
         Only set this before starting your animation.
     """
-    _animated_wantedSize_hint    = (0,0)
+    _wanted_Size_hint           = (0,0)
     """
         Private variable which represents the
         new size to animate towards. (width, height)
@@ -409,29 +409,29 @@ class Animated:
         # region --- [Step 0]: Build argument dictionary
         Debug.Log("Building original arguments for Animation")
         arguments = {
-                        "_animated_value"         : self._animated_wantedValue,
-                        "_animated_pos"           : self._animated_wantedPos,
-                        "_animated_size"          : self._animated_wantedSize,
-                        "_animated_pos_hint"      : self._animated_wantedPos_hint,
-                        "_animated_size_hint"     : self._animated_wantedSize_hint,
-                        "_animated_radius"        : self._animated_wantedRadius,
-                        "_animated_endAngle"      : self._animated_wantedEndAngle,
-                        "_animated_startAngle"    : self._animated_wantedStartAngle,
-                        "_animated_fillingWidth"  : self._animated_wantedFillingWidth,
-                        "_animated_trackWidth"    : self._animated_wantedTrackWidth
+                        "_current_value"         : self._wanted_Value,
+                        "_current_pos"           : self._wanted_Pos,
+                        "_current_size"          : self._wanted_Size,
+                        "_current_pos_hint"      : self._wanted_Pos_hint,
+                        "_current_size_hint"     : self._wanted_Size_hint,
+                        "_current_radius"        : self._wanted_Radius,
+                        "_current_endAngle"      : self._wanted_EndAngle,
+                        "_current_startAngle"    : self._wanted_StartAngle,
+                        "_current_fillingWidth"  : self._wanted_FillingWidth,
+                        "_current_trackWidth"    : self._wanted_TrackWidth
                     }
 
         comparator = {
-                        "_animated_value"         : self._animated_value,
-                        "_animated_pos"           : self._animated_pos,
-                        "_animated_size"          : self._animated_size,
-                        "_animated_pos_hint"      : self._animated_pos_hint,
-                        "_animated_size_hint"     : self._animated_size_hint,
-                        "_animated_radius"        : self._animated_radius,
-                        "_animated_endAngle"      : self._animated_endAngle,
-                        "_animated_startAngle"    : self._animated_startAngle,
-                        "_animated_fillingWidth"  : self._animated_fillingWidth,
-                        "_animated_trackWidth"    : self._animated_trackWidth
+                        "_current_value"         : self._current_value,
+                        "_current_pos"           : self._current_pos,
+                        "_current_size"          : self._current_size,
+                        "_current_pos_hint"      : self._current_pos_hint,
+                        "_current_size_hint"     : self._current_size_hint,
+                        "_current_radius"        : self._current_radius,
+                        "_current_endAngle"      : self._current_endAngle,
+                        "_current_startAngle"    : self._current_startAngle,
+                        "_current_fillingWidth"  : self._current_fillingWidth,
+                        "_current_trackWidth"    : self._current_trackWidth
                     }
 
         Debug.Log("Arguments before pop: {}".format(arguments))
@@ -481,15 +481,15 @@ class Animated:
         # region --- [Step 0]: Build argument dictionary
         Debug.Log("Building original arguments for Animation")
         arguments = {
-                        "_animated_backgroundColor"   : self._animated_wantedBackgroundColor,
-                        "_animated_trackColor"        : self._animated_wantedTrackColor,
-                        "_animated_fillingColor"      : self._animated_wantedFillingColor,
+                        "_current_backgroundColor"   : self._wanted_BackgroundColor,
+                        "_current_trackColor"        : self._wanted_TrackColor,
+                        "_current_fillingColor"      : self._wanted_FillingColor,
                     }
 
         comparator= {
-                        "_animated_backgroundColor"   : self._animated_backgroundColor,
-                        "_animated_trackColor"        : self._animated_trackColor,
-                        "_animated_fillingColor"      : self._animated_fillingColor,
+                        "_current_backgroundColor"   : self._current_backgroundColor,
+                        "_current_trackColor"        : self._current_trackColor,
+                        "_current_fillingColor"      : self._current_fillingColor,
                     }
         # endregion
         # region --- [Step 1]: Pop arguments equal to themselves
@@ -524,24 +524,24 @@ class Animated:
     def _InstantAnimation(self):
         """ Will make all values equal to their wanted equivalent """
         Debug.Start("_InstantAnimation")
-        self._animated_backgroundColor = self._animated_wantedBackgroundColor
-        self._animated_fillingColor = self._animated_wantedFillingColor
-        self._animated_trackColor = self._animated_wantedTrackColor
+        self._current_backgroundColor = self._wanted_BackgroundColor
+        self._current_fillingColor = self._wanted_FillingColor
+        self._current_trackColor = self._wanted_TrackColor
 
-        self._animated_size = (self._animated_wantedSize[0], self._animated_wantedSize[1])
-        self._animated_pos  = (self._animated_wantedPos[0], self._animated_wantedPos[1])
-        self._animated_size_hint    = (self._animated_wantedSize_hint[0], self._animated_wantedSize_hint[1])
-        self._animated_pos_hint     = (self._animated_wantedPos_hint[0], self._animated_wantedPos_hint[1])
-        self._animated_radius = self._animated_wantedRadius
-        self._animated_value = self._animated_wantedValue
+        self._current_size = (self._wanted_Size[0], self._wanted_Size[1])
+        self._current_pos  = (self._wanted_Pos[0], self._wanted_Pos[1])
+        self._current_size_hint    = (self._wanted_Size_hint[0], self._wanted_Size_hint[1])
+        self._current_pos_hint     = (self._wanted_Pos_hint[0], self._wanted_Pos_hint[1])
+        self._current_radius = self._wanted_Radius
+        self._current_value = self._wanted_Value
 
-        self._animated_endAngle = self._animated_wantedEndAngle
-        self._animated_startAngle = self._animated_wantedStartAngle
+        self._current_endAngle = self._wanted_EndAngle
+        self._current_startAngle = self._wanted_StartAngle
 
-        self._animated_trackWidth = self._animated_wantedTrackWidth
-        self._animated_fillingWidth = self._animated_wantedFillingWidth
+        self._current_trackWidth = self._wanted_TrackWidth
+        self._current_fillingWidth = self._wanted_FillingWidth
         Debug.End()
-    def _Animated_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
+    def _current_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
         """
             Transfer specified currently stored value of your class's
             DrawingProperties into the Animated class for you if inherited.
@@ -550,7 +550,7 @@ class Animated:
 
             copy = from theseProperty, copy ("None","All","Colors","Shapes")
         """
-        Debug.Start("_Animated_Get")
+        Debug.Start("_current_Get")
         def Check(thisProperty):
             return (thisProperty != None)
 
@@ -560,25 +560,25 @@ class Animated:
             # [Step 1]: Copying Current colors
             if(type == "All" or type == "Colors"):
                 if(Check(self.backgroundColor)):
-                    self._animated_backgroundColor = self.backgroundColor
-                self._animated_fillingColor = fromTheseProperties.fillingColor
-                self._animated_trackColor   = fromTheseProperties.trackColor
+                    self._current_backgroundColor = self.backgroundColor
+                self._current_fillingColor = fromTheseProperties.fillingColor
+                self._current_trackColor   = fromTheseProperties.trackColor
 
             # [Step 2]: Copying Current Shapes
             if(type == "All" or type == "Shapes"):
-                self._animated_endAngle     = fromTheseProperties.endAngle
-                self._animated_startAngle   = fromTheseProperties.startAngle
-                self._animated_fillingWidth = fromTheseProperties.fillingWidth
-                self._animated_trackWidth   = fromTheseProperties.trackWidth
-                self._animated_value        = fromTheseProperties.value
+                self._current_endAngle     = fromTheseProperties.endAngle
+                self._current_startAngle   = fromTheseProperties.startAngle
+                self._current_fillingWidth = fromTheseProperties.fillingWidth
+                self._current_trackWidth   = fromTheseProperties.trackWidth
+                self._current_value        = fromTheseProperties.value
 
                 if(Check(self.pos)):
                     Debug.Log("Gotten pos: {}".format(self.pos))
-                    # self._animated_pos = (self.pos[0], self.pos[1])
+                    # self._current_pos = (self.pos[0], self.pos[1])
 
                 if(Check(self.size)):
                     Debug.Log("Gotten size: {}".format(self.size))
-                    # self._animated_size = (self.size[0], self.size[1])
+                    # self._current_size = (self.size[0], self.size[1])
         Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
@@ -655,8 +655,8 @@ class BRS_ValueWidgetAttributes(Animated):
 
         # [Step 1]: Update the shape based on the new value
         if(newValue != self.Properties.value):
-            self._animated_value        = self.Properties.value
-            self._animated_wantedValue  = self.Properties.TestValue(newValue)
+            self._current_value        = self.Properties.value
+            self._wanted_Value  = self.Properties.TestValue(newValue)
             self._UpdateShape()
     #endregion
     #region   -- FillingWidth
@@ -679,8 +679,8 @@ class BRS_ValueWidgetAttributes(Animated):
         Debug.Start("FillingWidth")
         # [Step 1]: Update the shape based on the new value
         if(newValue != self.Properties.fillingWidth):
-            self._animated_fillingWidth        = self.Properties.fillingWidth
-            self._animated_wantedFillingWidth  = newValue
+            self._current_fillingWidth        = self.Properties.fillingWidth
+            self._wanted_FillingWidth  = newValue
             self._UpdateShape()
         Debug.End()
     #endregion
@@ -705,7 +705,7 @@ class BRS_ValueWidgetAttributes(Animated):
         Debug.Start("TrackWidth")
         # [Step 1]: Update the shape based on the new value
         if(newValue != self.Properties.trackWidth):
-            self._animated_wantedTrackWidth  = newValue
+            self._wanted_TrackWidth  = newValue
             self._UpdateShape()
         Debug.End()
     #endregion
@@ -728,7 +728,7 @@ class BRS_ValueWidgetAttributes(Animated):
         """
         Debug.Start("Size")
         # [Step 0]: Save newValue
-        self._animated_wantedSize = (newValue[0], newValue[1])
+        self._wanted_Size = (newValue[0], newValue[1])
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape()
@@ -753,7 +753,7 @@ class BRS_ValueWidgetAttributes(Animated):
         """
         Debug.Start("Pos")
         # [Step 0]: Save newValue
-        self._animated_wantedPos = (newValue[0], newValue[1])
+        self._wanted_Pos = (newValue[0], newValue[1])
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape()
@@ -849,13 +849,13 @@ class BRS_ValueWidgetAttributes(Animated):
         """
 
         # [Step 0]: Set wanted animation goals
-        self._animated_wantedFillingWidth = self._animated_fillingWidth if (FillingWidth == None)   else FillingWidth
-        self._animated_wantedTrackWidth   = self._animated_trackWidth   if (TrackWidth == None)     else TrackWidth
-        self._animated_wantedStartAngle   = self._animated_startAngle   if (startAngle == None)     else startAngle
-        self._animated_wantedEndAngle     = self._animated_endAngle     if (endAngle == None)       else endAngle
-        self._animated_wantedValue        = self._animated_value        if (value == None)          else self.Properties.TestValue(value)
-        self._animated_wantedPos          = (self._animated_wantedPos[0],self._animated_wantedPos[1]) if (position == None) else (position[0],position[1])
-        self._animated_wantedSize         = (self._animated_wantedSize[0],self._animated_wantedSize[1]) if (size == None) else (size[0],size[1])
+        self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
+        self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
+        self._wanted_StartAngle   = self._current_startAngle   if (startAngle == None)     else startAngle
+        self._wanted_EndAngle     = self._current_endAngle     if (endAngle == None)       else endAngle
+        self._wanted_Value        = self._current_value        if (value == None)          else self.Properties.TestValue(value)
+        self._wanted_Pos          = (self._wanted_Pos[0],self._wanted_Pos[1]) if (position == None) else (position[0],position[1])
+        self._wanted_Size         = (self._wanted_Size[0],self._wanted_Size[1]) if (size == None) else (size[0],size[1])
 
         self.Properties.showFilling     = self.Properties.showFilling       if (showFilling == None)    else showFilling
         self.Properties.showTrack       = self.Properties.showTrack         if (showTrack == None)      else showTrack
@@ -869,9 +869,9 @@ class BRS_ValueWidgetAttributes(Animated):
         """
         Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
-        self._animated_wantedFillingColor    = StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling    else (0,0,0,0)
-        self._animated_wantedTrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack      else (0,0,0,0)
-        self._animated_wantedBackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self.Properties.showBackground else (0,0,0,0)
+        self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling    else (0,0,0,0)
+        self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack      else (0,0,0,0)
+        self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self.Properties.showBackground else (0,0,0,0)
 
         # [Step 2]: Start animation
         # Debug.Log("[Step 2]:")
@@ -891,7 +891,7 @@ class BRS_ValueWidgetAttributes(Animated):
             *args = [object, (x,y)]
         """
         Debug.Start("[PieChartDial]: _UpdatePos")
-        self._animated_wantedPos = (args[1][0], args[1][1])
+        self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
         Debug.End()
     # ------------------------------------------------------
@@ -903,7 +903,7 @@ class BRS_ValueWidgetAttributes(Animated):
             *args = [object, (width,height)]
         """
         Debug.Start("[PieChartDial]: _UpdateSize")
-        self._animated_wantedSize = (args[1][0], args[1][1])
+        self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
         Debug.End()
     # ------------------------------------------------------
@@ -916,7 +916,7 @@ class BRS_ValueWidgetAttributes(Animated):
         """
         Debug.Start("_UpdateShape")
         # [Step 0]: Getting valus from widget properties
-        self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
+        self._current_Get("Shapes", fromTheseProperties = self.Properties)
 
         # [Step 1]: Checking if widget should have animations or not
         if(self.animated):
