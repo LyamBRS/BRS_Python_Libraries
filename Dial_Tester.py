@@ -229,30 +229,37 @@ class WindowLayout(BoxLayout):
 
             self.dials.Information.State = state
             self.dials.PieChartDial.State = state
+
+        self.buttons.switchState.State = self.dials.PieChartDial.State
+        self.buttons.showBackground.State = self.dials.PieChartDial.State
+        self.buttons.showFilling.State = self.dials.PieChartDial.State
+        self.buttons.showTrack.State = self.dials.PieChartDial.State
+
+        self.sliders.valueSlider.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
+        self.sliders.startAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
+        self.sliders.endAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
+        self.sliders.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
+        self.sliders.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.PieChartDial.State)
     def SetValue(self, *args):
         self.dials.PieChartDial.animated = False
         self.dials.PieChartDial.Value = self.sliders.valueSlider.value
         self.dials.Information.Text = "Value: {}".format(int(self.sliders.valueSlider.value))
         self.dials.PieChartDial.animated = True
-
     def SetEnd(self, *args):
         self.dials.PieChartDial.animated = False
         self.dials.PieChartDial.SetAttributes(endAngle = self.sliders.endAngle.value, startAngle= self.sliders.startAngle.value)
         self.dials.Information.Text = "End angle: {}".format(int(self.sliders.endAngle.value))
         self.dials.PieChartDial.animated = True
-
     def SetStart(self, *args):
         self.dials.PieChartDial.animated = False
         self.dials.PieChartDial.SetAttributes(startAngle= self.sliders.startAngle.value, endAngle=self.sliders.endAngle.value)
         self.dials.Information.Text = "Start angle: {}".format(int(self.sliders.startAngle.value))
         self.dials.PieChartDial.animated = True
-
     def SetTrackWidth(self, *args):
         self.dials.PieChartDial.animated = False
         self.dials.PieChartDial.SetAttributes(TrackWidth=self.sliders.trackWidth.value)
         self.dials.Information.Text = "Track: {}".format(int(self.sliders.trackWidth.value))
         self.dials.PieChartDial.animated = True
-
     def SetFillingWidth(self, *args):
         self.dials.PieChartDial.animated = False
         self.dials.PieChartDial.SetAttributes(FillingWidth=self.sliders.fillingWidth.value)

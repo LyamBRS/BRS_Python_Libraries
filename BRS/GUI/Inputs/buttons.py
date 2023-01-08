@@ -115,14 +115,16 @@ class TextButton(ButtonBehavior, Widget):
         if self.state == "down":  # if the button is being pressed
             wantedColor       = StatesColors.Pressed.GetColorFrom(self.State)
             self._label.color = StatesColors.Text.GetColorFrom(self.State)
+            duration = 0
         else:
             wantedColor = StatesColors.Default.GetColorFrom(self.State)
             self._label.color = StatesColors.Text.GetColorFrom(self.State)
+            duration = 0.3
 
         self._wantedColor = wantedColor
         self._currentColor = self.color.rgba
 
-        self.animation = Animation(_currentColor = self._wantedColor, duration = 0.1)
+        self.animation = Animation(_currentColor = self._wantedColor, duration = duration)
         self.animation.bind(on_progress = self._Animating)
         self.animation.start(self)
         Debug.End()
