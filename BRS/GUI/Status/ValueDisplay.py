@@ -5,6 +5,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
+import time
 from BRS.Utilities.states import States,StatesColors
 from BRS.GUI.Utilities.font import Font
 from BRS.Debug.consoleLog import Debug
@@ -70,7 +71,6 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
             See PieChartDial for an example.
         """
         Debug.Start("_AnimatingShapes")
-
         # [Step 0]: Save private values as actual Widget properties
         self.Properties.value         = self._current_value
         self.Properties.endAngle      = self._current_endAngle
@@ -81,8 +81,8 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         self.Properties.size          = (self._current_size[0], self._current_size[1])
 
         # [Step 1]: Update drawings based on new values
-        UpdateEllipse(self.Properties, self, "Track", self.Track)
-        UpdateEllipse(self.Properties, self, "Filling", self.Filling)
+        UpdateEllipse(self, "Track", self.Track)
+        UpdateEllipse(self, "Filling", self.Filling)
 
         # [Step 2]: Update background's positions
         self.rect.pos   = (self._current_pos[0], self._current_pos[1])
@@ -94,6 +94,7 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         Debug.Start("_AnimatingColors")
 
         # [Step 0]: Update widget's colors with these colors
+        Debug.Log("Color = {}".format(self._current_trackColor))
         self.trackColor.rgba   = self._current_trackColor
         self.fillingColor.rgba = self._current_fillingColor
         self.backgroundColor.rgba = self._current_backgroundColor
@@ -113,8 +114,11 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         super(PieChartDial, self).__init__(**kwargs)
         Debug.Start("PieChartDial")
         #region --------------------------- Initial check ups
-        self.Properties.size = (self.size[0], self.size[1])
-        self.Properties.pos  = (self.pos[0], self.pos[1])
+        self.InitAnimations()
+        x = self.pos[0]
+        y = self.pos[1]
+        # self.Properties.size = (self.size[0], self.size[1])
+        # self.Properties.pos  = (self.pos[0], self.pos[1])
         #endregion
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")
@@ -128,22 +132,21 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         self.Properties.endAngle        = endAngle
         self.Properties.startAngle      = startAngle
 
-        Debug.Log("the maximum is: {}".format(self.Properties.max))
         #endregion
         #region --------------------------- Set Canvas
         Debug.Log("Creating Canvas")
         with self.canvas:
             Debug.Log("Creating drawings for PieChartDial widget's background")
-            self.backgroundColor = Color(rgba = (StatesColors.Text.GetColorFrom(self._state) if self.Properties.showBackground else (0,0,0,0)))
-            self.rect = RoundedRectangle(size=(self.size[0], self.size[1]), pos=(self.pos[0], self.pos[1]))
+            self.backgroundColor = Color(rgba = (StatesColors.Text.GetColorFrom(self._state) if self._showBackground else (0,0,0,0)))
+            self.rect = RoundedRectangle(size=(self.size[0], self.size[1]), pos=(x, y))
 
             Debug.Log("Creating PieChartDial's track")
-            self.trackColor = Color(rgba = (StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack else (0,0,0,0)))
-            self.Track = GetEllipse(self.Properties, self, "Track")
+            self.trackColor = Color(rgba = (StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack else (0,0,0,0)))
+            self.Track = GetEllipse(self, "Track")
 
             Debug.Log("Creating PieChartDial's filling")
-            self.fillingColor = Color(rgba = (StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling else (0,0,0,0)))
-            self.Filling = GetEllipse(self.Properties, self, "Filling")
+            self.fillingColor = Color(rgba = (StatesColors.Default.GetColorFrom(self._state) if self._showFilling else (0,0,0,0)))
+            self.Filling = GetEllipse(self, "Filling")
 
             Debug.Log("Binding events to PieChartDial")
             self.bind(pos = self._UpdatePos, size = self._UpdateSize)
@@ -159,35 +162,36 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
         # self._wanted_TrackColor     = self.Properties.trackColor.rgba
 
         self._current_backgroundColor       = self.backgroundColor.rgba
-        self._wanted_BackgroundColor = self.backgroundColor.rgba
+        self._wanted_BackgroundColor        = self.backgroundColor.rgba
         self._current_fillingColor          = self.fillingColor.rgba
-        self._wanted_FillingColor    = self.fillingColor.rgba
+        self._wanted_FillingColor           = self.fillingColor.rgba
         self._current_trackColor            = self.trackColor.rgba
-        self._wanted_TrackColor      = self.trackColor.rgba
+        self._wanted_TrackColor             = self.trackColor.rgba
 
         Debug.Log("Setting PieChartDial's shape animation properties")
-        self._current_pos                 = (self.pos[0], self.pos[1])
-        self._wanted_Pos           = (self.pos[0], self.pos[1])
 
-        self._current_size                 = (self.size[0], self.size[1])
-        self._wanted_Size           = (self.size[0], self.size[1])
+        self._current_pos           = (x, y)
+        self._wanted_Pos            = (x, y)
 
-        self._current_pos_hint             = (self.pos[0], self.pos[1])
-        self._wanted_Pos_hint       = (self.pos[0], self.pos[1])
+        self._current_size          = (x, y)
+        self._wanted_Size           = (x, y)
 
-        self._current_size_hint            = (self.size[0], self.size[1])
-        self._wanted_Size_hint      = (self.size[0], self.size[1])
+        self._current_pos_hint      = (x, y)
+        self._wanted_Pos_hint       = (x, y)
 
-        self._current_value                = self.Properties.value
-        self._wanted_Value          = self.Properties.value
-        self._current_endAngle             = self.Properties.endAngle
-        self._wanted_EndAngle       = self.Properties.endAngle
-        self._current_startAngle           = self.Properties.startAngle
-        self._wanted_StartAngle     = self.Properties.startAngle
-        self._current_fillingWidth         = self.Properties.fillingWidth
-        self._current_trackWidth           = self.Properties.trackWidth
-        self._wanted_FillingWidth   = self.Properties.fillingWidth
-        self._wanted_TrackWidth     = self.Properties.trackWidth
+        self._current_size_hint     = (x, y)
+        self._wanted_Size_hint      = (x, y)
+
+        # self._current_value         = self.Properties.value
+        # self._wanted_Value          = self.Properties.value
+        self._current_endAngle      = endAngle
+        self._wanted_EndAngle       = endAngle
+        self._current_startAngle    = startAngle
+        self._wanted_StartAngle     = startAngle
+        self._current_fillingWidth  = fillingWidth
+        self._current_trackWidth    = trackWidth
+        self._wanted_FillingWidth   = fillingWidth
+        self._wanted_TrackWidth     = trackWidth
 
 
         #endregion

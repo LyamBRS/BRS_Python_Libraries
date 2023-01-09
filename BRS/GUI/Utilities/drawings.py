@@ -5,6 +5,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
+import time
 from BRS.Debug.consoleLog import Debug
 from BRS.Utilities.states import States,StatesColors
 from kivy.clock import Clock
@@ -14,19 +15,19 @@ from kivy.animation import Animation
 #====================================================================#
 # Functions
 #====================================================================#
-def UpdateEllipse(Properties, widget, type:str, ellipse):
+def UpdateEllipse(widget, type:str, ellipse):
     Debug.Start("UpdateEllipse")
     """Updates an already existing Ellipse from DrawingProperties"""
 
     if(type == "Track"):
         # Debug.Log("\nGetting Track ellipse")
-        ellipse.pos  = (Properties.pos[0] + Properties.trackWidth/2,
-                        Properties.pos[1] + Properties.trackWidth/2)
-        ellipse.size = (Properties.size[0] - Properties.trackWidth,
-                        Properties.size[1] - Properties.trackWidth)
+        ellipse.pos  = (widget._current_pos[0] + widget._current_trackWidth/2,
+                        widget._current_pos[1] + widget._current_trackWidth/2)
+        ellipse.size = (widget._current_size[0] - widget._current_trackWidth,
+                        widget._current_size[1] - widget._current_trackWidth)
 
-        ellipse.angle_start = Properties.startAngle
-        ellipse.angle_end   = Properties.endAngle
+        ellipse.angle_start = widget._current_startAngle
+        ellipse.angle_end   = widget._current_endAngle
 
         # Debug.Log("Value = {}".format(Properties.value))
         # Debug.Log("Widget Size: {}".format(widget.size))
@@ -35,14 +36,14 @@ def UpdateEllipse(Properties, widget, type:str, ellipse):
         # Debug.Log("Max = {}".format(Properties.max))
     else:
         # Debug.Log("\nGetting Filling ellipse")
-        ellipse.pos  = (Properties.pos[0] + Properties.fillingWidth/2,
-                        Properties.pos[1] + Properties.fillingWidth/2)
-        ellipse.size = (Properties.size[0] - Properties.fillingWidth,
-                        Properties.size[1] - Properties.fillingWidth)
+        ellipse.pos  = (widget._current_pos[0] + widget._current_fillingWidth/2,
+                        widget._current_pos[1] + widget._current_fillingWidth/2)
+        ellipse.size = (widget._current_size[0] - widget._current_fillingWidth,
+                        widget._current_size[1] - widget._current_fillingWidth)
 
-        ratio = (Properties.value - Properties.min) / (Properties.max - Properties.min)
-        ellipse.angle_start = Properties.startAngle
-        ellipse.angle_end =  ((1-ratio) * (Properties.startAngle - Properties.endAngle)) + Properties.endAngle
+        ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+        ellipse.angle_start = widget._current_startAngle
+        ellipse.angle_end =  ((1-ratio) * (widget._current_startAngle - widget._current_endAngle)) + widget._current_endAngle
 
         # Debug.Log("Value = {}".format(Properties.value))
         # Debug.Log("Widget Size: {}".format(widget.size))
@@ -55,41 +56,925 @@ def UpdateEllipse(Properties, widget, type:str, ellipse):
 
     Debug.End()
 
-def GetEllipse(Properties, widget, type:str):
+def GetEllipse(widget, type:str):
     # Debug.Start()
     """Draws an ellipse from given values"""
 
     if(type == "Track"):
         # Debug.Log("Getting Track ellipse")
-        ellipseWidth = Properties.trackWidth
-        startAngle = Properties.startAngle
-        endAngle = Properties.endAngle
+        ellipseWidth = widget._current_trackWidth
+        startAngle = widget._current_startAngle
+        endAngle = widget._current_endAngle
         # Debug.Log("Max = {}".format(Properties.max))
         # Debug.Log("Start angle: {}".format(startAngle))
         # Debug.Log("End angle: {}".format(endAngle))
     else:
         # Debug.Log("Getting Filling ellipse")
-        ellipseWidth = Properties.fillingWidth
-        ratio = (Properties.value - Properties.min) / (Properties.max - Properties.min)
-        startAngle = Properties.startAngle
-        endAngle =  (ratio * (Properties.max - Properties.min)) + Properties.min
-        # Debug.Log("Max = {}".format(Properties.max))
-        # Debug.Log("Start angle: {}".format(startAngle))
-        # Debug.Log("End angle: {}".format(endAngle))
+        ellipseWidth = widget._current_fillingWidth
+        ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+        startAngle = widget._current_startAngle
+        endAngle =  (ratio * (widget._current_max - widget._current_min)) + widget._current_min
 
-    position = (Properties.pos[0] + ellipseWidth, Properties.pos[1] + ellipseWidth)
+    Debug.Log("Min = {}".format(widget._current_min))
+    Debug.Log("Max = {}".format(widget._current_max))
+    Debug.Log("Start angle: {}".format(widget._current_startAngle))
+    Debug.Log("End angle: {}".format(widget._current_endAngle))
+    Debug.Log("Pos: {}".format(widget._current_pos))
 
-    width   = widget.size[0] - (Properties.fillingWidth * 2)
-    height  = widget.size[1] - (Properties.trackWidth * 2)
+    position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
+
+    width   = widget.size[0] - (widget._current_fillingWidth * 2)
+    height  = widget.size[1] - (widget._current_trackWidth * 2)
 
     # Debug.End()
     return Ellipse(pos = position, size = (width, height), angle_start = startAngle, angle_end = endAngle)
 #====================================================================#
 # Lists
 #====================================================================#
-
 #====================================================================#
-# Classes
+# Inherited Attributes
+#====================================================================#
+class Attribute_Foundation:
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited class containing all the very basic attributes that 
+        a BRS widget should have no matter its type or purpose in life.
+
+        Do not build this class
+
+        - State
+        - Size
+        - Pos
+        - Size_hint
+        - Pos_hint
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _state : int = States.Disabled
+    """
+        Internal reference of the widget's state.
+        Do not change this value by hand, use the Get
+        Set method instead (State).
+
+        Refer to Utilities.States for a list of available
+        States that this widget can be set to.
+    """
+    _current_pos                = (0,0)
+    """
+        Represents your widget's current position
+        (x,y).
+        Defaults to (0,0)
+
+        Use this to update the widget's
+        real position in your Animation binded on_progress function.
+    """
+    _wanted_Pos                 = (0,0)
+    """
+        Represents the wanted new position of your widget.
+        Defaults to (0,0)
+
+        Only set this before starting your animation.
+    """
+    _current_size               = (0,0)
+    """
+        Private variable representing your widget's current
+        size. (width, height).
+        Defaults to (0,0)
+
+        Use this to update the widget's
+        real size in your Animation binded on_progress function.
+    """
+    _wanted_Size                = (0,0)
+    """
+        Private variable which represents the
+        new size to animate towards. (width, height)
+        Defaults to (0,0)
+
+        Only set this before starting your animation.
+    """
+    _current_radius             = 0
+    """
+        Private variable which represents your widget's real
+        radius. Defaults to 0.
+
+        Use this to update the widget's
+        real radius in your Animation binded on_progress function.
+    """
+    _wanted_Radius              = 0
+    """
+        Private variable representing the new radius needed for your
+        widget. Defaults to 0.
+
+        Only set this before starting your animation.
+    """
+    _current_pos_hint           = (0,0)
+    """
+        Represents your widget's current position
+        (x,y).
+        Defaults to (0,0)
+
+        Use this to update the widget's
+        real position in your Animation binded on_progress function.
+    """
+    _wanted_Pos_hint            = (0,0)
+    """
+        Represents the wanted new position of your widget.
+        Defaults to (0,0)
+
+        Only set this before starting your animation.
+    """
+    _wanted_Size_hint           = (0,0)
+    """
+        Private variable which represents the
+        new size to animate towards. (width, height)
+        Defaults to (0,0)
+
+        Only set this before starting your animation.
+    """
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- State
+    @property
+    def State(self) -> int:
+        """[GET]
+            Returns the State in which the widget is in.
+            Refer to Utilities.States for a list of all
+            available states
+        """
+        return self._state
+
+    @State.setter
+    def State(self, newState:States) -> None:
+        """[SET]:
+            Set the State of the widget to ones from the States class.
+            This will handle color changing and animations based of the
+            new state. Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newState (States): Utilities.States
+        """
+        #Save new state in private variable
+        if(newState != self._state):
+            self._state = newState
+            self._UpdateColors(None,None)
+    #endregion
+    #region   -- Size
+    @property
+    def Size(self) -> list:
+        """ [GET]:
+            Returns the current Size of the widget.
+            This returns a new array and not an address
+        """
+        Debug.Start("GET Size")
+        Debug.End()
+        return (self.size[0], self.size[1])
+
+    @Size.setter
+    def Size(self, newValue:list) -> None:
+        """ [SET]:
+            Sets the Size of the widget.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new size of the widget
+        """
+        Debug.Start("SET Size")
+        # [Step 0]: Save newValue
+        self._wanted_Size = (newValue[0], newValue[1])
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape()
+        Debug.End()
+    #endregion
+    #region   -- Pos
+    @property
+    def Pos(self) -> list:
+        """ [GET]:
+        Returns the current position of the widget (x,y)
+        This returns a new array, not an address
+        """
+        Debug.Start("Pos: Get")
+        Debug.End()
+        return (self.pos[0], self.pos[1])
+
+    @Pos.setter
+    def Pos(self, newValue:list) -> None:
+        """ [SET]:
+            Sets the position of the widget.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new position of the widget (x,y)
+        """
+        Debug.Start("SET Pos")
+        # [Step 0]: Save newValue
+        self._wanted_Pos = (newValue[0], newValue[1])
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape()
+        Debug.End()
+    #endregion
+    #region   -- Size_hint
+    @property
+    def Size_hint(self) -> list:
+        """ [GET]:
+            Returns the current Size_hint of the widget.
+            This returns a new array and not an address
+        """
+        return (self.size_hint[0], self.size_hint[1])
+
+    @Size_hint.setter
+    def Size_hint(self, newValue:list) -> None:
+        """ [SET]:
+            Sets the size_hint of the widget.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new size_hint of the widget
+        """
+        Debug.Start("Size_hint")
+        # [Step 0]: Save newValue
+        self._wanted_Size_hint = (newValue[0], newValue[1])
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape()
+        Debug.End()
+    #endregion
+    #region   -- Pos_hint
+    @property
+    def Pos_hint(self) -> list:
+        """ [GET]:
+        Returns the current position of the widget (x,y)
+        This returns a new array, not an address
+        """
+        return (self.pos_hint[0], self.pos_hint[1])
+
+    @Pos_hint.setter
+    def Pos_hint(self, newValue:list) -> None:
+        """ [SET]:
+            Sets the Pos_hint of the widget.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new Pos_hint of the widget (x,y)
+        """
+        Debug.Start("Pos_hint")
+        # [Step 0]: Save newValue
+        self._wanted_Pos_hint = (newValue[0], newValue[1])
+
+        # [Step 1]: Update the shape based on the new value
+        self._UpdateShape()
+        Debug.End()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Foundation_SetToWanted(self):
+        Debug.Start("_Attribute_Foundation_SetToWanted")
+        self._current_pos = (self._wanted_Pos[0], self._wanted_Pos[1])
+        self._current_pos_hint = (self._wanted_Pos_hint[0], self._wanted_Pos_hint[1])
+        self._current_size = (self._wanted_Size[0], self._wanted_Size[1])
+        self._current_size_hint = (self._wanted_Size_hint[0], self._wanted_Size_hint[1])
+        Debug.End()
+
+    def _Attribute_Foundation_GetShapeComparator(self):
+        Debug.Start("_Attribute_Foundation_GetShapeComparator")
+        comparator = {
+                        "_current_pos"  : self._current_pos,
+                        "_current_size" : self._current_size,
+                        "_current_pos_hint" : self._current_pos_hint,
+                        "_current_size_hint" : self._current_size_hint
+                     }
+        Debug.End()
+        return comparator
+    def _Attribute_Foundation_GetShapeArguments(self):
+        Debug.Start("_Attribute_Foundation_GetShapeComparator")
+        attributes = {
+                        "_current_pos"  : self._wanted_Pos,
+                        "_current_size" : self._wanted_Size,
+                        "_current_pos_hint"  : self._wanted_Pos_hint,
+                        "_current_size_hint" : self._wanted_Size_hint
+                     }
+        Debug.End()
+        return attributes
+    #endregion
+    pass
+
+class Attribute_Track:
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited class containing all needed members and methods
+        in order to add a track to your widget.
+
+        A track is what it is. It's a track which a "filling" follows.
+        A filling is drawn above the track and represents a value.
+        Tracks usually goes from a minimum to a maximum associated with
+        a value
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _wanted_TrackColor          = [0,0,0,0]
+    """
+        Private variable used to store the wanted color of the widget's
+        Track. Defaults to [0,0,0,0].
+
+        Only set this before starting your animation.
+    """
+    _current_trackColor         = [0,0,0,0]
+    """
+        Private variable used to store the current color of the widget's
+        Track. Defaults to [0,0,0,0].
+
+        Use this to update the widget's
+        real Track color in your Animation binded on_progress function.
+    """
+    _current_trackWidth         = 0
+    """
+        Private variable specifying the current padding of the
+        widget's track. Defaults to 0.
+
+        Set this before calling the Animation starter.
+    """
+    _wanted_TrackWidth          = 0
+    """
+        Private variable representing your widget's new Track padding.
+        Defaults to 0
+
+        Only set this before starting your animation.
+    """
+    _showTrack : bool = True
+    """Enables the tracks's drawing"""
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- TrackWidth
+    @property
+    def TrackWidth(self) -> int:
+        """ [GET]:
+            Returns the current width of the track aspect
+        """
+        return self._wanted_TrackWidth
+
+    @TrackWidth.setter
+    def TrackWidth(self, newValue:int) -> None:
+        """ [SET]:
+            Sets the Track width of the widget.
+            The track is drawn below the Filling.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new width of the widget's track
+        """
+        Debug.Start("TrackWidth")
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._wanted_TrackWidth):
+            # self._wanted_TrackWidth  = newValue
+            self._UpdateShape()
+        Debug.End()
+    #endregion
+    #region   -- ShowTrack
+    @property
+    def ShowTrack(self) -> bool:
+        """ [GET]:
+            Returns wether the track is shown or not 
+        """
+        return self._showTrack
+
+    @ShowTrack.setter
+    def ShowTrack(self, newValue:bool) -> None:
+        """ [SET]:
+            Sets wether the track is shown or not.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (bool): the new showing or not
+        """
+        Debug.Start("ShowTrack")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self._showTrack):
+            self._showTrack = newValue
+            self._UpdateColors(None,None)
+        Debug.End()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Track_SetToWanted(self):
+        self._current_trackColor = (
+                                    self._wanted_TrackColor[0],
+                                    self._wanted_TrackColor[1],
+                                    self._wanted_TrackColor[2],
+                                    self._wanted_TrackColor[3],
+                                    )
+        self._current_trackWidth = self._wanted_TrackWidth
+    def _Attribute_Track_GetColorsComparator(self):
+        comparator = {
+                        "_current_trackColor"      : self._current_trackColor,
+                     }
+        return comparator
+    def _Attribute_Track_GetColorsArguments(self):
+        attributes = {
+                      "_current_trackColor"      : self._wanted_TrackColor,
+                     }
+        return attributes
+    def _Attribute_Track_GetShapeComparator(self):
+        comparator = {
+                        "_current_trackWidth"      : self._current_trackWidth,
+                     }
+        return comparator
+    def _Attribute_Track_GetShapeArguments(self):
+        attributes = {
+                      "_current_trackWidth"      : self._wanted_TrackWidth,
+                     }
+        return attributes
+    #endregion
+    pass
+class Attribute_Filling:
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited class containing all needed members and methods
+        in order to add a filling to your widget.
+
+        A track is what it is. It's a track which a "filling" follows.
+        A filling is drawn above the track and represents a value.
+        Tracks usually goes from a minimum to a maximum associated with
+        a value
+        Fillings go from min to value
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _wanted_FillingColor        = [0,0,0,0]
+    """
+        Private variable used to store the wanted color of the widget's
+        Filling. Defaults to [0,0,0,0].
+
+        Only set this before starting your animation.
+    """
+    _current_fillingColor       = [0,0,0,0]
+    """
+        Private variable used to store the current color of the widget's
+        Filling. Defaults to [0,0,0,0].
+
+        Use this to update the widget's
+        real filling color in your Animation binded on_progress function.
+    """
+    _current_fillingWidth       = 0
+    """
+        Private variable specifying the current width of the
+        widget's filling. Defaults to 0.
+
+        Set this before calling the Animation starter.
+    """
+    _wanted_FillingWidth        = 0
+    """
+        Private variable representing your widget's new Filling width.
+        Defaults to 0
+
+        Only set this before starting your animation.
+    """
+    _showFilling : bool = True
+    """Defines if the filling should be displayed"""
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- FillingWidth
+    @property
+    def FillingWidth(self) -> int:
+        """ [GET]:
+            Returns the current width of the filling aspect
+        """
+        return self._wanted_FillingWidth
+
+    @FillingWidth.setter
+    def FillingWidth(self, newValue:int) -> None:
+        """ [SET]:
+            Sets the filling width of the PieChartDial.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new width of the PieChartDial's filling
+        """
+        Debug.Start("FillingWidth")
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._wanted_FillingWidth):
+            self._wanted_FillingWidth  = newValue
+            self._UpdateShape()
+        Debug.End()
+    #endregion
+    #region   -- ShowFilling
+    @property
+    def ShowFilling(self) -> bool:
+        """ [GET]:
+            Returns wether the track is shown or not 
+        """
+        return self._showFilling
+
+    @ShowFilling.setter
+    def ShowFilling(self, newValue:bool) -> None:
+        """ [SET]:
+            Sets wether the track is shown or not.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (bool): the new showing or not
+        """
+        Debug.Start("ShowFilling")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self._showFilling):
+            self._showFilling = newValue
+            self._UpdateColors(None,None)
+        Debug.End()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Filling_SetToWanted(self):
+        self._current_fillingColor = (
+                                    self._wanted_FillingColor[0],
+                                    self._wanted_FillingColor[1],
+                                    self._wanted_FillingColor[2],
+                                    self._wanted_FillingColor[3],
+                                    )
+        self._current_fillingWidth = self._wanted_FillingWidth
+    def _Attribute_Filling_GetColorsComparator(self):
+        comparator = {
+                        "_current_fillingColor"      : self._current_fillingColor,
+                     }
+        return comparator
+    def _Attribute_Filling_GetColorsArguments(self):
+        attributes = {
+                      "_current_fillingColor"      : self._wanted_FillingColor,
+                     }
+        return attributes
+    def _Attribute_Filling_GetShapeComparator(self):
+        comparator = {
+                        "_current_fillingWidth"      : self._current_fillingWidth,
+                     }
+        return comparator
+    def _Attribute_Filling_GetShapeArguments(self):
+        attributes = {
+                      "_current_fillingWidth"      : self._wanted_FillingWidth,
+                     }
+        return attributes
+    #endregion
+    pass
+class Attribute_Background:
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited class containing all needed members and methods
+        in order to add a background to your widget.
+
+        The background takes the entire widget's size.
+
+        - BackgroundColor
+        - ShowBackground
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _wanted_BackgroundColor     = [0,0,0,0]
+    """
+        Private variable used to store the wanted primary color of
+        the widget. Defaults to [0,0,0,0].
+
+        Only set this before starting your animation.
+    """
+    _current_backgroundColor    = [0,0,0,0]
+    """
+        Private variable used to store the current primary color of
+        the widget. Defaults to [0,0,0,0].
+
+        Use this to update the widget's
+        real primary color in your Animation binded on_progress function.
+    """
+    _showBackground : bool = True
+    """ Defines wether the background of the widget should be shown or not. Defaults to False """
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- ShowBackground
+    @property
+    def ShowBackground(self) -> bool:
+        """ [GET]:
+        Returns wether the background is shown or not
+        """
+        return self._showBackground
+
+    @ShowBackground.setter
+    def ShowBackground(self, newValue:bool) -> None:
+        """ [SET]:
+            Sets wether the background is shown or not
+        Args:
+            newValue (bool): the new showing or not
+        """
+        Debug.Start("ShowBackground")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self._showBackground):
+            self._showBackground = newValue
+            self._UpdateColors(None,None)
+        Debug.End()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Background_SetToWanted(self):
+        self._current_backgroundColor = (
+                                        self._wanted_BackgroundColor[0],
+                                        self._wanted_BackgroundColor[1],
+                                        self._wanted_BackgroundColor[2],
+                                        self._wanted_BackgroundColor[3],
+                                        )
+    def _Attribute_Background_GetColorsComparator(self):
+        comparator = {
+                        "_current_backgroundColor"      : self._current_backgroundColor,
+                     }
+        return comparator
+
+    def _Attribute_Background_GetColorsArguments(self):
+        attributes = {
+                      "_current_backgroundColor"      : self._wanted_BackgroundColor,
+                     }
+        return attributes
+    #endregion
+    pass
+
+class Attribute_Value:
+    #region   --------------------------- DOCSTRING
+    """
+        Inherited class which contains all Animated
+        properties specific to widgets that shows 1 value.
+        Do not build this class, it's useless.
+
+        Contains:
+        - value : widget's represented value
+        - max : maximum the value can reach
+        - min : minimum the value can reach
+    """
+    #endregion
+    #region   --------------------------- MEMBERS
+    _wanted_Value               = 0
+    """
+        Used to Animate the transition between your widget's current
+        value and a new value.
+
+        Only set this before starting your animation.
+    """
+    _current_value              = 0
+    """
+        Represents the current value of your widget.
+
+        Use this to set your Widget's real Value variable when
+        the Animation's on_progress is called
+    """
+    _current_max                = 100
+    """ Represents the maximum the Value can reach. """
+    _wanted_max                 = 100
+    """ the wanted maximum of the widget"""
+    _current_min                = 0
+    """ Represents the minimum the Value can reach. """
+    _wanted_min                 = 0
+    """ the wanted minimum of the widget"""
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- Value
+    @property
+    def Value(self) -> int:
+        """[GET]:
+            Returns the shown value of the widget
+        """
+        return self._wanted_Value
+
+    @Value.setter
+    def Value(self, newValue:float) -> None:
+        """[SET:]
+            Sets the value of the widget. It will automatically
+            adjusts itself to be within the Propertie's range.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new value (from min to max).
+        """
+        # [Step 0]: Correct the given value
+        if(newValue > self._wanted_max):
+            newValue = self._wanted_max
+        if(newValue < self._wanted_min):
+            newValue = self._wanted_max
+
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._wanted_Value):
+            self._wanted_Value  = newValue
+            self._UpdateShape()
+    #endregion
+    #region   -- Max
+    @property
+    def Max(self) -> int:
+        """[GET]:
+            Returns the widget value's maximum.
+        """
+        return self._wanted_max
+
+    @Max.setter
+    def Max(self, newValue:float) -> None:
+        """[SET:]
+            Sets the maximum the widget's value can reach. It will automatically
+            adjusts the stored values to be within the Propertie's range.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new reacheable maximum
+        """
+
+        # [Step 1]: Update the shape based on the new maximum
+        if(newValue != self._wanted_max):
+            self._wanted_max  = newValue
+
+            if(self._wanted_Value > newValue):
+                self._wanted_Value = newValue
+
+            self._UpdateShape()
+    #endregion
+    #region   -- Min
+    @property
+    def Min(self) -> int:
+        """[GET]:
+            Returns the widget value's minimum.
+        """
+        return self._wanted_min
+
+    @Min.setter
+    def Min(self, newValue:float) -> None:
+        """[SET:]
+            Sets the minimum the widget's value can reach. It will automatically
+            adjusts the stored values to be within the Propertie's range.
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes.
+        Args:
+            newValue (float): the new reacheable minimum
+        """
+
+        # [Step 1]: Update the shape based on the new maximum
+        if(newValue != self._wanted_min):
+            self._wanted_min  = newValue
+
+            if(self._wanted_Value < newValue):
+                self._wanted_Value = newValue
+
+            self._UpdateShape()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Value_SetToWanted(self):
+        self._current_max = self._wanted_max
+        self._current_min = self._wanted_min
+        self._current_value = self._wanted_Value
+
+    def _Attribute_Value_GetShapeComparator(self):
+        comparator = {
+                        "_current_max"      : self._current_max,
+                        "_current_min"      : self._current_min,
+                        "_current_value"      : self._current_value,
+                     }
+        return comparator
+
+    def _Attribute_Value_GetShapeArguments(self):
+        attributes = {
+                        "_current_max"      : self._wanted_max,
+                        "_current_min"      : self._wanted_min,
+                        "_current_value"      : self._wanted_Value,
+                     }
+        return attributes
+
+    def TestValue(self, valueToTest) -> float:
+        """
+            This function allows you to do a quick verification of your
+            DrawingProperties. if some members of this class get weird
+            data, they'll be automatically capped by this function.
+
+            returns the corrected value
+        """
+        result = True
+
+        # Check Value
+        if(valueToTest > self._wanted_max):
+            return self._wanted_max
+
+        if(valueToTest < self._wanted_min):
+            return self._wanted_min
+
+        return valueToTest
+    #endregion
+    pass
+
+class Attribute_Angles:
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited class containing all needed members and methods
+        in order to add basic angles to your widget.
+
+        Do not build this class, it's useless
+
+        - startAngle
+        - endAngle
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _current_startAngle         = 0
+    """
+        Private variable representing your widget's starting angle
+        in degrees. Defaults to 0.
+
+        Use this to update the widget's
+        real startAngle in your Animation binded on_progress function.
+    """
+    _wanted_StartAngle          = 0
+    """
+        Private variable representing your widget's new startAngle.
+        Defaults to 0.
+
+        Only set this before starting your animation.
+    """
+    _current_endAngle           = 360
+    """
+        Private variable representing your widget's end angle in
+        degrees. Defaults to 360.
+
+        Use this to update the widget's
+        real endAngle in your Animation binded on_progress function.
+    """
+    _wanted_EndAngle            = 360
+    """
+        Private variable representing your widget's new startAngle.
+        Defaults to 360.
+
+        Only set this before starting your animation.
+    """
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- StartAngle
+    @property
+    def StartAngle(self) -> int:
+        """[GET]:
+            Returns the widget value's StartAngle.
+        """
+        return self._wanted_StartAngle
+
+    @StartAngle.setter
+    def StartAngle(self, newValue:float) -> None:
+        """[SET:]
+            Sets the Start Angle the widget's value can reach. 
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes to optimize
+            your run time
+        Args:
+            newValue (float): the new Start Angle in degrees
+        """
+
+        # [Step 1]: Update the shape based on the new start angle
+        if(newValue != self._wanted_StartAngle):
+            self._wanted_StartAngle  = newValue
+            self._UpdateShape()
+    #endregion
+    #region   -- EndAngle
+    @property
+    def EndAngle(self) -> int:
+        """[GET]:
+            Returns the widget value's EndAngle.
+        """
+        return self._wanted_EndAngle
+
+    @EndAngle.setter
+    def EndAngle(self, newValue:float) -> None:
+        """[SET:]
+            Sets the End Angle the widget's value can reach. 
+            Instead of setting bunch of widget attributes one
+            above the other, please use SetAttributes to optimize
+            your run time
+        Args:
+            newValue (float): the new End Angle in degrees
+        """
+
+        # [Step 1]: Update the shape based on the new end angle
+        if(newValue != self._wanted_EndAngle):
+            self._wanted_EndAngle  = newValue
+            self._UpdateShape()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Angles_SetToWanted(self):
+        self._current_endAngle = self._wanted_EndAngle
+        self._current_startAngle = self._wanted_StartAngle
+
+    def _Attribute_Angles_GetShapeComparator(self):
+        comparator = {
+                        "_current_endAngle"      : self._current_endAngle,
+                        "_current_startAngle"    : self._current_startAngle,
+                     }
+        return comparator
+
+    def _Attribute_Angles_GetShapeArguments(self):
+        attributes = {
+                        "_current_endAngle"      : self._wanted_EndAngle,
+                        "_current_startAngle"    : self._wanted_StartAngle,
+                     }
+        return attributes
+    #endregion
+    pass
+#====================================================================#
+# Sub Classes
 #====================================================================#
 class DrawingProperties:
     #region   --------------------------- DOCSTRING
@@ -201,196 +1086,16 @@ class Animated:
     """
         The animation's duration in seconds
     """
+    _animation_transition = "in_out_cubic"
 
-    _wanted_BackgroundColor     = [0,0,0,0]
-    """
-        Private variable used to store the wanted primary color of
-        the widget. Defaults to [0,0,0,0].
+    _animation_ShapeArguments_functions = {}
+    _animation_ShapeComparator_functions = {}
 
-        Only set this before starting your animation.
-    """
-    _current_backgroundColor    = [0,0,0,0]
-    """
-        Private variable used to store the current primary color of
-        the widget. Defaults to [0,0,0,0].
+    _animation_ColoArguments_functions = {}
+    _animation_ColorComparator_functions = {}
 
-        Use this to update the widget's
-        real primary color in your Animation binded on_progress function.
-    """
-    _wanted_TrackColor          = [0,0,0,0]
-    """
-        Private variable used to store the wanted color of the widget's
-        Track. Defaults to [0,0,0,0].
-
-        Only set this before starting your animation.
-    """
-    _current_trackColor         = [0,0,0,0]
-    """
-        Private variable used to store the current color of the widget's
-        Track. Defaults to [0,0,0,0].
-
-        Use this to update the widget's
-        real Track color in your Animation binded on_progress function.
-    """
-    _wanted_FillingColor        = [0,0,0,0]
-    """
-        Private variable used to store the wanted color of the widget's
-        Filling. Defaults to [0,0,0,0].
-
-        Only set this before starting your animation.
-    """
-    _current_fillingColor       = [0,0,0,0]
-    """
-        Private variable used to store the current color of the widget's
-        Filling. Defaults to [0,0,0,0].
-
-        Use this to update the widget's
-        real filling color in your Animation binded on_progress function.
-    """
-    _wanted_Value               = 0
-    """
-        Used to Animate the transition between your widget's current
-        value and a new value.
-
-        Only set this before starting your animation.
-    """
-    _current_value              = 0
-    """
-        Represents the current value of your widget.
-
-        Use this to set your Widget's real Value variable when
-        the Animation's on_progress is called
-    """
-    _current_pos                = (0,0)
-    """
-        Represents your widget's current position
-        (x,y).
-        Defaults to (0,0)
-
-        Use this to update the widget's
-        real position in your Animation binded on_progress function.
-    """
-    _wanted_Pos                 = (0,0)
-    """
-        Represents the wanted new position of your widget.
-        Defaults to (0,0)
-
-        Only set this before starting your animation.
-    """
-    _current_size               = (0,0)
-    """
-        Private variable representing your widget's current
-        size. (width, height).
-        Defaults to (0,0)
-
-        Use this to update the widget's
-        real size in your Animation binded on_progress function.
-    """
-    _wanted_Size                = (0,0)
-    """
-        Private variable which represents the
-        new size to animate towards. (width, height)
-        Defaults to (0,0)
-
-        Only set this before starting your animation.
-    """
-    _current_radius             = 0
-    """
-        Private variable which represents your widget's real
-        radius. Defaults to 0.
-
-        Use this to update the widget's
-        real radius in your Animation binded on_progress function.
-    """
-    _wanted_Radius              = 0
-    """
-        Private variable representing the new radius needed for your
-        widget. Defaults to 0.
-
-        Only set this before starting your animation.
-    """
-    _current_startAngle         = 0
-    """
-        Private variable representing your widget's starting angle
-        in degrees. Defaults to 0.
-
-        Use this to update the widget's
-        real startAngle in your Animation binded on_progress function.
-    """
-    _wanted_StartAngle          = 0
-    """
-        Private variable representing your widget's new startAngle.
-        Defaults to 0.
-
-        Only set this before starting your animation.
-    """
-    _current_endAngle           = 0
-    """
-        Private variable representing your widget's end angle in
-        degrees. Defaults to 0.
-
-        Use this to update the widget's
-        real endAngle in your Animation binded on_progress function.
-    """
-    _wanted_EndAngle            = 0
-    """
-        Private variable representing your widget's new startAngle.
-        Defaults to 0.
-
-        Only set this before starting your animation.
-    """
-    _current_fillingWidth       = 0
-    """
-        Private variable specifying the current width of the
-        widget's filling. Defaults to 0.
-
-        Set this before calling the Animation starter.
-    """
-    _wanted_FillingWidth        = 0
-    """
-        Private variable representing your widget's new Filling width.
-        Defaults to 0
-
-        Only set this before starting your animation.
-    """
-    _current_trackWidth         = 0
-    """
-        Private variable specifying the current width of the
-        widget's track. Defaults to 0.
-
-        Set this before calling the Animation starter.
-    """
-    _wanted_TrackWidth          = 0
-    """
-        Private variable representing your widget's new Track width.
-        Defaults to 0
-
-        Only set this before starting your animation.
-    """
-    _current_pos_hint           = (0,0)
-    """
-        Represents your widget's current position
-        (x,y).
-        Defaults to (0,0)
-
-        Use this to update the widget's
-        real position in your Animation binded on_progress function.
-    """
-    _wanted_Pos_hint            = (0,0)
-    """
-        Represents the wanted new position of your widget.
-        Defaults to (0,0)
-
-        Only set this before starting your animation.
-    """
-    _wanted_Size_hint           = (0,0)
-    """
-        Private variable which represents the
-        new size to animate towards. (width, height)
-        Defaults to (0,0)
-
-        Only set this before starting your animation.
-    """
+    _animation_InstantAnimation_functions = {}
+    """ List of attribute's functions that sets their current to wanted """
     #endregion
     #region   --------------------------- METHODS
     def _StartShapeAnimation(self, duration:float=0.1, transition:str="in_out_cubic"):
@@ -407,32 +1112,14 @@ class Animated:
             Will automatically start the animation
         """
         # region --- [Step 0]: Build argument dictionary
-        Debug.Log("Building original arguments for Animation")
-        arguments = {
-                        "_current_value"         : self._wanted_Value,
-                        "_current_pos"           : self._wanted_Pos,
-                        "_current_size"          : self._wanted_Size,
-                        "_current_pos_hint"      : self._wanted_Pos_hint,
-                        "_current_size_hint"     : self._wanted_Size_hint,
-                        "_current_radius"        : self._wanted_Radius,
-                        "_current_endAngle"      : self._wanted_EndAngle,
-                        "_current_startAngle"    : self._wanted_StartAngle,
-                        "_current_fillingWidth"  : self._wanted_FillingWidth,
-                        "_current_trackWidth"    : self._wanted_TrackWidth
-                    }
+        arguments = {"_" : 0}
+        comparator = {"_" : 0}
 
-        comparator = {
-                        "_current_value"         : self._current_value,
-                        "_current_pos"           : self._current_pos,
-                        "_current_size"          : self._current_size,
-                        "_current_pos_hint"      : self._current_pos_hint,
-                        "_current_size_hint"     : self._current_size_hint,
-                        "_current_radius"        : self._current_radius,
-                        "_current_endAngle"      : self._current_endAngle,
-                        "_current_startAngle"    : self._current_startAngle,
-                        "_current_fillingWidth"  : self._current_fillingWidth,
-                        "_current_trackWidth"    : self._current_trackWidth
-                    }
+        for function in self._animation_ShapeArguments_functions:
+            arguments.update(function())
+
+        for function in self._animation_ShapeComparator_functions:
+            comparator.update(function())
 
         Debug.Log("Arguments before pop: {}".format(arguments))
         Debug.Log("comparator before pop: {}".format(comparator))
@@ -458,6 +1145,7 @@ class Animated:
         Debug.Log("Success")
         # endregion
         # region --- [Step 2]: Build and return the Animation to execute
+        Debug.Error("Arguments : {}".format(arguments))
         animation = Animation(**arguments)
         animation.bind(on_progress = self._AnimatingShapes)
         animation.start(self)
@@ -480,17 +1168,14 @@ class Animated:
         """
         # region --- [Step 0]: Build argument dictionary
         Debug.Log("Building original arguments for Animation")
-        arguments = {
-                        "_current_backgroundColor"   : self._wanted_BackgroundColor,
-                        "_current_trackColor"        : self._wanted_TrackColor,
-                        "_current_fillingColor"      : self._wanted_FillingColor,
-                    }
+        arguments = {"_" : 0}
+        comparator = {"_" : 0}
 
-        comparator= {
-                        "_current_backgroundColor"   : self._current_backgroundColor,
-                        "_current_trackColor"        : self._current_trackColor,
-                        "_current_fillingColor"      : self._current_fillingColor,
-                    }
+        for function in self._animation_ColoArguments_functions:
+            arguments.update(function())
+
+        for function in self._animation_ColorComparator_functions:
+            comparator.update(function())
         # endregion
         # region --- [Step 1]: Pop arguments equal to themselves
         Debug.Log("Removing unused arguments from argument list...")
@@ -506,6 +1191,8 @@ class Animated:
         if(len(arguments) == 0):
             Debug.Warn("No animations were made due to no attributes needing change")
             return
+        else:
+            Debug.Log("Arguments : {}".format(arguments))
 
         # Add duration and transition
         arguments["d"] = duration
@@ -514,6 +1201,7 @@ class Animated:
         # endregion
         # region --- [Step 2]: Build and return the Animation to execute
         Debug.Log("Generating and launching Animation()")
+        Debug.Error("Arguments : {}".format(arguments))
         animation = Animation(**arguments)
         animation.bind(on_progress = self._AnimatingColors)
         animation.start(self)
@@ -524,24 +1212,12 @@ class Animated:
     def _InstantAnimation(self):
         """ Will make all values equal to their wanted equivalent """
         Debug.Start("_InstantAnimation")
-        self._current_backgroundColor = self._wanted_BackgroundColor
-        self._current_fillingColor = self._wanted_FillingColor
-        self._current_trackColor = self._wanted_TrackColor
+        
+        for function in self._animation_InstantAnimation_functions:
+            function()
 
-        self._current_size = (self._wanted_Size[0], self._wanted_Size[1])
-        self._current_pos  = (self._wanted_Pos[0], self._wanted_Pos[1])
-        self._current_size_hint    = (self._wanted_Size_hint[0], self._wanted_Size_hint[1])
-        self._current_pos_hint     = (self._wanted_Pos_hint[0], self._wanted_Pos_hint[1])
-        self._current_radius = self._wanted_Radius
-        self._current_value = self._wanted_Value
-
-        self._current_endAngle = self._wanted_EndAngle
-        self._current_startAngle = self._wanted_StartAngle
-
-        self._current_trackWidth = self._wanted_TrackWidth
-        self._current_fillingWidth = self._wanted_FillingWidth
         Debug.End()
-    def _current_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
+    def _Animated_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
         """
             Transfer specified currently stored value of your class's
             DrawingProperties into the Animated class for you if inherited.
@@ -572,20 +1248,30 @@ class Animated:
                 self._current_trackWidth   = fromTheseProperties.trackWidth
                 self._current_value        = fromTheseProperties.value
 
-                if(Check(self.pos)):
-                    Debug.Log("Gotten pos: {}".format(self.pos))
+                # if(Check(self.pos)):
+                    # Debug.Log("Gotten pos: {}".format(self.pos))
                     # self._current_pos = (self.pos[0], self.pos[1])
 
-                if(Check(self.size)):
-                    Debug.Log("Gotten size: {}".format(self.size))
+                # if(Check(self.size)):
+                    # Debug.Log("Gotten size: {}".format(self.size))
                     # self._current_size = (self.size[0], self.size[1])
         Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
     pass
-# --------------------------------------------------
-class BRS_ValueWidgetAttributes(Animated):
+#====================================================================#
+# Widget Builders
+#====================================================================#
+class BRS_ValueWidgetAttributes(
+                                Attribute_Foundation,
+                                Attribute_Background,
+                                Attribute_Filling,
+                                Attribute_Track,
+                                Attribute_Value,
+                                Attribute_Angles,
+                                Animated
+                                ):
     #region   --------------------------- DOCSTRING
     '''
         Inherited object containing standard get set
@@ -596,240 +1282,51 @@ class BRS_ValueWidgetAttributes(Animated):
         of it is used
     '''
     #endregion
-    #region   --------------------------- MEMBERS
-    _state : int = States.Disabled
-    """
-        Internal reference of the widget's state.
-        Do not change this value by hand, use the Get
-        Set method instead (State).
+    #region   =========================== ANIMATION CONSTRUCTOR
+    def InitAnimations(self):
+        """Call this at the start of your widget's __init__"""
 
-        Refer to Utilities.States for a list of available
-        States that this widget can be set to.
-    """
+        self._animation_ShapeArguments_functions = {
+                                                    self._Attribute_Angles_GetShapeArguments,
+                                                    self._Attribute_Track_GetShapeArguments,
+                                                    self._Attribute_Value_GetShapeArguments,
+                                                    self._Attribute_Filling_GetShapeArguments,
+                                                    self._Attribute_Foundation_GetShapeArguments
+                                                    }
+
+        self._animation_ShapeComparator_functions = {
+                                                    self._Attribute_Angles_GetShapeComparator,
+                                                    self._Attribute_Track_GetShapeComparator,
+                                                    self._Attribute_Value_GetShapeComparator,
+                                                    self._Attribute_Filling_GetShapeComparator,
+                                                    self._Attribute_Foundation_GetShapeComparator
+                                                    }
+
+        self._animation_ColoArguments_functions = {
+                                                    self._Attribute_Filling_GetColorsArguments,
+                                                    self._Attribute_Track_GetColorsArguments,
+                                                    self._Attribute_Background_GetColorsArguments
+                                                    }
+
+        self._animation_ColorComparator_functions = {
+                                                    self._Attribute_Filling_GetColorsComparator,
+                                                    self._Attribute_Track_GetColorsComparator,
+                                                    self._Attribute_Background_GetColorsComparator
+                                                    }
+
+        self._animation_InstantAnimation_functions = {
+                                                    self._Attribute_Angles_SetToWanted,
+                                                    self._Attribute_Track_SetToWanted,
+                                                    self._Attribute_Value_SetToWanted,
+                                                    self._Attribute_Filling_SetToWanted,
+                                                    self._Attribute_Foundation_SetToWanted,
+                                                    self._Attribute_Background_SetToWanted
+                                                    }
+    #endregion
+    #region   --------------------------- MEMBERS
     Properties = DrawingProperties()
     #endregion
     #region   --------------------------- GET SETS
-    #region   -- State
-    @property
-    def State(self) -> int:
-        """[GET]
-            Returns the State in which the widget is in.
-            Refer to Utilities.States for a list of all
-            available states
-        """
-        return self._state
-
-    @State.setter
-    def State(self, newState:States) -> None:
-        """[SET]:
-            Set the State of the widget to ones from the States class.
-            This will handle color changing and animations based of the
-            new state. Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newState (States): Utilities.States
-        """
-        #Save new state in private variable
-        if(newState != self._state):
-            self._state = newState
-            self._UpdateColors(None,None)
-    #endregion
-    #region   -- Value
-    @property
-    def Value(self) -> int:
-        """[GET]:
-            Returns the shown value of the widget
-        """
-        return self.Properties.value
-
-    @Value.setter
-    def Value(self, newValue:float) -> None:
-        """[SET:]
-            Sets the value of the widget. It will automatically
-            adjusts itself to be within the Propertie's range.
-            Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newValue (float): the new value (from min to max).
-        """
-
-        # [Step 1]: Update the shape based on the new value
-        if(newValue != self.Properties.value):
-            self._current_value        = self.Properties.value
-            self._wanted_Value  = self.Properties.TestValue(newValue)
-            self._UpdateShape()
-    #endregion
-    #region   -- FillingWidth
-    @property
-    def FillingWidth(self) -> int:
-        """ [GET]:
-            Returns the current width of the filling aspect
-        """
-        return self.Properties.fillingWidth
-
-    @FillingWidth.setter
-    def FillingWidth(self, newValue:int) -> None:
-        """ [SET]:
-            Sets the filling width of the PieChartDial.
-            Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newValue (float): the new width of the PieChartDial's filling
-        """
-        Debug.Start("FillingWidth")
-        # [Step 1]: Update the shape based on the new value
-        if(newValue != self.Properties.fillingWidth):
-            self._current_fillingWidth        = self.Properties.fillingWidth
-            self._wanted_FillingWidth  = newValue
-            self._UpdateShape()
-        Debug.End()
-    #endregion
-    #region   -- TrackWidth
-    @property
-    def TrackWidth(self) -> int:
-        """ [GET]:
-            Returns the current width of the track aspect
-        """
-        return self.Properties.trackWidth
-
-    @TrackWidth.setter
-    def TrackWidth(self, newValue:int) -> None:
-        """ [SET]:
-            Sets the Track width of the widget.
-            The track is drawn below the Filling.
-            Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newValue (float): the new width of the widget's track
-        """
-        Debug.Start("TrackWidth")
-        # [Step 1]: Update the shape based on the new value
-        if(newValue != self.Properties.trackWidth):
-            self._wanted_TrackWidth  = newValue
-            self._UpdateShape()
-        Debug.End()
-    #endregion
-    #region   -- Size
-    @property
-    def Size(self) -> list:
-        """ [GET]:
-            Returns the current Size of the widget
-        """
-        return self.size
-
-    @Size.setter
-    def Size(self, newValue:list) -> None:
-        """ [SET]:
-            Sets the Size of the widget.
-            Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newValue (float): the new size of the widget
-        """
-        Debug.Start("Size")
-        # [Step 0]: Save newValue
-        self._wanted_Size = (newValue[0], newValue[1])
-
-        # [Step 1]: Update the shape based on the new value
-        self._UpdateShape()
-        Debug.End()
-    #endregion
-    #region   -- Pos
-    @property
-    def Pos(self) -> list:
-        """ [GET]:
-        Returns the current position of the widget (x,y)
-        """
-        return self.pos
-
-    @Pos.setter
-    def Pos(self, newValue:list) -> None:
-        """ [SET]:
-            Sets the position of the widget.
-            Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newValue (float): the new position of the widget (x,y)
-        """
-        Debug.Start("Pos")
-        # [Step 0]: Save newValue
-        self._wanted_Pos = (newValue[0], newValue[1])
-
-        # [Step 1]: Update the shape based on the new value
-        self._UpdateShape()
-        Debug.End()
-    #endregion
-    #region   -- ShowTrack
-    @property
-    def ShowTrack(self) -> bool:
-        """ [GET]:
-            Returns wether the track is shown or not 
-        """
-        return self.Properties.showTrack
-
-    @ShowTrack.setter
-    def ShowTrack(self, newValue:bool) -> None:
-        """ [SET]:
-            Sets wether the track is shown or not.
-            Instead of setting bunch of widget attributes one
-            above the other, please use SetAttributes.
-        Args:
-            newValue (bool): the new showing or not
-        """
-        Debug.Start("ShowTrack")
-
-        # [Step 1]: Update the shape based on the new value if its a new value
-        if(newValue != self.Properties.showTrack):
-            self.Properties.showTrack = newValue
-            self._UpdateColors(None,None)
-        Debug.End()
-    #endregion
-    #region   -- ShowFilling
-    @property
-    def ShowFilling(self) -> bool:
-        """ [GET]:
-        Returns wether the filling is shown or not
-        """
-        return self.Properties.showFilling
-
-    @ShowFilling.setter
-    def ShowFilling(self, newValue:bool) -> None:
-        """ [SET]:
-            Sets wether the filling is shown or not
-        Args:
-            newValue (bool): the new showing or not
-        """
-        Debug.Start("ShowFilling")
-
-        # [Step 1]: Update the shape based on the new value if its a new value
-        if(newValue != self.Properties.showFilling):
-            self.Properties.showFilling = newValue
-            self._UpdateColors(None,None)
-        Debug.End()
-    #endregion
-    #region   -- ShowBackground
-    @property
-    def ShowBackground(self) -> bool:
-        """ [GET]:
-        Returns wether the background is shown or not
-        """
-        return self.Properties.showBackground
-
-    @ShowBackground.setter
-    def ShowBackground(self, newValue:bool) -> None:
-        """ [SET]:
-            Sets wether the background is shown or not
-        Args:
-            newValue (bool): the new showing or not
-        """
-        Debug.Start("ShowBackground")
-
-        # [Step 1]: Update the shape based on the new value if its a new value
-        if(newValue != self.Properties.showBackground):
-            self.Properties.showBackground = newValue
-            self._UpdateColors(None,None)
-        Debug.End()
-    #endregion
     #endregion
     #region   --------------------------- METHODS
     def SetAttributes(self,
@@ -847,7 +1344,7 @@ class BRS_ValueWidgetAttributes(Animated):
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
             This will only call UpdateShapes Once.
         """
-
+        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
         self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
@@ -862,6 +1359,7 @@ class BRS_ValueWidgetAttributes(Animated):
         self.Properties.showBackground  = self.Properties.showBackground    if (showBackground == None) else showBackground
 
         self._UpdateShape()
+        Debug.End()
     # ------------------------------------------------------
     def _UpdateColors(self, instance, value):
         """
@@ -869,9 +1367,9 @@ class BRS_ValueWidgetAttributes(Animated):
         """
         Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
-        self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self.Properties.showFilling    else (0,0,0,0)
-        self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self.Properties.showTrack      else (0,0,0,0)
-        self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self.Properties.showBackground else (0,0,0,0)
+        self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
+        self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
+        self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
 
         # [Step 2]: Start animation
         # Debug.Log("[Step 2]:")
@@ -890,7 +1388,7 @@ class BRS_ValueWidgetAttributes(Animated):
 
             *args = [object, (x,y)]
         """
-        Debug.Start("[PieChartDial]: _UpdatePos")
+        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
         self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
         Debug.End()
@@ -902,7 +1400,7 @@ class BRS_ValueWidgetAttributes(Animated):
 
             *args = [object, (width,height)]
         """
-        Debug.Start("[PieChartDial]: _UpdateSize")
+        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
         self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
         Debug.End()
@@ -916,7 +1414,7 @@ class BRS_ValueWidgetAttributes(Animated):
         """
         Debug.Start("_UpdateShape")
         # [Step 0]: Getting valus from widget properties
-        self._current_Get("Shapes", fromTheseProperties = self.Properties)
+        self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
         # [Step 1]: Checking if widget should have animations or not
         if(self.animated):
