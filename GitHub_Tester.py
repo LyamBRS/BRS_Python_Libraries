@@ -174,16 +174,20 @@ print("\n")
 print("\n")
 print("\n")
 
-# GitHub.GetUser("LyamBRS")
+GitHub.GetAll("LyamBRS")
 # print(str(GitHub.userInformation))
 print("\n")
+currentTag = GitHub.LocalRepository["version"]
+latestTag = GitHub.LatestTag
+value = GitHub.CheckIfBehind()
+
+if(value==True):
+    Debug.Warn(f"Your repository is behind! You are using {currentTag} while {latestTag} is out.")
+else:
+    Debug.Log(f"Your version is up to date: {currentTag}")
+
+
 print("\n")
-print("\n")
-# GitHub.GetUserRepositories()
-# print(str(GitHub.ListOfRepositories))
-print("\n")
-GitHub.GetLocalRepositoryInformation()
-print(GitHub.LocalRepository)
 
 # KivyUIApp().run()
 Debug.Warn(logged = "============================END OF SCRIPT============================")
