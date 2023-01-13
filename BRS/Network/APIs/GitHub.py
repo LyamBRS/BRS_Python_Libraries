@@ -25,6 +25,7 @@ class GitHub:
     Object = git()
     user = "None"
     userInformation = "None"
+    LocalRepository = "None"
     ListOfRepositories = {}
     #endregion
     #region   --------------------------- METHODS
@@ -77,12 +78,23 @@ class GitHub:
         except:
             pass
     #------------------------------------------------
-    def GetLocalRevisionNumber() -> str:
+    def GetLocalRepositoryInformation():
+
+        # Get current repository information through Git terminal
         repo_url = subprocess.run(['git', 'config', '--get', 'remote.origin.url'], capture_output=True, text=True).stdout.strip()
         repo_branch = subprocess.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture_output=True, text=True).stdout.strip()
         repo_commit_hash = subprocess.run(['git', 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()
         repo_version = subprocess.run(['git', 'describe', '--tags', '--abbrev=0'], capture_output=True, text=True).stdout.strip()
-        return {"url": repo_url, "branch": repo_branch, "commit_hash": repo_commit_hash, "version": repo_version}
+        repo_name = ""
+
+        # Get name of repository
+        parsedLink = repo_url.split("/")
+        for word in parsedLink:
+            if ".git" in word:
+                repo_name = word.replace(".git", "")
+
+        # Save local repository's information in the GitHub class.
+        GitHub.LocalRepository = {"url": repo_url, "branch": repo_branch, "commit_hash": repo_commit_hash, "version": repo_version, "name": repo_name}
     #------------------------------------------------
     #endregion
     #region   --------------------------- CONSTRUCTOR
