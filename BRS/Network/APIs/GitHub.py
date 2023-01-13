@@ -33,6 +33,9 @@ class GitHub:
     LatestCommit:list = None
     CommitTags:list = None
     LatestTag:str = None
+
+    LatestError:str = "None"
+    """Stores the latest error that happened while using this class"""
     #endregion
     #region   --------------------------- METHODS
     def GetUser(username):
@@ -52,8 +55,11 @@ class GitHub:
             to this function's calling.
         """
         Debug.Start("GetUserRepositories")
-        if(GitHub.username == "None"):
-            return "Error: GetUser not called"
+        if(GitHub.username == None):
+            return "No username stored in the GitHub class. Make sure to call GetAll"
+
+        if(GitHub.userInformation == None):
+            return "No user information were stored. Verify network connected and call GetAll"
 
         GitHub.ListOfRepositories = {}
 
@@ -119,7 +125,7 @@ class GitHub:
         Debug.End()
     #------------------------------------------------
     def GetMatchingRepository() -> str:
-
+        Debug.Start("GetMatchingRepository")
         # [Step 0]: Check if the needed information is present.
         if(GitHub.LocalRepository == None):
             return "The local repository was not initialized."
@@ -137,12 +143,16 @@ class GitHub:
         for name,repo in GitHub.ListOfRepositories.items():
             if wanted in name:
                 GitHub.MatchedRepository = repo
-                return "GOOD"
+                return None
 
-        return "No matching repositories"
+        return "No matching repositories. Make sure you are using a cloned repository."
+        Debug.End()
     #------------------------------------------------
     def GetMatchingRepositoryTag() -> None:
         Debug.Start("GetMatchingRepositoryTag")
+
+        if(GitHub.MatchedRepository == None):
+            return "No matched repositories to use. Make sure you are using a cloned repository."
 
         Debug.Log("Getting master branch")
         GitHub.MasterBranch = GitHub.MatchedRepository.get_branch("master")
@@ -172,19 +182,34 @@ class GitHub:
         """
         Debug.Start("GetAll")
         # [Step 1]: Getting local repository's information.
-        GitHub.GetLocalRepository()
+        error = GitHub.GetLocalRepository()
+        if(error != None):
+            Debug.Error(error)
+            return
 
         # [Step 2]: Getting GitHub user's information.
-        GitHub.GetUser(username)
+        error = GitHub.GetUser(username)
+        if(error != None):
+            Debug.Error(error)
+            return
 
         # [Step 3]: Getting all repositories of the specified user
-        GitHub.GetUserRepositories()
+        error = GitHub.GetUserRepositories()
+        if(error != None):
+            Debug.Error(error)
+            return
 
         # [Step 4]: Checking if the local repository exist within the user's repositories.
-        GitHub.GetMatchingRepository()
+        error = GitHub.GetMatchingRepository()
+        if(error != None):
+            Debug.Error(error)
+            return
 
         # [Step 5]: Get the latest tag of the repository
-        GitHub.GetMatchingRepositoryTag()
+        error = GitHub.GetMatchingRepositoryTag()
+        if(error != None):
+            Debug.Error(error)
+            return
 
         Debug.Log("Latest tag: " + str(GitHub.LatestTag))
         Debug.End()
