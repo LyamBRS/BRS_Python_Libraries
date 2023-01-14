@@ -174,7 +174,9 @@ print("\n")
 print("\n")
 print("\n")
 
-GitHub.GetAll("LyamBRS")
+error = GitHub.GetAll("LyamBRS")
+if(error != 0):
+    Debug.Error("Could not check if your device is up to date. ")
 # print(str(GitHub.userInformation))
 print("\n")
 currentTag = GitHub.LocalRepository["version"]

@@ -5,6 +5,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
+import socket
 import requests
 import subprocess
 import base64
@@ -45,7 +46,12 @@ class GitHub:
         """
         Debug.Start("GetUser")
         GitHub.username = username
-        GitHub.userInformation = GitHub.Object.get_user(username)
+        try:
+            GitHub.userInformation = GitHub.Object.get_user(username)
+        except:
+            Debug.Error(f"Could not get username")
+            Debug.End()
+            return "Could not get username"
         Debug.End()
     #------------------------------------------------
     def GetUserRepositories():
@@ -56,9 +62,11 @@ class GitHub:
         """
         Debug.Start("GetUserRepositories")
         if(GitHub.username == None):
+            Debug.End()
             return "No username stored in the GitHub class. Make sure to call GetAll"
 
         if(GitHub.userInformation == None):
+            Debug.End()
             return "No user information were stored. Verify network connected and call GetAll"
 
         GitHub.ListOfRepositories = {}
@@ -128,12 +136,15 @@ class GitHub:
         Debug.Start("GetMatchingRepository")
         # [Step 0]: Check if the needed information is present.
         if(GitHub.LocalRepository == None):
+            Debug.End()
             return "The local repository was not initialized."
 
         if(GitHub.userInformation == None):
+            Debug.End()
             return "No GitHub users were initialized."
 
         if(GitHub.ListOfRepositories == None):
+            Debug.End()
             return "User's repositories were not initialized"
 
         # [Step 1]: Find the matching repository names in the list of repositories
@@ -143,6 +154,7 @@ class GitHub:
         for name,repo in GitHub.ListOfRepositories.items():
             if wanted in name:
                 GitHub.MatchedRepository = repo
+                Debug.End()
                 return None
 
         return "No matching repositories. Make sure you are using a cloned repository."
@@ -152,6 +164,7 @@ class GitHub:
         Debug.Start("GetMatchingRepositoryTag")
 
         if(GitHub.MatchedRepository == None):
+            Debug.End()
             return "No matched repositories to use. Make sure you are using a cloned repository."
 
         Debug.Log("Getting master branch")
@@ -185,31 +198,40 @@ class GitHub:
         error = GitHub.GetLocalRepository()
         if(error != None):
             Debug.Error(error)
-            return
+            Debug.End()
+            return 1
 
+        # try:
         # [Step 2]: Getting GitHub user's information.
         error = GitHub.GetUser(username)
         if(error != None):
             Debug.Error(error)
-            return
+            Debug.End()
+            return 1
 
         # [Step 3]: Getting all repositories of the specified user
         error = GitHub.GetUserRepositories()
         if(error != None):
             Debug.Error(error)
-            return
+            Debug.End()
+            return 1
 
         # [Step 4]: Checking if the local repository exist within the user's repositories.
         error = GitHub.GetMatchingRepository()
         if(error != None):
             Debug.Error(error)
-            return
+            Debug.End()
+            return 1
 
         # [Step 5]: Get the latest tag of the repository
         error = GitHub.GetMatchingRepositoryTag()
         if(error != None):
             Debug.Error(error)
-            return
+            Debug.End()
+            return 1
+
+        # except socket.error:
+            # Debug.Error(f"Network Error")
 
         Debug.Log("Latest tag: " + str(GitHub.LatestTag))
         Debug.End()
