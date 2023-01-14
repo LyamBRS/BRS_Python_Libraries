@@ -25,17 +25,10 @@ def UpdateEllipse(widget, type:str, ellipse):
                         widget._current_pos[1] + widget._current_trackWidth/2)
         ellipse.size = (widget._current_size[0] - widget._current_trackWidth,
                         widget._current_size[1] - widget._current_trackWidth)
-
         ellipse.angle_start = widget._current_startAngle
         ellipse.angle_end   = widget._current_endAngle
 
-        # Debug.Log("Value = {}".format(Properties.value))
-        # Debug.Log("Widget Size: {}".format(widget.size))
-        # Debug.Log("Ellipse Size: {}".format(ellipse.size))
-        # Debug.Log("Track width: {}".format(Properties.trackWidth))
-        # Debug.Log("Max = {}".format(Properties.max))
-    else:
-        # Debug.Log("\nGetting Filling ellipse")
+    elif(type == "Filling"):
         ellipse.pos  = (widget._current_pos[0] + widget._current_fillingWidth/2,
                         widget._current_pos[1] + widget._current_fillingWidth/2)
         ellipse.size = (widget._current_size[0] - widget._current_fillingWidth,
@@ -45,49 +38,160 @@ def UpdateEllipse(widget, type:str, ellipse):
         ellipse.angle_start = widget._current_startAngle
         ellipse.angle_end =  ((1-ratio) * (widget._current_startAngle - widget._current_endAngle)) + widget._current_endAngle
 
-        # Debug.Log("Value = {}".format(Properties.value))
-        # Debug.Log("Widget Size: {}".format(widget.size))
-        # Debug.Log("Ellipse Size: {}".format(ellipse.size))
-        # Debug.Log("Filling width: {}".format(Properties.fillingWidth))
-        # Debug.Log("Angle end = {}".format(ellipse.angle_end))
-        # Debug.Log("max = {}".format(Properties.max))
-        # Debug.Log("min = {}".format(Properties.min))
-        # Debug.Log("Ratio = {}".format(ratio))
+    elif(type == "Background"):
+        ellipse.pos = (widget._current_pos[0] + widget._current_trackWidth, widget._current_pos[1] + widget._current_trackWidth)
+        ellipse.size = (widget._current_size[0] - widget._current_trackWidth*2, widget._current_size[1] - widget._current_trackWidth*2)
 
     Debug.End()
-
+#---------------------------------------------------------------------
 def GetEllipse(widget, type:str):
     # Debug.Start()
     """Draws an ellipse from given values"""
 
     if(type == "Track"):
-        # Debug.Log("Getting Track ellipse")
         ellipseWidth = widget._current_trackWidth
         startAngle = widget._current_startAngle
         endAngle = widget._current_endAngle
-        # Debug.Log("Max = {}".format(Properties.max))
-        # Debug.Log("Start angle: {}".format(startAngle))
-        # Debug.Log("End angle: {}".format(endAngle))
-    else:
-        # Debug.Log("Getting Filling ellipse")
+        width   = widget.size[0] - (widget._current_fillingWidth * 2)
+        height  = widget.size[1] - (widget._current_trackWidth * 2)
+
+    elif(type == "Filling"):
         ellipseWidth = widget._current_fillingWidth
         ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
         startAngle = widget._current_startAngle
         endAngle =  (ratio * (widget._current_max - widget._current_min)) + widget._current_min
+        width   = widget.size[0] - (widget._current_fillingWidth * 2)
+        height  = widget.size[1] - (widget._current_trackWidth * 2)
 
-    Debug.Log("Min = {}".format(widget._current_min))
-    Debug.Log("Max = {}".format(widget._current_max))
-    Debug.Log("Start angle: {}".format(widget._current_startAngle))
-    Debug.Log("End angle: {}".format(widget._current_endAngle))
-    Debug.Log("Pos: {}".format(widget._current_pos))
+    elif(type == "Background"):
+        ellipseWidth = 0
+        startAngle = 0
+        endAngle = 360
+        width = widget.size[0] - (widget._current_trackWidth * 2)
+        height = widget.size[1] - (widget._current_trackWidth * 2)
 
     position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
 
-    width   = widget.size[0] - (widget._current_fillingWidth * 2)
-    height  = widget.size[1] - (widget._current_trackWidth * 2)
-
     # Debug.End()
-    return Ellipse(pos = position, size = (width, height), angle_start = startAngle, angle_end = endAngle)
+    return Ellipse(pos=position, size=(width,height), angle_start=startAngle, angle_end=endAngle, line=(2, (1, 0, 0, 1)))
+#---------------------------------------------------------------------
+def UpdateBorder(widget, type:str, line):
+    Debug.Start("UpdateBorder")
+    """
+        Updates an already existing Border from a widget's
+        attributes.
+
+        Your widget needs to have the following attributes:
+        - Attribute_Track
+        - Attribute_Filling
+        - Attribute_Value
+
+        Optional attributes are:
+        - Attribute_Angles
+    """
+    # [Step 0]: Get the largest of both tracks
+    if(widget._current_fillingWidth > widget._current_trackWidth):
+        width = widget._current_fillingWidth
+    else:
+        width = widget._current_trackWidth
+
+
+    # [Step 0]: Check if the widget has end and start attributes
+    if(widget._current_endAngle != None):
+        if(type == "Track"):
+            if(width <= 0):
+                width = 1
+
+            line.ellipse = (
+                            widget._current_pos[0] + width,
+                            widget._current_pos[1] + width,
+                            widget._current_size[0] - width*2,
+                            widget._current_size[1] - width*2,
+                            widget._current_startAngle,
+                            widget._current_endAngle
+                            )
+            Debug.Log(str(width))
+            line.width = widget._current_trackWidth
+
+        else:
+            # Avoid border errors when width is set to 0
+            if(width <= 0):
+                width = 1
+
+            # Check if value is equal to minimum
+            if(widget._current_value == widget._current_min):
+                width = 1
+                line.width = 1
+            else:
+                line.width = widget._current_fillingWidth
+
+            ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+
+            line.ellipse = (
+                            widget._current_pos[0] + width,
+                            widget._current_pos[1] + width,
+                            widget._current_size[0] - width*2,
+                            widget._current_size[1] - width*2,
+                            widget._current_startAngle,
+                            ((1-ratio) * (widget._current_startAngle - widget._current_endAngle)) + widget._current_endAngle
+                            )
+
+    Debug.End()
+#---------------------------------------------------------------------
+def GetBorder(widget, type:str):
+    # Debug.Start()
+    """
+        Draws a border from given values.
+        if your widget has end and start angles attributes,
+        it will draw an ellipse.
+
+        Your widget needs to have the following attributes:
+        - Attribute_Track
+        - Attribute_Filling
+        - Attribute_Value
+
+        Optional attributes are:
+        - Attribute_Angles
+    """
+
+    # [Step 0]: Get the largest of both tracks
+    if(widget._current_fillingWidth > widget._current_trackWidth):
+        ellipseWidth = widget._current_fillingWidth
+    else:
+        ellipseWidth = widget._current_trackWidth
+
+    # [Step 0]: Check if the widget has end and start attributes
+    if(widget._current_endAngle != None):
+        if(type == "Track"):
+            if(ellipseWidth <= 0):
+                ellipseWidth = 1
+
+            startAngle      = widget._current_startAngle
+            endAngle        = widget._current_endAngle
+            width           = widget.size[0] - (ellipseWidth * 2)
+            height          = widget.size[1] - (ellipseWidth * 2)
+
+        elif(type == "Filling"):
+            if(ellipseWidth <= 0):
+                ellipseWidth = 1
+
+            ratio           = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+            startAngle      = widget._current_startAngle
+            endAngle        = (ratio * (widget._current_max - widget._current_min)) + widget._current_min
+            width           = widget.size[0] - (ellipseWidth * 2)
+            height          = widget.size[1] - (ellipseWidth * 2)
+
+        # [Step 0]: Adjust the width if needed
+        if(ellipseWidth <= 0):
+            ellipseWidth = 1
+
+        # [Step 1]: get the ellipse's position
+        position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
+
+
+        # Debug.End()
+        return Line(ellipse=(position[0], position[1], width, height, startAngle, endAngle), width=ellipseWidth)
+#--------------------------------------------------------------------
 #====================================================================#
 # Lists
 #====================================================================#
@@ -423,6 +527,11 @@ class Attribute_Track:
             newValue (float): the new width of the widget's track
         """
         Debug.Start("TrackWidth")
+
+        if(newValue == 0):
+            Debug.Warn("Attempted to set width at 0. Automatically set back to 1")
+            newValue = 1
+
         # [Step 1]: Update the shape based on the new value
         if(newValue != self._wanted_TrackWidth):
             # self._wanted_TrackWidth  = newValue
@@ -551,6 +660,11 @@ class Attribute_Filling:
             newValue (float): the new width of the PieChartDial's filling
         """
         Debug.Start("FillingWidth")
+
+        if(newValue == 0):
+            Debug.Warn("Attempted to set width at 0. Automatically set back to 1")
+            newValue = 1
+
         # [Step 1]: Update the shape based on the new value
         if(newValue != self._wanted_FillingWidth):
             self._wanted_FillingWidth  = newValue
@@ -1347,7 +1461,13 @@ class BRS_ValueWidgetAttributes(
         Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
+        if(self._wanted_FillingWidth <= 0):
+            self._wanted_FillingWidth = 1
+
         self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
+        if(self._wanted_TrackWidth <= 0):
+            self._wanted_TrackWidth = 1
+
         self._wanted_StartAngle   = self._current_startAngle   if (startAngle == None)     else startAngle
         self._wanted_EndAngle     = self._current_endAngle     if (endAngle == None)       else endAngle
         self._wanted_Value        = self._current_value        if (value == None)          else self.Properties.TestValue(value)

@@ -10,8 +10,8 @@ from BRS.Utilities.states import States,StatesColors
 from BRS.GUI.Utilities.font import Font
 from BRS.Debug.consoleLog import Debug
 from BRS.GUI.Utilities.drawings import DrawingProperties
-from BRS.GUI.Utilities.drawings import GetEllipse
-from BRS.GUI.Utilities.drawings import UpdateEllipse
+from BRS.GUI.Utilities.drawings import GetEllipse,GetBorder
+from BRS.GUI.Utilities.drawings import UpdateEllipse,UpdateBorder
 from BRS.GUI.Utilities.drawings import BRS_ValueWidgetAttributes
 
 from kivy.uix.widget import Widget
@@ -27,14 +27,14 @@ from kivy.uix.label import Label
 #====================================================================#
 
 #====================================================================#
-# Classes
+# PieChartDial
 #====================================================================#
 class PieChartDial(BRS_ValueWidgetAttributes, Widget):
     #region   --------------------------- DOCSTRING
     '''
         This class allows you to create a PieChartDial like widget which represents
         a float value in between a starting angle and an ending angle.
-        Use .Property to set the PieChartDial's properties such as end and start angle.
+        Use SetAttributes to set the PieChartDial's properties such as end and start angle.
         Do not use Radians.
     '''
     #endregion
@@ -50,9 +50,9 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
             This function returns the end angle of the PieChartDial's filling in degrees
         """
         # [Step 0]: Get properties into local variables
-        _max = self.Properties.max
-        _min = self.Properties.min
-        _value = self.Properties.value
+        _max = self._current_max
+        _min = self._current_min
+        _value = self._current_value
 
         # [Step 1]: Get filling ratio
         ratio = (_value - _min) / (_max - _min)
@@ -184,6 +184,168 @@ class PieChartDial(BRS_ValueWidgetAttributes, Widget):
 
         # self._current_value         = self.Properties.value
         # self._wanted_Value          = self.Properties.value
+        self._current_endAngle      = endAngle
+        self._wanted_EndAngle       = endAngle
+        self._current_startAngle    = startAngle
+        self._wanted_StartAngle     = startAngle
+        self._current_fillingWidth  = fillingWidth
+        self._current_trackWidth    = trackWidth
+        self._wanted_FillingWidth   = fillingWidth
+        self._wanted_TrackWidth     = trackWidth
+
+
+        #endregion
+        Debug.End()
+    #endregion
+    pass
+#====================================================================#
+# OutlineDial
+#====================================================================#
+class OutlineDial(BRS_ValueWidgetAttributes, Widget):
+    #region   --------------------------- DOCSTRING
+    '''
+        This class allows you to create a OutlineDial like widget which represents
+        a float value in between a starting angle and an ending angle.
+        Use SetAttributes to set the OutlineDial's properties such as end and start angle.
+        Do not use Radians.
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _use_hint = False
+    #endregion
+    #region   --------------------------- GET SET
+    #endregion
+    #region   --------------------------- METHODS
+    #region   -- Public
+    def GetFillingAngle(self):
+        """
+            This function returns the end angle of the PieChartDial's filling in degrees
+        """
+        # [Step 0]: Get properties into local variables
+        _max = self._current_max
+        _min = self._current_min
+        _value = self._current_value
+
+        # [Step 1]: Get filling ratio
+        ratio = (_value - _min) / (_max - _min)
+
+        # [Step 2]: Return corresponding angle.
+        return (ratio * (_max - _min)) + _min
+    # -------------------------------------------
+    #endregion
+    #region   -- Private
+    # ------------------------------------------------------
+    def _AnimatingShapes(self, animation, value, theOtherOne):
+        """
+            Called when Animations are executed.
+            Call which shapes need to be set to new values here.
+
+            See PieChartDial for an example.
+        """
+        Debug.Start("_AnimatingShapes")
+        # [Step 0]: Save private values as actual Widget properties
+        self.Properties.value         = self._current_value
+        self.Properties.endAngle      = self._current_endAngle
+        self.Properties.startAngle    = self._current_startAngle
+        self.Properties.fillingWidth  = self._current_fillingWidth
+        self.Properties.trackWidth    = self._current_trackWidth
+        self.Properties.pos           = (self._current_pos[0], self._current_pos[1])
+        self.Properties.size          = (self._current_size[0], self._current_size[1])
+
+        # [Step 1]: Update drawings based on new values
+        UpdateBorder(self, "Track", self.Track)
+        UpdateBorder(self, "Filling", self.Filling)
+        UpdateEllipse(self, "Background", self.background)
+
+        Debug.End()
+    # ------------------------------------------------------
+    def _AnimatingColors(self, animation, value, theOtherOne):
+        """ Called when color related animations are executed """
+        Debug.Start("_AnimatingColors")
+
+        # [Step 0]: Update widget's colors with these colors
+        Debug.Log("Color = {}".format(self._current_trackColor))
+        self.trackColor.rgba        = self._current_trackColor
+        self.fillingColor.rgba      = self._current_fillingColor
+        self.backgroundColor.rgba   = self._current_backgroundColor
+        Debug.End()
+    #endregion
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    def __init__(self,
+                 initialState = States.Disabled,
+                 trackWidth = 20,
+                 fillingWidth = 10,
+                 min = 0,
+                 max = 100,
+                 startAngle = 0,
+                 endAngle = 360,
+                 **kwargs):
+        super(OutlineDial, self).__init__(**kwargs)
+        Debug.Start("OutlineDial")
+        #region --------------------------- Initial check ups
+        self.InitAnimations()
+        x = self.pos[0]
+        y = self.pos[1]
+        w = self.size[0]
+        h = self.size[1]
+        #endregion
+        #region --------------------------- Set Variables
+        Debug.Log("Setting internal variables to new specified values")
+        self._state = initialState
+
+        self.Properties.fillingWidth    = fillingWidth
+        self.Properties.trackWidth      = trackWidth
+        self.Properties.max             = max
+        self.Properties.min             = min
+        self.Properties.value           = 50
+        self.Properties.endAngle        = endAngle
+        self.Properties.startAngle      = startAngle
+
+        #endregion
+        #region --------------------------- Set Canvas
+        Debug.Log("Creating Canvas")
+        with self.canvas:
+            Debug.Log("Creating drawings for OutlineDial widget's background")
+            self.backgroundColor = Color(rgba = (StatesColors.Text.GetColorFrom(self._state) if self._showBackground else (0,0,0,0)))
+            self.background = GetEllipse(self, "Background")
+
+            Debug.Log("Creating OutlineDial's track")
+            self.trackColor = Color(rgba = (StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack else (0,0,0,0)))
+            self.Track = GetBorder(self, "Track")
+
+            Debug.Log("Creating OutlineDial's filling")
+            self.fillingColor = Color(rgba = (StatesColors.Default.GetColorFrom(self._state) if self._showFilling else (0,0,0,0)))
+            self.Filling = GetBorder(self, "Filling")
+
+            Debug.Log("Binding events to OutlineDial")
+            self.bind(pos = self._UpdatePos, size = self._UpdateSize)
+
+        #endregion
+        #region --------------------------- Set Animation Properties
+        Debug.Log("Setting PieChartDial's color animation properties")
+
+        self._current_backgroundColor       = self.backgroundColor.rgba
+        self._wanted_BackgroundColor        = self.backgroundColor.rgba
+        self._current_fillingColor          = self.fillingColor.rgba
+        self._wanted_FillingColor           = self.fillingColor.rgba
+        self._current_trackColor            = self.trackColor.rgba
+        self._wanted_TrackColor             = self.trackColor.rgba
+
+        Debug.Log("Setting PieChartDial's shape animation properties")
+
+        self._current_pos           = (x, y)
+        self._wanted_Pos            = (x, y)
+
+        self._current_size          = (w, h)
+        self._wanted_Size           = (w, h)
+
+        self._current_pos_hint      = (x, y)
+        self._wanted_Pos_hint       = (x, y)
+
+        self._current_size_hint     = (w, h)
+        self._wanted_Size_hint      = (w, h)
+
         self._current_endAngle      = endAngle
         self._wanted_EndAngle       = endAngle
         self._current_startAngle    = startAngle
