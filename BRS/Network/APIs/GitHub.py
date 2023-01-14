@@ -254,6 +254,18 @@ class GitHub:
 
         if(GitHub.LocalRepository["version"] < GitHub.LatestTag):
             return True
+    #------------------------------------------------
+    def UpdateDevice():
+        """When called, this will initiate a Git Pull."""
+        Debug.Start("UpdateDevice")
+        gitStuff = subprocess.run(['git', 'pull', "--rebase"])
+        if(gitStuff == 0):
+            Debug.Log("Pull successfull")
+        else:
+            Debug.Error("Could not pull")
+
+        Debug.End()
+        return gitStuff
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion

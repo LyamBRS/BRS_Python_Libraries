@@ -7,6 +7,7 @@
 #====================================================================#
 from github import Github as git
 import subprocess
+import sys
 
 
 from BRS.Network.APIs.GitHub import GitHub
@@ -175,7 +176,7 @@ print("\n")
 print("\n")
 
 error = GitHub.GetAll("LyamBRS")
-if(error != 0):
+if(error != 0 and error != None):
     Debug.Error("Could not check if your device is up to date. ")
 # print(str(GitHub.userInformation))
 print("\n")
@@ -184,7 +185,16 @@ latestTag = GitHub.LatestTag
 value = GitHub.CheckIfBehind()
 
 if(value==True):
-    Debug.Warn(f"Your repository is behind! You are using {currentTag} while {latestTag} is out.")
+    Debug.Warn(f"Your device is behind! You are using {currentTag} while {latestTag} is out.")
+    Debug.Log("Do you want to update your device? (Y/N)")
+
+    key = "Y" # reads one byte at a time, similar to getchar()
+
+    if(key == "Y"):
+        Debug.Warn("Updating your device, do not disconnect it.")
+        GitHub.UpdateDevice()
+    else:
+        Debug.Warn("Not updating, your version is behind.")
 else:
     Debug.Log(f"Your version is up to date: {currentTag}")
 
