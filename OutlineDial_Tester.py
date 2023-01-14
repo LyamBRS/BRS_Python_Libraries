@@ -23,7 +23,7 @@ from BRS.GUI.Inputs.buttons import TextButton
 from BRS.GUI.Status.Progress import Bar
 from BRS.Utilities.states import States
 from BRS.Debug.consoleLog import Debug
-from BRS.GUI.Status.ValueDisplay import OutlineDial
+from BRS.GUI.Status.ValueDisplay import OutlineDial, PieChartDial
 #====================================================================#
 # Configuration
 #====================================================================#
@@ -149,18 +149,22 @@ class DialLayout(BoxLayout):
             super(DialLayout, self).__init__(**kwargs)
 
             self.padding = 50
-            self.spacing = 50
+            self.spacing = 25
             self.orientation = "vertical"
 
             self.OutlineDial = OutlineDial(min=0, max=100, endAngle=360, startAngle=0)
             self.OutlineDial.animated = True
 
+            self.PieChartDial = PieChartDial(min=0, max=100, endAngle=360, startAngle=0)
+            self.PieChartDial.animated = True
+
             self.Information = TextButton(initialFont=ButtonFont)
             self.Information.Text = "PieChartDial"
 
 
-            self.add_widget(self.Information)
+            # self.add_widget(self.Information)
             self.add_widget(self.OutlineDial)
+            self.add_widget(self.PieChartDial)
             Debug.End()
     #endregion
 
@@ -175,28 +179,35 @@ class WindowLayout(BoxLayout):
     def HideTrack(self):
         if(self.dials.OutlineDial.ShowTrack):
             self.dials.OutlineDial.ShowTrack = False
+            self.dials.PieChartDial.ShowTrack = False
             self.buttons.showTrack.State = States.Inactive
             self.buttons.showTrack.Text  = "Show track"
         else:
             self.dials.OutlineDial.ShowTrack = True
+            self.dials.PieChartDial.ShowTrack = True
             self.buttons.showTrack.State = States.Active
             self.buttons.showTrack.Text  = "Hide track"
+
     def HideFilling(self):
         if(self.dials.OutlineDial.ShowFilling):
             self.dials.OutlineDial.ShowFilling = False
+            self.dials.PieChartDial.ShowFilling = False
             self.buttons.showFilling.State = States.Inactive
             self.buttons.showFilling.Text  = "Show Filling"
         else:
             self.dials.OutlineDial.ShowFilling = True
+            self.dials.PieChartDial.ShowFilling = True
             self.buttons.showFilling.State = States.Active
             self.buttons.showFilling.Text  = "Hide Filling"
     def HideBackground(self):
         if(self.dials.OutlineDial.ShowBackground):
             self.dials.OutlineDial.ShowBackground = False
+            self.dials.PieChartDial.ShowBackground = False
             self.buttons.showBackground.State = States.Inactive
             self.buttons.showBackground.Text  = "Show Background"
         else:
             self.dials.OutlineDial.ShowBackground = True
+            self.dials.PieChartDial.ShowBackground = True
             self.buttons.showBackground.State = States.Active
             self.buttons.showBackground.Text  = "Hide Background"
     def SwitchState(self):
@@ -204,6 +215,7 @@ class WindowLayout(BoxLayout):
 
         if(state == 7):
             self.dials.OutlineDial.State = States.Disabled
+            self.dials.PieChartDial.State = States.Disabled
             self.dials.Information.State = States.Disabled
             self.dials.Information.Text = "State: Disabled"
         else:
@@ -228,6 +240,7 @@ class WindowLayout(BoxLayout):
 
             self.dials.Information.State = state
             self.dials.OutlineDial.State = state
+            self.dials.PieChartDial.State = state
 
         # Changing the states of all the buttons
         self.buttons.switchState.State = self.dials.OutlineDial.State
@@ -244,29 +257,48 @@ class WindowLayout(BoxLayout):
 
     def SetValue(self, *args):
         self.dials.OutlineDial.animated = False
+        self.dials.PieChartDial.animated = False
         self.dials.OutlineDial.Value = self.sliders.valueSlider.value
+        self.dials.PieChartDial.Value = self.sliders.valueSlider.value
         self.dials.Information.Text = "Value: {}".format(int(self.sliders.valueSlider.value))
         self.dials.OutlineDial.animated = True
+        self.dials.PieChartDial.animated = True
+
     def SetEnd(self, *args):
         self.dials.OutlineDial.animated = False
+        self.dials.PieChartDial.animated = False
+        self.dials.PieChartDial.SetAttributes(endAngle = self.sliders.endAngle.value, startAngle= self.sliders.startAngle.value)
         self.dials.OutlineDial.SetAttributes(endAngle = self.sliders.endAngle.value, startAngle= self.sliders.startAngle.value)
         self.dials.Information.Text = "End angle: {}".format(int(self.sliders.endAngle.value))
         self.dials.OutlineDial.animated = True
+        self.dials.PieChartDial.animated = True
+
     def SetStart(self, *args):
         self.dials.OutlineDial.animated = False
+        self.dials.PieChartDial.animated = False
         self.dials.OutlineDial.SetAttributes(startAngle= self.sliders.startAngle.value, endAngle=self.sliders.endAngle.value)
+        self.dials.PieChartDial.SetAttributes(startAngle= self.sliders.startAngle.value, endAngle=self.sliders.endAngle.value)
         self.dials.Information.Text = "Start angle: {}".format(int(self.sliders.startAngle.value))
         self.dials.OutlineDial.animated = True
+        self.dials.PieChartDial.animated = True
+
     def SetTrackWidth(self, *args):
         self.dials.OutlineDial.animated = False
+        self.dials.PieChartDial.animated = False
         self.dials.OutlineDial.SetAttributes(TrackWidth=self.sliders.trackWidth.value)
+        self.dials.PieChartDial.SetAttributes(TrackWidth=self.sliders.trackWidth.value)
         self.dials.Information.Text = "Track: {}".format(int(self.sliders.trackWidth.value))
         self.dials.OutlineDial.animated = True
+        self.dials.PieChartDial.animated = True
+
     def SetFillingWidth(self, *args):
         self.dials.OutlineDial.animated = False
+        self.dials.PieChartDial.animated = False
         self.dials.OutlineDial.SetAttributes(FillingWidth=self.sliders.fillingWidth.value)
+        self.dials.PieChartDial.SetAttributes(FillingWidth=self.sliders.fillingWidth.value)
         self.dials.Information.Text = "Filling: {}".format(int(self.sliders.fillingWidth.value))
         self.dials.OutlineDial.animated = True
+        self.dials.PieChartDial.animated = True
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, **kwargs):
