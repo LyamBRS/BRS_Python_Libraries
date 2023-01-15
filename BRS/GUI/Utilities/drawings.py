@@ -75,8 +75,8 @@ def GetEllipse(widget, type:str):
     # Debug.End()
     return Ellipse(pos=position, size=(width,height), angle_start=startAngle, angle_end=endAngle, line=(2, (1, 0, 0, 1)))
 #---------------------------------------------------------------------
-def UpdateBorder(widget, type:str, line):
-    Debug.Start("UpdateBorder")
+def UpdateLine(widget, type:str, line):
+    Debug.Start("UpdateLine")
     """
         Updates an already existing Border from a widget's
         attributes.
@@ -95,9 +95,8 @@ def UpdateBorder(widget, type:str, line):
     else:
         width = widget._current_trackWidth
 
-
-    # [Step 0]: Check if the widget has end and start attributes
-    if(widget._current_endAngle != None):
+    # [Step 1]: Check if the widget has end and start attributes
+    if(hasattr(widget, "_current_endAngle")):
         if(type == "Track"):
             if(width <= 0):
                 width = 1
@@ -110,9 +109,7 @@ def UpdateBorder(widget, type:str, line):
                             widget._current_startAngle,
                             widget._current_endAngle
                             )
-            Debug.Log(str(width))
             line.width = widget._current_trackWidth
-
         else:
             # Avoid border errors when width is set to 0
             if(width <= 0):
@@ -135,11 +132,88 @@ def UpdateBorder(widget, type:str, line):
                             widget._current_startAngle,
                             ((1-ratio) * (widget._current_startAngle - widget._current_endAngle)) + widget._current_endAngle
                             )
+    else:
+        # [Step 2]: Creating the 2 coordinates needed to create the line
+        if(widget._orientation == "Top" or widget._orientation == "Bottom"):
+            maxWidth = widget._current_size[0]/2
+            x1 = widget._current_pos[0] + widget._current_size[0]/2 # For centering
+            x2 = widget._current_pos[0] + widget._current_size[0]/2 # For centering
+            y1 = widget._current_pos[1]
+            y2 = widget._current_pos[1] + widget._current_size[1]
+        else:
+            maxWidth = widget._current_size[1]/2
+            x1 = widget._current_pos[0]
+            x2 = widget._current_pos[0] + widget._current_size[0]
+            y1 = widget._current_pos[1] + widget._current_size[1]/2 # For centering
+            y2 = widget._current_pos[1] + widget._current_size[1]/2 # For centering
+
+        if(type == "Track"):
+            # Width check so we don't overflow onto other neighboring widgets
+            width = widget._current_trackWidth
+            if(width > maxWidth):
+                width = maxWidth
+
+            if(width <= 0):
+                width = 1
+
+            line.points = (x1, y1, x2, y2)
+            line.width = width
+
+        elif(type == "Filling"):
+            # Width check so we don't overflow onto other neighboring widgets
+            width = _GetFillingWidth(widget, maxWidth)
+
+            # Create variables depending on if we start from the middle or not
+            if(widget._startFromMiddle):
+                ratio = ((widget._current_value - widget._current_min) / (widget._current_max - widget._current_min))-0.5
+                offsetHeight = (widget._current_size[1] * 0.5)
+                offsetWidth = (widget._current_size[0] * 0.5)
+            else:
+                ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+                offsetHeight = 0
+                offsetWidth = 0
+
+            # Find the starting coordinates and the ending coordinates depending on the wanted orientation.
+            if(widget._orientation == "Top"):
+                distance = (widget._current_size[1]) * ratio
+                startX = x2
+                startY = y2 - offsetHeight
+                endX   = x1
+                endY   = y2 - (distance + offsetHeight)
+                Debug.Log("startY : {}, endY : {}".format(startY, endY))
+
+            elif(widget._orientation == "Right"):
+                distance = (widget._current_size[0]) * ratio
+                startX = x2 - offsetWidth
+                startY = y2
+                endX   = x2 - (distance + offsetWidth)
+                endY   = y1
+            elif(widget._orientation == "Bottom"):
+                distance = (widget._current_size[1]) * ratio
+                startX = x1
+                startY = y1 + offsetHeight
+                endX   = x2
+                endY   = y1 + (distance + offsetHeight)
+            elif(widget._orientation == "Left"):
+                distance = (widget._current_size[0]) * ratio
+                startX = x1 + offsetWidth
+                startY = y1
+                endX   = x1 + (distance + offsetWidth)
+                endY   = y2
+
+            line.points = (startX, startY, endX, endY)
+            line.width = width
+
+        elif(type == "Background"):
+            if(maxWidth <= 0):
+                maxWidth = 1
+            line.points = (x1, y1, x2, y2)
+            line.width = maxWidth
 
     Debug.End()
 #---------------------------------------------------------------------
-def GetBorder(widget, type:str):
-    # Debug.Start()
+def GetLine(widget, type:str):
+    Debug.Start("GetLine")
     """
         Draws a border from given values.
         if your widget has end and start angles attributes,
@@ -160,38 +234,132 @@ def GetBorder(widget, type:str):
     else:
         ellipseWidth = widget._current_trackWidth
 
-    # [Step 0]: Check if the widget has end and start attributes
-    if(widget._current_endAngle != None):
-        if(type == "Track"):
-            if(ellipseWidth <= 0):
-                ellipseWidth = 1
+    # [Step 1]: Adjust the width if equal to 0 to avoid crashes
+    if(ellipseWidth <= 0):
+        ellipseWidth = 1
 
+
+    # [Step 1]: Check if the widget has end and start attributes
+    if(hasattr(widget, "_current_endAngle")):
+        if(type == "Track"):
             startAngle      = widget._current_startAngle
             endAngle        = widget._current_endAngle
             width           = widget.size[0] - (ellipseWidth * 2)
             height          = widget.size[1] - (ellipseWidth * 2)
 
         elif(type == "Filling"):
-            if(ellipseWidth <= 0):
-                ellipseWidth = 1
-
             ratio           = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
             startAngle      = widget._current_startAngle
             endAngle        = (ratio * (widget._current_max - widget._current_min)) + widget._current_min
             width           = widget.size[0] - (ellipseWidth * 2)
             height          = widget.size[1] - (ellipseWidth * 2)
 
-        # [Step 0]: Adjust the width if needed
-        if(ellipseWidth <= 0):
-            ellipseWidth = 1
-
-        # [Step 1]: get the ellipse's position
+        # [Step 2]: Get the ellipse's position
         position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
 
-
-        # Debug.End()
+        # [Step 3]: Return the line resulting from the previous settings
+        Debug.End()
         return Line(ellipse=(position[0], position[1], width, height, startAngle, endAngle), width=ellipseWidth)
+
+    else:
+        # [Step 2]: Creating the 2 coordinates needed to create the line
+        if(widget._orientation == "Top" or widget._orientation == "Bottom"):
+            maxWidth = widget._current_size[0]/2
+            x1 = widget._current_pos[0] + widget._current_size[0]/2 # For centering
+            x2 = widget._current_pos[0] + widget._current_size[0]/2 # For centering
+            y1 = widget._current_pos[1]
+            y2 = widget._current_pos[1] + widget._current_size[1]
+        else:
+            maxWidth = widget._current_size[1]/2
+            x1 = widget._current_pos[0]
+            x2 = widget._current_pos[0] + widget._current_size[0]
+            y1 = widget._current_pos[1] + widget._current_size[1]/2 # For centering
+            y2 = widget._current_pos[1] + widget._current_size[1]/2 # For centering
+
+        if(type == "Track"):
+            # Width check so we don't overflow onto other neighboring widgets
+            width = widget._current_trackWidth
+            if(width > maxWidth):
+                width = maxWidth
+
+            if(width <= 0):
+                width = 1
+
+            Debug.End()
+            return Line(points=(x1, y1, x2, y2), width=width)
+
+        elif(type == "Filling"):
+            # Width check so we don't overflow onto other neighboring widgets
+            width = _GetFillingWidth(widget, maxWidth)
+
+            # Create variables depending on if we start from the middle or not
+            if(widget._startFromMiddle):
+                ratio = ((widget._current_value - widget._current_min) / (widget._current_max - widget._current_min))-0.5
+                offsetHeight = (widget._current_size[1] * 0.5)
+                offsetWidth = (widget._current_size[0] * 0.5)
+            else:
+                ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+                offsetHeight = 0
+                offsetWidth = 0
+
+            # Find the starting coordinates and the ending coordinates depending on the wanted orientation.
+            if(widget._orientation == "Top"):
+                distance = (widget._current_size[1]) * ratio
+                startX = x2
+                startY = y2 - offsetHeight
+                endX   = x1
+                endY   = y2 - (distance + offsetHeight)
+                Debug.Log("startY : {}, endY : {}".format(startY, endY))
+
+            elif(widget._orientation == "Right"):
+                distance = (widget._current_size[0]) * ratio
+                startX = x2 - offsetWidth
+                startY = y2
+                endX   = x2 - (distance + offsetWidth)
+                endY   = y1
+            elif(widget._orientation == "Bottom"):
+                distance = (widget._current_size[1]) * ratio
+                startX = x1
+                startY = y1 + offsetHeight
+                endX   = x2
+                endY   = y1 + (distance + offsetHeight)
+            elif(widget._orientation == "Left"):
+                distance = (widget._current_size[0]) * ratio
+                startX = x1 + offsetWidth
+                startY = y1
+                endX   = x1 + (distance + offsetWidth)
+                endY   = y2
+
+            Debug.End()
+            return Line(points=(startX, startY, endX, endY), width=width)
+
+        elif(type == "Background"):
+            if(maxWidth <= 0):
+                maxWidth = 1
+
+            Debug.End()
+            return Line(points=(x1, y1, x2, y2), width=maxWidth)
 #--------------------------------------------------------------------
+def _GetFillingWidth(widget, maximumWidth) -> int:
+
+    # Width check so we don't overflow onto other neighboring widgets
+    width = widget._current_fillingWidth
+    if(width > maximumWidth):
+        width = maximumWidth
+
+    if(width <= 0):
+        width = 1
+
+    if(widget._startFromMiddle):
+        # Check if value is equal to half the ratio
+        if((((widget._current_value - widget._current_min) / (widget._current_max - widget._current_min))-0.5) == 0):
+            width = 1
+        return width
+    else:
+        # Check if value is equal to minimum
+        if(widget._current_value == widget._current_min):
+            width = 1
+        return width
 #====================================================================#
 # Lists
 #====================================================================#
@@ -294,6 +462,14 @@ class Attribute_Foundation:
         Defaults to (0,0)
 
         Only set this before starting your animation.
+    """
+    _forceAnimation             = False
+    """
+        This is used by other attributes.
+        Do not manually use this.
+
+        An example of attributes using this would be orientation changes for example.
+        Since there is no ways to tell all that must be changed, that one is instant.
     """
     #endregion
     #region   --------------------------- GET SET
@@ -837,11 +1013,13 @@ class Attribute_Value:
     _current_max                = 100
     """ Represents the maximum the Value can reach. """
     _wanted_max                 = 100
-    """ the wanted maximum of the widget"""
+    """ The wanted maximum of the widget"""
     _current_min                = 0
     """ Represents the minimum the Value can reach. """
     _wanted_min                 = 0
-    """ the wanted minimum of the widget"""
+    """ The wanted minimum of the widget"""
+    _startFromMiddle            = False
+    """ If set to True, the middle point of the widget will be the starting point for the Filling's drawing"""
     #endregion
     #region   --------------------------- GET SET
     #region   -- Value
@@ -927,6 +1105,30 @@ class Attribute_Value:
             if(self._wanted_Value < newValue):
                 self._wanted_Value = newValue
 
+            self._UpdateShape()
+    #endregion
+    #region   -- StartFromMiddle
+    @property
+    def StartFromMiddle(self) -> bool:
+        """[GET]:
+            Returns True if the widget is drawing it's Filling starting from the middle of itself.
+        """
+        return self._startFromMiddle
+
+    @StartFromMiddle.setter
+    def StartFromMiddle(self, newValue:bool) -> None:
+        """[SET:]
+            Sets wether the Filling of the widget is drawn from an edge or from
+            the middle point between the Minimum and the Maximum.
+            This will force animations.
+        Args:
+            newValue (bool): the new drawing starting point
+        """
+
+        # [Step 1]: Update the shape based on the new starting drawing attribute
+        if(newValue != self._startFromMiddle):
+            self._startFromMiddle  = newValue
+            self._forceAnimation = True
             self._UpdateShape()
     #endregion
     #endregion
@@ -1085,6 +1287,62 @@ class Attribute_Angles:
                         "_current_startAngle"    : self._wanted_StartAngle,
                      }
         return attributes
+    #endregion
+    pass
+
+class Attribute_Orientation:
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited class containing all needed members and methods
+        in order to add basic orientation to a widget.
+        Orientation can be "Top,Bottom,Left,Right".
+
+        Do not build this class, it's useless
+
+        - orientation
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    _orientation:str         = "Top"
+    """
+        Private variable representing your widget's orientation
+        Note that this is not using current and wanted prefixes
+        because this cannot be animated.
+
+        Use the Get Set representative to set the orientation.
+        Defaults to "Top"
+    """
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- Orientation
+    @property
+    def Orientation(self) -> str:
+        """[GET]:
+            Returns the widget orientation
+            "Top,Bottom,Left,Right"
+        """
+        return self._orientation
+
+    @Orientation.setter
+    def Orientation(self, newValue:str) -> None:
+        """[SET:]
+            Sets your widget's orientation and calls the
+            update shape function. It also disregards callings
+            if the new value is equal to the current orientation.
+        Args:
+            newValue (str): the new orientation
+        """
+        Debug.Start("Orientation")
+        # [Step 1]: Update the shape based on the new start angle
+        if(newValue != self._orientation):
+            self._orientation  = newValue
+            Debug.Log("Forcing animation")
+            self._forceAnimation = True
+            self._UpdateShape()
+        Debug.End()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
     #endregion
     pass
 #====================================================================#
@@ -1250,8 +1508,12 @@ class Animated:
             arguments.pop(key)
 
         if(len(arguments) == 0):
-            Debug.Warn("No animations were made due to no attributes needing change")
-            return
+            if(not self._forceAnimation):
+                Debug.Warn("No animations were made due to no attributes needing change")
+                return
+            else:
+                self._forceAnimation = False
+
         # Add duration and transition
         arguments["d"] = duration
         arguments["t"] = transition
@@ -1535,6 +1797,172 @@ class BRS_ValueWidgetAttributes(
         Debug.Start("_UpdateShape")
         # [Step 0]: Getting valus from widget properties
         self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
+
+        # [Step 1]: Checking if widget should have animations or not
+        if(self.animated):
+            self._StartShapeAnimation()
+        else:
+            self._InstantAnimation()
+            self._AnimatingShapes(None, None, None)
+        Debug.End()
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    #endregion
+    pass
+# --------------------------------------------------
+class BRS_BarGraphWidgetAttributes(
+                                Attribute_Foundation,
+                                Attribute_Background,
+                                Attribute_Filling,
+                                Attribute_Track,
+                                Attribute_Value,
+                                Attribute_Orientation,
+                                Animated
+                                ):
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited object containing standard get set
+        and functions used in any BRS widgets to avoid
+        useless calls.
+
+        Your widgets should inherit this event if not all
+        of it is used
+    '''
+    #endregion
+    #region   =========================== ANIMATION CONSTRUCTOR
+    def InitAnimations(self):
+        """Call this at the start of your widget's __init__"""
+
+        self._animation_ShapeArguments_functions = {
+                                                    self._Attribute_Track_GetShapeArguments,
+                                                    self._Attribute_Value_GetShapeArguments,
+                                                    self._Attribute_Filling_GetShapeArguments,
+                                                    self._Attribute_Foundation_GetShapeArguments
+                                                    }
+
+        self._animation_ShapeComparator_functions = {
+                                                    self._Attribute_Track_GetShapeComparator,
+                                                    self._Attribute_Value_GetShapeComparator,
+                                                    self._Attribute_Filling_GetShapeComparator,
+                                                    self._Attribute_Foundation_GetShapeComparator
+                                                    }
+
+        self._animation_ColoArguments_functions = {
+                                                    self._Attribute_Filling_GetColorsArguments,
+                                                    self._Attribute_Track_GetColorsArguments,
+                                                    self._Attribute_Background_GetColorsArguments
+                                                    }
+
+        self._animation_ColorComparator_functions = {
+                                                    self._Attribute_Filling_GetColorsComparator,
+                                                    self._Attribute_Track_GetColorsComparator,
+                                                    self._Attribute_Background_GetColorsComparator
+                                                    }
+
+        self._animation_InstantAnimation_functions = {
+                                                    self._Attribute_Track_SetToWanted,
+                                                    self._Attribute_Value_SetToWanted,
+                                                    self._Attribute_Filling_SetToWanted,
+                                                    self._Attribute_Foundation_SetToWanted,
+                                                    self._Attribute_Background_SetToWanted
+                                                    }
+    #endregion
+    #region   --------------------------- MEMBERS
+    #endregion
+    #region   --------------------------- GET SETS
+    #endregion
+    #region   --------------------------- METHODS
+    def SetAttributes(self,
+                        TrackWidth = None,
+                        FillingWidth = None,
+                        position = None,
+                        size = None,
+                        value = None,
+                        showTrack = None,
+                        orientation = None,
+                        showBackground = None,
+                        showFilling = None):
+        """
+            Allows you to set multiple properties at once instead of creating an animation for each one you change.
+            This will only call UpdateShapes Once.
+        """
+        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        # [Step 0]: Set wanted animation goals
+        self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
+        if(self._wanted_FillingWidth <= 0):
+            self._wanted_FillingWidth = 1
+
+        self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
+        if(self._wanted_TrackWidth <= 0):
+            self._wanted_TrackWidth = 1
+
+        self._wanted_Value        = self._current_value        if (value == None)          else self.Properties.TestValue(value)
+        self._wanted_Pos          = (self._wanted_Pos[0],self._wanted_Pos[1]) if (position == None) else (position[0],position[1])
+        self._wanted_Size         = (self._wanted_Size[0],self._wanted_Size[1]) if (size == None) else (size[0],size[1])
+
+        self._showTrack = self._showTrack if(showTrack == None) else showTrack
+        self._showTrack = self._showFilling if(showFilling == None) else showFilling
+        self._showTrack = self._showBackground if(showBackground == None) else showBackground
+
+        self._orientation = self._orientation if(orientation == None) else orientation
+
+        self._UpdateShape()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdateColors(self, instance, value):
+        """
+            Updates the color based on the widget's State
+        """
+        Debug.Start("_UpdateColors")
+        # [Step 0]: Set wanted animation results
+        self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
+        self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
+        self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
+
+        # [Step 2]: Start animation
+        # Debug.Log("[Step 2]:")
+        if(self.animated):
+            self._StartColorAnimation()
+        else:
+            self._InstantAnimation()
+            self._AnimatingColors(None, None, None)
+        Debug.End()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdatePos(self, *args):
+        """
+            Called when the pos property is changed. This is called by
+            itself, do not call this function yourself.
+
+            *args = [object, (x,y)]
+        """
+        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        self._wanted_Pos = (args[1][0], args[1][1])
+        self._UpdateShape()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdateSize(self, *args):
+        """
+            Called when the size property is changed. This is called by
+            itself, do not call this function yourself.
+
+            *args = [object, (width,height)]
+        """
+        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        self._wanted_Size = (args[1][0], args[1][1])
+        self._UpdateShape()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdateShape(self):
+        """
+            Function called to setup the Animations and variables
+            needed to update the widget's shape.
+
+            Do not call this function outside of this widget
+        """
+        Debug.Start("_UpdateShape")
+        # [Step 0]: Getting values from widget properties
+        # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
         # [Step 1]: Checking if widget should have animations or not
         if(self.animated):
