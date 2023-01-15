@@ -60,25 +60,26 @@ class ButtonLayout(BoxLayout):
 
             self.orientation = "vertical"
             self.padding = 25
-            self.spacing = 50
+            self.spacing = 25
 
             self.showTrack = TextButton(initialFont = ButtonFont, wantedText = "Hide Track")
             self.showFilling = TextButton(initialFont = ButtonFont, wantedText = "Hide Filling")
             self.showBackground = TextButton(initialFont = ButtonFont, wantedText = "Hide Background")
             self.switchState    = TextButton(initialFont = ButtonFont, wantedText = "Switch State")
+            self.startingPoint      = TextButton(initialFont = ButtonFont, wantedText = "Edges")
 
             self.add_widget(self.showTrack)
             self.add_widget(self.showFilling)
             self.add_widget(self.showBackground)
             self.add_widget(self.switchState)
+            self.add_widget(self.startingPoint)
 
             self.showTrack.State = States.Active
             self.showFilling.State = States.Active
             self.showBackground.State = States.Active
             self.switchState.State = States.Active
+            self.startingPoint.State = States.Active
 
-            with self.canvas:
-                self.color = Color(0, 0, 1, 1)  # red
             Debug.End()
     #endregion
 
@@ -246,6 +247,7 @@ class WindowLayout(BoxLayout):
         self.buttons.showBackground.State = self.dials.OutlineDial.State
         self.buttons.showFilling.State = self.dials.OutlineDial.State
         self.buttons.showTrack.State = self.dials.OutlineDial.State
+        self.buttons.startingPoint.State = self.dials.OutlineDial.State
 
         # Changing the track color of sliders
         self.sliders.valueSlider.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
@@ -253,6 +255,15 @@ class WindowLayout(BoxLayout):
         self.sliders.endAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
         self.sliders.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
         self.sliders.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
+    def SwitchEdges(self):
+        # Inverse the current value
+        self.dials.OutlineDial.StartFromMiddle = not self.dials.OutlineDial.StartFromMiddle
+
+        # Change the text
+        if(self.dials.OutlineDial.StartFromMiddle):
+            self.buttons.startingPoint.Text = "Middle"
+        else:
+            self.buttons.startingPoint.Text = "Edges"
 
     def SetValue(self, *args):
         self.dials.OutlineDial.animated = False
@@ -316,6 +327,7 @@ class WindowLayout(BoxLayout):
             self.buttons.showTrack.on_press = self.HideTrack
             self.buttons.showFilling.on_press = self.HideFilling
             self.buttons.showBackground.on_press = self.HideBackground
+            self.buttons.startingPoint.on_press = self.SwitchEdges
 
             self.sliders.valueSlider.bind(value = self.SetValue)
             self.sliders.startAngle.bind(value = self.SetStart)

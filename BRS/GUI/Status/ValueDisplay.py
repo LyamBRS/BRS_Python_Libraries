@@ -394,18 +394,11 @@ class LineGraph(BRS_BarGraphWidgetAttributes, Widget):
             See PieChartDial for an example.
         """
         Debug.Start("_AnimatingShapes")
-        # [Step 0]: Save private values as actual Widget properties
-        # self.Properties.value         = self._current_value
-        # self.Properties.endAngle      = self._current_endAngle
-        # self.Properties.startAngle    = self._current_startAngle
-        # self.Properties.fillingWidth  = self._current_fillingWidth
-        # self.Properties.trackWidth    = self._current_trackWidth
-        # self.Properties.pos           = (self._current_pos[0], self._current_pos[1])
-        # self.Properties.size          = (self._current_size[0], self._current_size[1])
 
         # [Step 1]: Update drawings based on new values
         UpdateLine(self, "Track", self.Track)
         UpdateLine(self, "Filling", self.Filling)
+
         # [Step 2]: Update background's positions
         self.background.pos   = (self._current_pos[0], self._current_pos[1])
         self.background.size  = (self._current_size[0], self._current_size[1])
