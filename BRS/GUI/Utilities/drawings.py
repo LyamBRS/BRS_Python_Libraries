@@ -29,14 +29,20 @@ def UpdateEllipse(widget, type:str, ellipse):
         ellipse.angle_end   = widget._current_endAngle
 
     elif(type == "Filling"):
-        ellipse.pos  = (widget._current_pos[0] + widget._current_fillingWidth/2,
-                        widget._current_pos[1] + widget._current_fillingWidth/2)
-        ellipse.size = (widget._current_size[0] - widget._current_fillingWidth,
-                        widget._current_size[1] - widget._current_fillingWidth)
+        ellipse.pos  = (
+                        widget._current_pos[0] + widget._current_fillingWidth/2,
+                        widget._current_pos[1] + widget._current_fillingWidth/2
+                        )
+        ellipse.size = (
+                        widget._current_size[0] - widget._current_fillingWidth,
+                        widget._current_size[1] - widget._current_fillingWidth
+                        )
 
-        ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
-        ellipse.angle_start = widget._current_startAngle
-        ellipse.angle_end =  ((1-ratio) * (widget._current_startAngle - widget._current_endAngle)) + widget._current_endAngle
+        ratio      = _GetRatio(widget)
+        startAngle = _GetStartAngle(widget)
+        endAngle   = _GetEndAngle(widget, startAngle, ratio)
+        ellipse.angle_start = startAngle
+        ellipse.angle_end =  endAngle
 
     elif(type == "Background"):
         ellipse.pos = (widget._current_pos[0] + widget._current_trackWidth, widget._current_pos[1] + widget._current_trackWidth)
@@ -56,10 +62,10 @@ def GetEllipse(widget, type:str):
         height  = widget.size[1] - (widget._current_trackWidth * 2)
 
     elif(type == "Filling"):
-        ellipseWidth = widget._current_fillingWidth
-        ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
-        startAngle = widget._current_startAngle
-        endAngle =  (ratio * (widget._current_max - widget._current_min)) + widget._current_min
+        ellipseWidth    = widget._current_fillingWidth
+        ratio           = _GetRatio(widget)
+        startAngle      = _GetStartAngle(widget)
+        endAngle        = _GetEndAngle(widget, startAngle, ratio)
         width   = widget.size[0] - (widget._current_fillingWidth * 2)
         height  = widget.size[1] - (widget._current_trackWidth * 2)
 

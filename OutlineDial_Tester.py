@@ -66,7 +66,7 @@ class ButtonLayout(BoxLayout):
             self.showFilling = TextButton(initialFont = ButtonFont, wantedText = "Hide Filling")
             self.showBackground = TextButton(initialFont = ButtonFont, wantedText = "Hide Background")
             self.switchState    = TextButton(initialFont = ButtonFont, wantedText = "Switch State")
-            self.startingPoint      = TextButton(initialFont = ButtonFont, wantedText = "Edges")
+            self.startingPoint      = TextButton(initialFont = ButtonFont, wantedText = "Start: Edges")
 
             self.add_widget(self.showTrack)
             self.add_widget(self.showFilling)
@@ -258,12 +258,13 @@ class WindowLayout(BoxLayout):
     def SwitchEdges(self):
         # Inverse the current value
         self.dials.OutlineDial.StartFromMiddle = not self.dials.OutlineDial.StartFromMiddle
+        self.dials.PieChartDial.StartFromMiddle = not self.dials.PieChartDial.StartFromMiddle
 
         # Change the text
         if(self.dials.OutlineDial.StartFromMiddle):
-            self.buttons.startingPoint.Text = "Middle"
+            self.buttons.startingPoint.Text = "Start: Middle"
         else:
-            self.buttons.startingPoint.Text = "Edges"
+            self.buttons.startingPoint.Text = "Start: Edges"
 
     def SetValue(self, *args):
         self.dials.OutlineDial.animated = False
