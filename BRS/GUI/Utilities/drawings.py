@@ -90,17 +90,11 @@ def UpdateLine(widget, type:str, line):
         - Attribute_Angles
     """
     # [Step 0]: Get the largest of both tracks
-    if(widget._current_fillingWidth > widget._current_trackWidth):
-        width = widget._current_fillingWidth
-    else:
-        width = widget._current_trackWidth
+    width = _GetLargestTrack(widget)
 
     # [Step 1]: Check if the widget has end and start attributes
     if(hasattr(widget, "_current_endAngle")):
         if(type == "Track"):
-            if(width <= 0):
-                width = 1
-
             line.ellipse = (
                             widget._current_pos[0] + width,
                             widget._current_pos[1] + width,
@@ -111,26 +105,24 @@ def UpdateLine(widget, type:str, line):
                             )
             line.width = widget._current_trackWidth
         else:
-            # Avoid border errors when width is set to 0
-            if(width <= 0):
-                width = 1
 
-            # Check if value is equal to minimum
-            if(widget._current_value == widget._current_min):
-                width = 1
-                line.width = 1
-            else:
-                line.width = widget._current_fillingWidth
+            # Get width if equal to minimum
+            fillingwidth = _GetFillingWidth(widget, 10000)
+            line.width = fillingwidth
 
-            ratio = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
+            # Get result values for the filling track
+            ratio      = _GetRatio(widget)
+            startAngle = _GetStartAngle(widget)
+            endAngle   = _GetEndAngle(widget, startAngle, ratio)
 
+            # Update the ellipse's properties
             line.ellipse = (
                             widget._current_pos[0] + width,
                             widget._current_pos[1] + width,
                             widget._current_size[0] - width*2,
                             widget._current_size[1] - width*2,
-                            widget._current_startAngle,
-                            ((1-ratio) * (widget._current_startAngle - widget._current_endAngle)) + widget._current_endAngle
+                            startAngle,
+                            endAngle
                             )
     else:
         # [Step 2]: Creating the 2 coordinates needed to create the line
@@ -229,15 +221,7 @@ def GetLine(widget, type:str):
     """
 
     # [Step 0]: Get the largest of both tracks
-    if(widget._current_fillingWidth > widget._current_trackWidth):
-        ellipseWidth = widget._current_fillingWidth
-    else:
-        ellipseWidth = widget._current_trackWidth
-
-    # [Step 1]: Adjust the width if equal to 0 to avoid crashes
-    if(ellipseWidth <= 0):
-        ellipseWidth = 1
-
+    ellipseWidth = _GetLargestTrack(widget)
 
     # [Step 1]: Check if the widget has end and start attributes
     if(hasattr(widget, "_current_endAngle")):
@@ -248,9 +232,9 @@ def GetLine(widget, type:str):
             height          = widget.size[1] - (ellipseWidth * 2)
 
         elif(type == "Filling"):
-            ratio           = (widget._current_value - widget._current_min) / (widget._current_max - widget._current_min)
-            startAngle      = widget._current_startAngle
-            endAngle        = (ratio * (widget._current_max - widget._current_min)) + widget._current_min
+            ratio           = _GetRatio(widget)
+            startAngle      = _GetStartAngle(widget)
+            endAngle        = _GetEndAngle(widget, startAngle, ratio)
             width           = widget.size[0] - (ellipseWidth * 2)
             height          = widget.size[1] - (ellipseWidth * 2)
 
@@ -339,6 +323,8 @@ def GetLine(widget, type:str):
 
             Debug.End()
             return Line(points=(x1, y1, x2, y2), width=maxWidth)
+
+
 #--------------------------------------------------------------------
 def _GetFillingWidth(widget, maximumWidth) -> int:
 
@@ -347,6 +333,7 @@ def _GetFillingWidth(widget, maximumWidth) -> int:
     if(width > maximumWidth):
         width = maximumWidth
 
+    # Check if equal to 0. If yes, equals to 1 to avoid errors.
     if(width <= 0):
         width = 1
 
@@ -360,6 +347,92 @@ def _GetFillingWidth(widget, maximumWidth) -> int:
         if(widget._current_value == widget._current_min):
             width = 1
         return width
+#--------------------------------------------------------------------
+def _GetRatio(widget) -> int:
+    """
+        Gets a ratio from 0 to 1 or -0.5 to 0.5 depending on
+        the widget's value, minimum and maximum.
+
+        if startfromMiddle is True, 0.5 will be used as a ratio.
+        Otherwise, 0 to 1 will be the returned ratio.
+    """
+    #[Step 0]: Get the values
+    _min = widget._current_min
+    _max = widget._current_max
+    _value = widget._current_value
+
+    #[Step 1]: Check if we want to start from the middle or not
+    if(widget._startFromMiddle):
+        return ((_value - _min) / (_max - _min)) - 0.5
+    else:
+        return ((_value - _min) / (_max - _min))
+#--------------------------------------------------------------------
+def _GetLargestTrack(widget) -> int:
+    """
+        Returns either the Filling track's width
+        or the Track's width. Also won't return 0.
+    """
+    # [Step 0]: Get global variables as local variables.
+    _filling = widget._current_fillingWidth
+    _track   = widget._current_trackWidth
+
+    # [Step 1]: Check which is larger
+    if(_filling > _track):
+        width = _filling
+    else:
+        width = _track
+
+    # [Step 2]: Make sure it is not equal to 0
+    if(width <= 0):
+        width = 1
+    
+    # [Step 3]: Return the resulted value
+    return width
+#---------------------------------------------------------------------
+def _GetStartAngle(widget) -> int:
+    """
+        Returns the widget's starting angle in degrees
+    """
+    # [Step 0]: Get local variables
+    _start = widget._current_startAngle
+    _end   = widget._current_endAngle
+
+    # [Step 1]: Check if we are starting from the middle
+    if(widget._startFromMiddle):
+
+        # [Step 2]: Calculate the offset between the Start and End
+        offset = (_end - _start)/2
+
+        # [Step 3]: Return the adjusted starting angle:
+        return _start + offset
+
+    else:
+        # [Step 2]: Return start angle
+        return _start
+#---------------------------------------------------------------------
+def _GetEndAngle(widget, startAngle, ratio) -> int:
+    """
+        Calculates the end angle of a widget depending on a given
+        ratio.
+    """
+    #[Step 0]: Get global variables as local variables
+    _end   = widget._current_endAngle
+
+    #[Step 1]: Check if we are starting from the middle
+    if(widget._startFromMiddle):
+        #[Step 2]: Get angle distance between start and end angle
+        length = (_end - startAngle)*2
+
+        #[Step 3]: Calculate the ratio on that length and add the start angle's offset
+        return (length * ratio) + startAngle
+
+    else:
+        #[Step 2]: Get the distance between start and end
+        length = (_end - startAngle)
+
+        #[Step 3]: Calculate the ratio on that length and add the start angle's offset
+        return (length * ratio) + startAngle
+#---------------------------------------------------------------------
 #====================================================================#
 # Lists
 #====================================================================#
