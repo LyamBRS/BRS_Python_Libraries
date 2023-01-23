@@ -12,6 +12,7 @@ from kivy.clock import Clock
 from kivy.graphics import Ellipse
 from kivy.graphics import Line
 from kivy.animation import Animation
+from kivy.graphics import svg
 #====================================================================#
 # Functions
 #====================================================================#
@@ -1061,6 +1062,83 @@ class Attribute_Background:
     #endregion
     pass
 
+class Attribute_SVG:
+    #region   --------------------------- DOCSTRING
+    """
+        Inherited class which contains all Animated
+        properties specific to widgets that shows an
+        SVG file
+
+        Contains:
+        - path : path to the wanted SVG
+    """
+    #endregion
+    #region   --------------------------- MEMBERS
+    _svg_path:str = None
+    """
+    Private variable which contains the path to the wanted
+    SVG file to display
+    """
+    _svg_instructions = None
+    """ Kivy's canvas instructions which draws the SVG """
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- SVGFile
+    @property
+    def SVGFile(self) -> str:
+        """[GET]:
+            Returns the path to the currently shown SVG
+        """
+        return self._svg_path
+
+    @SVGFile.setter
+    def SVGFile(self, newValue:str) -> None:
+        """[SET:]
+            Sets a new path to use to get the SVG file to show
+            on the widget
+        Args:
+            newValue (str): path to the SVG
+        """
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._svg_path):
+            self._svg_path  = newValue
+            self._UpdateShape()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_SVG_SetToWanted(self):
+        self._current_max = self._wanted_max
+        self._current_min = self._wanted_min
+        self._current_value = self._wanted_Value
+
+    def _Attribute_SVG_GetShapeComparator(self):
+        comparator = {
+                        "_current_max"      : self._current_max,
+                        "_current_min"      : self._current_min,
+                        "_current_value"      : self._current_value,
+                     }
+        return comparator
+
+    def _Attribute_SVG_GetShapeArguments(self):
+        # attributes = {
+                        # "_current_max"      : self._wanted_max,
+                        # "_current_min"      : self._wanted_min,
+                        # "_current_value"      : self._wanted_Value,
+                    #  }
+        # return attributes
+        pass
+    
+    def _CreateSVG(self):
+        """
+            Private function which creates the drawing instructions
+            needed to draw the SVG in the canvas.
+        """
+        with self.canvas:
+            self._svg_instructions = svg.svg_to_instruction_group(self._svg_path)
+    #endregion
+    pass
+
+
 class Attribute_Value:
     #region   --------------------------- DOCSTRING
     """
@@ -2033,6 +2111,150 @@ class BRS_BarGraphWidgetAttributes(
         Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self):
+        """
+            Function called to setup the Animations and variables
+            needed to update the widget's shape.
+
+            Do not call this function outside of this widget
+        """
+        Debug.Start("_UpdateShape")
+        # [Step 0]: Getting values from widget properties
+        # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
+
+        # [Step 1]: Checking if widget should have animations or not
+        if(self.animated):
+            self._StartShapeAnimation()
+        else:
+            self._InstantAnimation()
+            self._AnimatingShapes(None, None, None)
+        Debug.End()
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    #endregion
+    pass
+# --------------------------------------------------
+class BRS_SVGWidgetAttributes(
+                                Attribute_Foundation,
+                                Attribute_Background,
+                                Attribute_SVG,
+                                Animated
+                                ):
+    #region   --------------------------- DOCSTRING
+    '''
+        Inherited object containing standard get set
+        and functions used in any BRS widgets to avoid
+        useless calls.
+
+        Your widgets should inherit this event if not all
+        of it is used
+    '''
+    #endregion
+    #region   =========================== ANIMATION CONSTRUCTOR
+    def InitAnimations(self):
+        """Call this at the start of your widget's __init__"""
+
+        self._animation_ShapeArguments_functions = {
+                                                    self._Attribute_Foundation_GetShapeArguments
+                                                    }
+
+        self._animation_ShapeComparator_functions = {
+                                                    self._Attribute_Foundation_GetShapeComparator
+                                                    }
+
+        self._animation_ColoArguments_functions = {
+                                                    self._Attribute_Background_GetColorsArguments
+                                                    }
+
+        self._animation_ColorComparator_functions = {
+                                                    self._Attribute_Background_GetColorsComparator
+                                                    }
+
+        self._animation_InstantAnimation_functions = {
+                                                    self._Attribute_Foundation_SetToWanted,
+                                                    self._Attribute_Background_SetToWanted
+                                                    }
+    #endregion
+    #region   --------------------------- MEMBERS
+    #endregion
+    #region   --------------------------- GET SETS
+    #endregion
+    #region   --------------------------- METHODS
+    def SetAttributes(self,
+                        position = None,
+                        size = None,
+                        showBackground = None):
+        """
+            Allows you to set multiple properties at once instead of creating an animation for each one you change.
+            This will only call UpdateShapes Once.
+        """
+        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        # [Step 0]: Set wanted animation goals
+        # self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
+        # if(self._wanted_FillingWidth <= 0):
+        #     self._wanted_FillingWidth = 1
+
+        # self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
+        # if(self._wanted_TrackWidth <= 0):
+        #     self._wanted_TrackWidth = 1
+
+        # self._wanted_Value        = self._current_value        if (value == None)          else self.Properties.TestValue(value)
+        self._wanted_Pos          = (self._wanted_Pos[0],self._wanted_Pos[1]) if (position == None) else (position[0],position[1])
+        self._wanted_Size         = (self._wanted_Size[0],self._wanted_Size[1]) if (size == None) else (size[0],size[1])
+
+        # self._showTrack = self._showTrack if(showTrack == None) else showTrack
+        # self._showTrack = self._showFilling if(showFilling == None) else showFilling
+        self._showTrack = self._showBackground if(showBackground == None) else showBackground
+
+        # self._orientation = self._orientation if(orientation == None) else orientation
+
+        self._UpdateShape()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdateColors(self, instance, value):
+        """
+            Updates the color based on the widget's State
+        """
+        Debug.Start("_UpdateColors")
+        # [Step 0]: Set wanted animation results
+        # self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
+        # self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
+        self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
+
+        # [Step 2]: Start animation
+        # Debug.Log("[Step 2]:")
+        if(self.animated):
+            self._StartColorAnimation()
+        else:
+            self._InstantAnimation()
+            self._AnimatingColors(None, None, None)
+        Debug.End()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdatePos(self, *args):
+        """
+            Called when the pos property is changed. This is called by
+            itself, do not call this function yourself.
+
+            *args = [object, (x,y)]
+        """
+        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        self._wanted_Pos = (args[1][0], args[1][1])
+        self._UpdateShape()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdateSize(self, *args):
+        """
+            Called when the size property is changed. This is called by
+            itself, do not call this function yourself.
+
+            *args = [object, (width,height)]
+        """
+        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        self._wanted_Size = (args[1][0], args[1][1])
+        self._UpdateShape()
+        Debug.End()
+    # ------------------------------------------------------
+    def _UpdateShape(self, *args):
         """
             Function called to setup the Animations and variables
             needed to update the widget's shape.

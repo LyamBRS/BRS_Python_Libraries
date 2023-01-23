@@ -17,11 +17,11 @@ from kivy.graphics import Line, Ellipse, Color
 
 import random
 from BRS.GUI.Utilities.font import Font
-from BRS.Utilities.states import StatesColors
 from BRS.GUI.Inputs.buttons import TextButton
-from BRS.Utilities.states import States
-from BRS.Debug.consoleLog import Debug
 from BRS.GUI.Status.ValueDisplay import OutlineDial, LineGraph
+from BRS.GUI.Status.Indicators import SVGDisplay
+from BRS.Utilities.states import StatesColors,States
+from BRS.Debug.consoleLog import Debug
 #====================================================================#
 # Configuration
 #====================================================================#
@@ -160,6 +160,9 @@ class DialLayout(BoxLayout):
             self.Information = TextButton(initialFont=ButtonFont)
             self.Information.Text = "LineGraph"
 
+            self.SVG = SVGDisplay(file="C:\\Users\\cous5\\Documents\\BRS_Documents\\Librairies\\Icons\\Applications\\Icons_BRS\\Logos\\UniLetters\\BRS_B.svg")
+
+            self.add_widget(self.SVG)
             self.add_widget(self.Information)
             self.add_widget(self.OutlineDial)
             Debug.End()
@@ -353,6 +356,7 @@ class KivyUIApp(App):
         Window.left = -1024
         Window.top = 600
         Window.fullscreen = 'auto'
+        Window.clearcolor = (1,1,1,1)
         #---------------------------------------------------------#
         Debug.Log("Building layouts")
 
