@@ -19,6 +19,7 @@ from kivy.uix.stencilview import StencilView
 from kivymd.app import MDApp
 from kivymd.uix.slider import MDSlider
 
+
 import random
 from BRS.GUI.Utilities.font import Font
 from BRS.Utilities.states import StatesColors
@@ -27,6 +28,7 @@ from BRS.GUI.Status.Progress import Bar
 from BRS.Utilities.states import States
 from BRS.Debug.consoleLog import Debug
 from BRS.GUI.Status.ValueDisplay import OutlineDial, PieChartDial
+from BRS.GUI.Containers.cards import WidgetCard
 #====================================================================#
 # Configuration
 #====================================================================#
@@ -62,26 +64,31 @@ class ButtonLayout(BoxLayout):
             super(ButtonLayout, self).__init__(**kwargs)
 
             self.orientation = "vertical"
-            self.padding = 25
+            self.padding = 10
             self.spacing = 25
 
-            self.showTrack = TextButton(initialFont = ButtonFont, wantedText = "Hide Track")
-            self.showFilling = TextButton(initialFont = ButtonFont, wantedText = "Hide Filling")
-            self.showBackground = TextButton(initialFont = ButtonFont, wantedText = "Hide Background")
-            self.switchState    = TextButton(initialFont = ButtonFont, wantedText = "Switch State")
-            self.startingPoint      = TextButton(initialFont = ButtonFont, wantedText = "Start: Edges")
+            self.card = WidgetCard()
+            self.card.Orientation = "vertical"
 
-            self.add_widget(self.showTrack)
-            self.add_widget(self.showFilling)
-            self.add_widget(self.showBackground)
-            self.add_widget(self.switchState)
-            self.add_widget(self.startingPoint)
+            self.card.showTrack = TextButton(initialFont = ButtonFont, wantedText = "Hide Track")
+            self.card.showFilling = TextButton(initialFont = ButtonFont, wantedText = "Hide Filling")
+            self.card.showBackground = TextButton(initialFont = ButtonFont, wantedText = "Hide Background")
+            self.card.switchState    = TextButton(initialFont = ButtonFont, wantedText = "Switch State")
+            self.card.startingPoint      = TextButton(initialFont = ButtonFont, wantedText = "Start: Edges")
 
-            self.showTrack.State = States.Active
-            self.showFilling.State = States.Active
-            self.showBackground.State = States.Active
-            self.switchState.State = States.Active
-            self.startingPoint.State = States.Active
+            self.card.Add_Widget(self.card.showTrack)
+            self.card.Add_Widget(self.card.showFilling)
+            self.card.Add_Widget(self.card.showBackground)
+            self.card.Add_Widget(self.card.switchState)
+            self.card.Add_Widget(self.card.startingPoint)
+
+            self.add_widget(self.card)
+
+            self.card.showTrack.State = States.Active
+            self.card.showFilling.State = States.Active
+            self.card.showBackground.State = States.Active
+            self.card.switchState.State = States.Active
+            self.card.startingPoint.State = States.Active
 
             Debug.End()
     #endregion
@@ -100,38 +107,42 @@ class SliderLayout(BoxLayout):
             Debug.Start("SliderLayout")
             super(SliderLayout, self).__init__(**kwargs)
 
-            self.padding = 50
+            self.padding = 10
             self.spacing = 25
 
-            self.valueSlider    = Slider(min = 0, max = 100)
-            self.fillingWidth   = Slider(min = 0, max = 100)
-            self.trackWidth     = Slider(min = 0, max = 100)
-            self.startAngle     = Slider(min = -360, max = 360)
-            self.endAngle       = Slider(min = -360, max = 360)
+            self.card = WidgetCard()
 
-            self.valueSlider.orientation = "vertical"
-            self.fillingWidth.orientation = "vertical"
-            self.trackWidth.orientation = "vertical"
-            self.startAngle.orientation = "vertical"
-            self.endAngle.orientation = "vertical"
+            self.card.valueSlider    = MDSlider(min = 0, max = 100)
+            self.card.fillingWidth   = MDSlider(min = 0, max = 100)
+            self.card.trackWidth     = MDSlider(min = 0, max = 100)
+            self.card.startAngle     = MDSlider(min = -360, max = 360)
+            self.card.endAngle       = MDSlider(min = -360, max = 360)
 
-            self.valueSlider.value_track = True
-            self.fillingWidth.value_track = True
-            self.trackWidth.value_track = True
-            self.startAngle.value_track = True
-            self.endAngle.value_track = True
+            self.card.valueSlider.orientation = "vertical"
+            self.card.fillingWidth.orientation = "vertical"
+            self.card.trackWidth.orientation = "vertical"
+            self.card.startAngle.orientation = "vertical"
+            self.card.endAngle.orientation = "vertical"
 
-            self.valueSlider.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
-            self.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
-            self.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
-            self.startAngle.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
-            self.endAngle.value_track_color  = StatesColors.Pressed.GetColorFrom(States.Active)
+            self.card.valueSlider.value_track = True
+            self.card.fillingWidth.value_track = True
+            self.card.trackWidth.value_track = True
+            self.card.startAngle.value_track = True
+            self.card.endAngle.value_track = True
 
-            self.add_widget(self.valueSlider )
-            self.add_widget(self.fillingWidth)
-            self.add_widget(self.trackWidth  )
-            self.add_widget(self.startAngle  )
-            self.add_widget(self.endAngle    )
+            self.card.valueSlider.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
+            self.card.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
+            self.card.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
+            self.card.startAngle.value_track_color = StatesColors.Pressed.GetColorFrom(States.Active)
+            self.card.endAngle.value_track_color  = StatesColors.Pressed.GetColorFrom(States.Active)
+
+            self.card.Add_Widget(self.card.valueSlider )
+            self.card.Add_Widget(self.card.fillingWidth)
+            self.card.Add_Widget(self.card.trackWidth  )
+            self.card.Add_Widget(self.card.startAngle  )
+            self.card.Add_Widget(self.card.endAngle    )
+
+            self.add_widget(self.card)
 
             with self.canvas:
                 Color(0, 1, 0, 1)  # red
@@ -152,22 +163,27 @@ class DialLayout(BoxLayout):
             Debug.Start("DialLayout")
             super(DialLayout, self).__init__(**kwargs)
 
-            self.padding = 50
+            self.padding = 10
             self.spacing = 25
             self.orientation = "vertical"
 
-            self.OutlineDial = OutlineDial(min=0, max=100, endAngle=360, startAngle=0)
-            self.OutlineDial.animated = True
+            self.card = WidgetCard()
+            self.card.Orientation = "vertical"
 
-            self.PieChartDial = PieChartDial(min=0, max=100, endAngle=360, startAngle=0)
-            self.PieChartDial.animated = True
+            self.card.OutlineDial = OutlineDial(min=0, max=100, endAngle=360, startAngle=0)
+            self.card.OutlineDial.animated = True
 
-            self.Information = TextButton(initialFont=ButtonFont)
-            self.Information.Text = "PieChartDial"
+            self.card.PieChartDial = PieChartDial(min=0, max=100, endAngle=360, startAngle=0)
+            self.card.PieChartDial.animated = True
+
+            self.card.Information = TextButton(initialFont=ButtonFont)
+            self.card.Information.Text = "PieChartDial"
 
             # self.add_widget(self.Information)
-            self.add_widget(self.OutlineDial)
-            self.add_widget(self.PieChartDial)
+            self.card.Add_Widget(self.card.OutlineDial)
+            self.card.Add_Widget(self.card.PieChartDial)
+
+            self.add_widget(self.card)
             Debug.End()
     #endregion
 
@@ -180,139 +196,139 @@ class WindowLayout(BoxLayout):
     #endregion
     #region   --------------------------- METHODS
     def HideTrack(self):
-        if(self.dials.OutlineDial.ShowTrack):
-            self.dials.OutlineDial.ShowTrack = False
-            self.dials.PieChartDial.ShowTrack = False
-            self.buttons.showTrack.State = States.Inactive
-            self.buttons.showTrack.Text  = "Show track"
+        if(self.dials.card.OutlineDial.ShowTrack):
+            self.dials.card.OutlineDial.ShowTrack = False
+            self.dials.card.PieChartDial.ShowTrack = False
+            self.buttons.card.showTrack.State = States.Inactive
+            self.buttons.card.showTrack.Text  = "Show track"
         else:
-            self.dials.OutlineDial.ShowTrack = True
-            self.dials.PieChartDial.ShowTrack = True
-            self.buttons.showTrack.State = States.Active
-            self.buttons.showTrack.Text  = "Hide track"
+            self.dials.card.OutlineDial.ShowTrack = True
+            self.dials.card.PieChartDial.ShowTrack = True
+            self.buttons.card.showTrack.State = States.Active
+            self.buttons.card.showTrack.Text  = "Hide track"
 
     def HideFilling(self):
-        if(self.dials.OutlineDial.ShowFilling):
-            self.dials.OutlineDial.ShowFilling = False
-            self.dials.PieChartDial.ShowFilling = False
-            self.buttons.showFilling.State = States.Inactive
-            self.buttons.showFilling.Text  = "Show Filling"
+        if(self.dials.card.OutlineDial.ShowFilling):
+            self.dials.card.OutlineDial.ShowFilling = False
+            self.dials.card.PieChartDial.ShowFilling = False
+            self.buttons.card.showFilling.State = States.Inactive
+            self.buttons.card.showFilling.Text  = "Show Filling"
         else:
-            self.dials.OutlineDial.ShowFilling = True
-            self.dials.PieChartDial.ShowFilling = True
-            self.buttons.showFilling.State = States.Active
-            self.buttons.showFilling.Text  = "Hide Filling"
+            self.dials.card.OutlineDial.ShowFilling = True
+            self.dials.card.PieChartDial.ShowFilling = True
+            self.buttons.card.showFilling.State = States.Active
+            self.buttons.card.showFilling.Text  = "Hide Filling"
     def HideBackground(self):
-        if(self.dials.OutlineDial.ShowBackground):
-            self.dials.OutlineDial.ShowBackground = False
-            self.dials.PieChartDial.ShowBackground = False
-            self.buttons.showBackground.State = States.Inactive
-            self.buttons.showBackground.Text  = "Show Background"
+        if(self.dials.card.OutlineDial.ShowBackground):
+            self.dials.card.OutlineDial.ShowBackground = False
+            self.dials.card.PieChartDial.ShowBackground = False
+            self.buttons.card.showBackground.State = States.Inactive
+            self.buttons.card.showBackground.Text  = "Show Background"
         else:
-            self.dials.OutlineDial.ShowBackground = True
-            self.dials.PieChartDial.ShowBackground = True
-            self.buttons.showBackground.State = States.Active
-            self.buttons.showBackground.Text  = "Hide Background"
+            self.dials.card.OutlineDial.ShowBackground = True
+            self.dials.card.PieChartDial.ShowBackground = True
+            self.buttons.card.showBackground.State = States.Active
+            self.buttons.card.showBackground.Text  = "Hide Background"
     def SwitchState(self):
-        state = self.dials.OutlineDial.State
+        state = self.dials.card.OutlineDial.State
 
         if(state == 7):
-            self.dials.OutlineDial.State = States.Disabled
-            self.dials.PieChartDial.State = States.Disabled
-            self.dials.Information.State = States.Disabled
-            self.dials.Information.Text = "State: Disabled"
+            self.dials.card.OutlineDial.State = States.Disabled
+            self.dials.card.PieChartDial.State = States.Disabled
+            self.dials.card.Information.State = States.Disabled
+            self.dials.card.Information.Text = "State: Disabled"
         else:
             state += 1
 
             if state == States.Active:
-                self.dials.Information.Text = "State: Active"
+                self.dials.card.Information.Text = "State: Active"
             if state == States.Inactive:
-                self.dials.Information.Text = "State: Inactive"
+                self.dials.card.Information.Text = "State: Inactive"
             if state == States.Warning:
-                self.dials.Information.Text = "State: Warning"
+                self.dials.card.Information.Text = "State: Warning"
             if state == States.Warning:
-                self.dials.Information.Text = "State: Warning"
+                self.dials.card.Information.Text = "State: Warning"
             if state == States.Error:
-                self.dials.Information.Text = "State: Error"
+                self.dials.card.Information.Text = "State: Error"
             if state == States.Locked:
-                self.dials.Information.Text = "State: Locked"
+                self.dials.card.Information.Text = "State: Locked"
             if state == States.Unavailable:
-                self.dials.Information.Text = "State: Unavailable"
+                self.dials.card.Information.Text = "State: Unavailable"
             if state == States.Good:
-                self.dials.Information.Text = "State: Good"
+                self.dials.card.Information.Text = "State: Good"
 
-            self.dials.Information.State = state
-            self.dials.OutlineDial.State = state
-            self.dials.PieChartDial.State = state
+            self.dials.card.Information.State = state
+            self.dials.card.OutlineDial.State = state
+            self.dials.card.PieChartDial.State = state
 
         # Changing the states of all the buttons
-        self.buttons.switchState.State = self.dials.OutlineDial.State
-        self.buttons.showBackground.State = self.dials.OutlineDial.State
-        self.buttons.showFilling.State = self.dials.OutlineDial.State
-        self.buttons.showTrack.State = self.dials.OutlineDial.State
-        self.buttons.startingPoint.State = self.dials.OutlineDial.State
+        self.buttons.card.switchState.State = self.dials.card.OutlineDial.State
+        self.buttons.card.showBackground.State = self.dials.card.OutlineDial.State
+        self.buttons.card.showFilling.State = self.dials.card.OutlineDial.State
+        self.buttons.card.showTrack.State = self.dials.card.OutlineDial.State
+        self.buttons.card.startingPoint.State = self.dials.card.OutlineDial.State
 
         # Changing the track color of sliders
-        self.sliders.valueSlider.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
-        self.sliders.startAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
-        self.sliders.endAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
-        self.sliders.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
-        self.sliders.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.OutlineDial.State)
+        self.sliders.card.valueSlider.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.card.OutlineDial.State)
+        self.sliders.card.startAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.card.OutlineDial.State)
+        self.sliders.card.endAngle.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.card.OutlineDial.State)
+        self.sliders.card.trackWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.card.OutlineDial.State)
+        self.sliders.card.fillingWidth.value_track_color = StatesColors.Pressed.GetColorFrom(self.dials.card.OutlineDial.State)
     def SwitchEdges(self):
         # Inverse the current value
-        self.dials.OutlineDial.StartFromMiddle = not self.dials.OutlineDial.StartFromMiddle
-        self.dials.PieChartDial.StartFromMiddle = not self.dials.PieChartDial.StartFromMiddle
+        self.dials.card.OutlineDial.StartFromMiddle = not self.dials.card.OutlineDial.StartFromMiddle
+        self.dials.card.PieChartDial.StartFromMiddle = not self.dials.card.PieChartDial.StartFromMiddle
 
         # Change the text
-        if(self.dials.OutlineDial.StartFromMiddle):
-            self.buttons.startingPoint.Text = "Start: Middle"
+        if(self.dials.card.OutlineDial.StartFromMiddle):
+            self.buttons.card.startingPoint.Text = "Start: Middle"
         else:
-            self.buttons.startingPoint.Text = "Start: Edges"
+            self.buttons.card.startingPoint.Text = "Start: Edges"
 
     def SetValue(self, *args):
-        self.dials.OutlineDial.animated = False
-        self.dials.PieChartDial.animated = False
-        self.dials.OutlineDial.Value = self.sliders.valueSlider.value
-        self.dials.PieChartDial.Value = self.sliders.valueSlider.value
-        self.dials.Information.Text = "Value: {}".format(int(self.sliders.valueSlider.value))
-        self.dials.OutlineDial.animated = True
-        self.dials.PieChartDial.animated = True
+        self.dials.card.OutlineDial.animated = False
+        self.dials.card.PieChartDial.animated = False
+        self.dials.card.OutlineDial.Value = self.sliders.card.valueSlider.value
+        self.dials.card.PieChartDial.Value = self.sliders.card.valueSlider.value
+        self.dials.card.Information.Text = "Value: {}".format(int(self.sliders.card.valueSlider.value))
+        self.dials.card.OutlineDial.animated = True
+        self.dials.card.PieChartDial.animated = True
 
     def SetEnd(self, *args):
-        self.dials.OutlineDial.animated = False
-        self.dials.PieChartDial.animated = False
-        self.dials.PieChartDial.SetAttributes(endAngle = self.sliders.endAngle.value, startAngle= self.sliders.startAngle.value)
-        self.dials.OutlineDial.SetAttributes(endAngle = self.sliders.endAngle.value, startAngle= self.sliders.startAngle.value)
-        self.dials.Information.Text = "End angle: {}".format(int(self.sliders.endAngle.value))
-        self.dials.OutlineDial.animated = True
-        self.dials.PieChartDial.animated = True
+        self.dials.card.OutlineDial.animated = False
+        self.dials.card.PieChartDial.animated = False
+        self.dials.card.PieChartDial.SetAttributes(endAngle = self.sliders.card.endAngle.value, startAngle= self.sliders.card.startAngle.value)
+        self.dials.card.OutlineDial.SetAttributes(endAngle = self.sliders.card.endAngle.value, startAngle= self.sliders.card.startAngle.value)
+        self.dials.card.Information.Text = "End angle: {}".format(int(self.sliders.card.endAngle.value))
+        self.dials.card.OutlineDial.animated = True
+        self.dials.card.PieChartDial.animated = True
 
     def SetStart(self, *args):
-        self.dials.OutlineDial.animated = False
-        self.dials.PieChartDial.animated = False
-        self.dials.OutlineDial.SetAttributes(startAngle= self.sliders.startAngle.value, endAngle=self.sliders.endAngle.value)
-        self.dials.PieChartDial.SetAttributes(startAngle= self.sliders.startAngle.value, endAngle=self.sliders.endAngle.value)
-        self.dials.Information.Text = "Start angle: {}".format(int(self.sliders.startAngle.value))
-        self.dials.OutlineDial.animated = True
-        self.dials.PieChartDial.animated = True
+        self.dials.card.OutlineDial.animated = False
+        self.dials.card.PieChartDial.animated = False
+        self.dials.card.OutlineDial.SetAttributes(startAngle= self.sliders.card.startAngle.value, endAngle=self.sliders.card.endAngle.value)
+        self.dials.card.PieChartDial.SetAttributes(startAngle= self.sliders.card.startAngle.value, endAngle=self.sliders.card.endAngle.value)
+        self.dials.card.Information.Text = "Start angle: {}".format(int(self.sliders.card.startAngle.value))
+        self.dials.card.OutlineDial.animated = True
+        self.dials.card.PieChartDial.animated = True
 
     def SetTrackWidth(self, *args):
-        self.dials.OutlineDial.animated = False
-        self.dials.PieChartDial.animated = False
-        self.dials.OutlineDial.SetAttributes(TrackWidth=self.sliders.trackWidth.value)
-        self.dials.PieChartDial.SetAttributes(TrackWidth=self.sliders.trackWidth.value)
-        self.dials.Information.Text = "Track: {}".format(int(self.sliders.trackWidth.value))
-        self.dials.OutlineDial.animated = True
-        self.dials.PieChartDial.animated = True
+        self.dials.card.OutlineDial.animated = False
+        self.dials.card.PieChartDial.animated = False
+        self.dials.card.OutlineDial.SetAttributes(TrackWidth=self.sliders.card.trackWidth.value)
+        self.dials.card.PieChartDial.SetAttributes(TrackWidth=self.sliders.card.trackWidth.value)
+        self.dials.card.Information.Text = "Track: {}".format(int(self.sliders.card.trackWidth.value))
+        self.dials.card.OutlineDial.animated = True
+        self.dials.card.PieChartDial.animated = True
 
     def SetFillingWidth(self, *args):
-        self.dials.OutlineDial.animated = False
-        self.dials.PieChartDial.animated = False
-        self.dials.OutlineDial.SetAttributes(FillingWidth=self.sliders.fillingWidth.value)
-        self.dials.PieChartDial.SetAttributes(FillingWidth=self.sliders.fillingWidth.value)
-        self.dials.Information.Text = "Filling: {}".format(int(self.sliders.fillingWidth.value))
-        self.dials.OutlineDial.animated = True
-        self.dials.PieChartDial.animated = True
+        self.dials.card.OutlineDial.animated = False
+        self.dials.card.PieChartDial.animated = False
+        self.dials.card.OutlineDial.SetAttributes(FillingWidth=self.sliders.card.fillingWidth.value)
+        self.dials.card.PieChartDial.SetAttributes(FillingWidth=self.sliders.card.fillingWidth.value)
+        self.dials.card.Information.Text = "Filling: {}".format(int(self.sliders.card.fillingWidth.value))
+        self.dials.card.OutlineDial.animated = True
+        self.dials.card.PieChartDial.animated = True
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, **kwargs):
@@ -327,23 +343,23 @@ class WindowLayout(BoxLayout):
             self.add_widget(self.dials)
             self.add_widget(self.sliders)
 
-            self.buttons.switchState.on_press = self.SwitchState
-            self.buttons.showTrack.on_press = self.HideTrack
-            self.buttons.showFilling.on_press = self.HideFilling
-            self.buttons.showBackground.on_press = self.HideBackground
-            self.buttons.startingPoint.on_press = self.SwitchEdges
+            self.buttons.card.switchState.on_press = self.SwitchState
+            self.buttons.card.showTrack.on_press = self.HideTrack
+            self.buttons.card.showFilling.on_press = self.HideFilling
+            self.buttons.card.showBackground.on_press = self.HideBackground
+            self.buttons.card.startingPoint.on_press = self.SwitchEdges
 
-            self.sliders.valueSlider.bind(value = self.SetValue)
-            self.sliders.startAngle.bind(value = self.SetStart)
-            self.sliders.endAngle.bind(value = self.SetEnd)
-            self.sliders.trackWidth.bind(value = self.SetTrackWidth)
-            self.sliders.fillingWidth.bind(value = self.SetFillingWidth)
+            self.sliders.card.valueSlider.bind(value = self.SetValue)
+            self.sliders.card.startAngle.bind(value = self.SetStart)
+            self.sliders.card.endAngle.bind(value = self.SetEnd)
+            self.sliders.card.trackWidth.bind(value = self.SetTrackWidth)
+            self.sliders.card.fillingWidth.bind(value = self.SetFillingWidth)
 
-            self.sliders.valueSlider.value  = self.dials.OutlineDial.Value
-            self.sliders.startAngle.value   = self.dials.OutlineDial.Properties.startAngle
-            self.sliders.endAngle.value     = self.dials.OutlineDial.Properties.endAngle
-            self.sliders.trackWidth.value   = self.dials.OutlineDial.Properties.trackWidth
-            self.sliders.fillingWidth.value = self.dials.OutlineDial.Properties.fillingWidth
+            self.sliders.card.valueSlider.value  = self.dials.card.OutlineDial.Value
+            self.sliders.card.startAngle.value   = self.dials.card.OutlineDial.Properties.startAngle
+            self.sliders.card.endAngle.value     = self.dials.card.OutlineDial.Properties.endAngle
+            self.sliders.card.trackWidth.value   = self.dials.card.OutlineDial.Properties.trackWidth
+            self.sliders.card.fillingWidth.value = self.dials.card.OutlineDial.Properties.fillingWidth
 
             Debug.End()
     #endregion
