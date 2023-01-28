@@ -16,6 +16,9 @@ from kivy.core.window import Window
 from kivy.graphics import Line, Ellipse, Color
 from kivy.uix.stencilview import StencilView
 
+from kivymd.app import MDApp
+from kivymd.uix.slider import MDSlider
+
 import random
 from BRS.GUI.Utilities.font import Font
 from BRS.Utilities.states import StatesColors
@@ -351,7 +354,7 @@ class MainWidget(Widget):
 #====================================================================#
 # Application Building
 #====================================================================#
-class KivyUIApp(App):
+class KivyUIApp(MDApp):
     def build(self):
         Debug.Start()
         Debug.Log("Building application's parameters...")
