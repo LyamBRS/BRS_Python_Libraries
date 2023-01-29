@@ -370,42 +370,42 @@ class MainWidget(Widget):
 #====================================================================#
 # Application Building
 #====================================================================#
-class KivyUIApp(MDApp):
-    def build(self):
-        Debug.Start()
-        Debug.Log("Building application's parameters...")
-        #---------------------------------------------------------# Title
-        Debug.Log("Setting Name...")
-        self.title = "BRS Dial Tester"
-        #---------------------------------------------------------# Window properties
-        Debug.Log("Setting Window configurations...")
+# class KivyUIApp(MDApp):
+#     def build(self):
+#         Debug.Start()
+#         Debug.Log("Building application's parameters...")
+#         #---------------------------------------------------------# Title
+#         Debug.Log("Setting Name...")
+#         self.title = "BRS Dial Tester"
+#         #---------------------------------------------------------# Window properties
+#         Debug.Log("Setting Window configurations...")
 
-        Window.borderless = False
-        Window.resizable = True
-        Window.left = -1024
-        Window.top = 600
-        Window.fullscreen = 'auto'
-        #---------------------------------------------------------#
-        Debug.Log("Building layouts")
+#         Window.borderless = False
+#         Window.resizable = True
+#         Window.left = -1024
+#         Window.top = 600
+#         Window.fullscreen = 'auto'
+#         #---------------------------------------------------------#
+#         Debug.Log("Building layouts")
 
-        self.windowLayout = WindowLayout()
-        Debug.End()
-        return self.windowLayout
+#         self.windowLayout = WindowLayout()
+#         Debug.End()
+#         return self.windowLayout
 
-    def run(self):
-        Debug.Start()
-        Debug.Warn("Kivy application called the run function")
-        Debug.End()
-        return super().run()
+#     def run(self):
+#         Debug.Start()
+#         Debug.Warn("Kivy application called the run function")
+#         Debug.End()
+#         return super().run()
 
-    def on_start(self):
-        Debug.Start("on_start")
-        Debug.End()
-#====================================================================#
-# Application Running
-#====================================================================#
-Debug.enableConsole = True
-Debug.Warn(logged = "Launching KivyUIApp through .run")
-KivyUIApp().run()
-Debug.Warn(logged = "============================END OF SCRIPT============================")
+#     def on_start(self):
+#         Debug.Start("on_start")
+#         Debug.End()
+# #====================================================================#
+# # Application Running
+# #====================================================================#
+# Debug.enableConsole = True
+# Debug.Warn(logged = "Launching KivyUIApp through .run")
+# KivyUIApp().run()
+# Debug.Warn(logged = "============================END OF SCRIPT============================")
 
