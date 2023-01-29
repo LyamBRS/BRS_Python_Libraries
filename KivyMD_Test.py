@@ -228,8 +228,8 @@ class KivyUIApp(MDApp):
 
         Window.borderless = False
         Window.resizable = True
-        Window.left = -1024
-        Window.top = 600
+        # Window.left = -1024
+        # Window.top = 600
         Window.fullscreen = 'auto'
         #---------------------------------------------------------#
         Debug.Log("Building layouts")
