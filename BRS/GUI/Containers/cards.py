@@ -58,6 +58,8 @@ class WidgetCard(BRS_CardLayoutAttributes, Widget):
         # [Step 1]: Update drawings based on new values
         self._MDCard.padding = self._current_padding
         self._MDCard.spacing = self._current_spacing
+        self._MDCard.elevation = self._current_elevation
+        self._MDCard.shadow_softness = self._current_ShadowSoftness
 
         # [Step 2]: Update background's positions
         self._MDCard.pos   = (self._current_pos[0], self._current_pos[1])
@@ -98,9 +100,11 @@ class WidgetCard(BRS_CardLayoutAttributes, Widget):
         self._MDCard.md_bg_color = GUIColors.Card
         self._MDCard.shadow_color = GUIColors.CardShadow
         self._MDCard.radius = Rounding.default
-        self._MDCard.spacing = "10dp"
-        self._MDCard.elevation = Shadow.Elevation.default
-        self._MDCard.shadow_softness = Shadow.Smoothness.default
+
+        self._MDCard.spacing = self._current_spacing
+        self._MDCard.padding = self._current_padding
+        self._MDCard.elevation = self._current_elevation
+        self._MDCard.shadow_softness = self._current_ShadowSoftness
         #endregion
         #region --------------------------- Set Canvas
         Debug.Log("Creating Canvas")
