@@ -13,7 +13,7 @@ from kivy.graphics.transformation import Matrix
 from kivy.uix.image import Image
 
 
-from BRS.GUI.Utilities.drawings import BRS_SVGWidgetAttributes
+from BRS.GUI.Utilities.attributes import BRS_SVGWidgetAttributes
 from BRS.Utilities.states import States,StatesColors
 from BRS.Debug.consoleLog import Debug
 #====================================================================#

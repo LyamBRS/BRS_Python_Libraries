@@ -9,7 +9,7 @@ import time
 from BRS.Debug.consoleLog import Debug
 from BRS.Utilities.states import States,StatesColors
 from BRS.GUI.Utilities.colors import GUIColors
-from Libraries.BRS_Python_Libraries.BRS.GUI.Utilities.WidgetAttributes import Shadow
+from BRS.GUI.Utilities.references import Shadow
 from kivy.clock import Clock
 from kivy.graphics import Ellipse
 from kivy.graphics import Line
@@ -722,6 +722,19 @@ class Attribute_Foundation:
                      }
         Debug.End()
         return attributes
+
+    def _Attribute_Foundation_SetAttributes(self, state=None, pos=None, size=None, radius=None, posHint=None, sizeHint=None):
+        """
+            Sets all the foundation attributes of the widget to something.
+            This is private, use your widgets's SetAttribute function instead.
+        """
+        self._wanted_Pos = self._wanted_Pos if (pos == None) else (pos[0], pos[1])
+        self._wanted_Size = self._wanted_Size if (size == None) else (size[0], size[1])
+
+        self._wanted_Pos_hint = self._wanted_Pos_hint if (posHint == None) else (posHint[0], posHint[1])
+        self._wanted_Size_hint = self._wanted_Size_hint if (sizeHint == None) else (sizeHint[0], sizeHint[1])
+
+        self._wanted_Radius = self._wanted_Radius if(radius == None) else radius
     #endregion
     pass
 
@@ -1226,6 +1239,28 @@ class Attribute_Shadow:
     """
         Private variable representing the current softness of the shadow
     """
+    _wanted_ShadowColor     = GUIColors.CardShadow
+    """
+        Private variable used to store the wanted shadow color of
+        the widget. Defaults to GUIColors.CardShadow.
+    """
+    _current_ShadowColor    = GUIColors.CardShadow
+    """
+        Private variable used to store the current shadow color of
+        the widget. Defaults to GUIColors.CardShadow.
+
+        Use this to update the widget's
+        real primary color in your Animation binded on_progress function.
+    """
+    _previousShadowColor    = GUIColors.CardShadow
+    """
+        When the widget's showShadow is set to false, this stores what wantedColor previously was
+        for when you decide to show the shadow again.
+    """
+    _showShadow:bool        = True
+    """
+        Private variable which stores if the shadow should be shown or not.
+    """
     #endregion
     #region   --------------------------- GET SET
     #region   -- Elevation
@@ -1245,9 +1280,12 @@ class Attribute_Shadow:
         """
 
         # [Step 1]: Update the shape based on the new value
+        Debug.Start("Elevation.setter")
         if(newValue != self._wanted_Elevation):
+            Debug.Log("New value saved in wanted.")
             self._wanted_Elevation  = newValue
             self._UpdateShape()
+        Debug.End()
     #endregion
     #region   -- Softness
     @property
@@ -1270,11 +1308,74 @@ class Attribute_Shadow:
             self._wanted_ShadowSoftness  = newValue
             self._UpdateShape()
     #endregion
+    #region   -- Color
+    @property
+    def ShadowColor(self) -> tuple:
+        """[GET]:
+            Returns the shadow color of the widget
+        """
+        # Build a temporary tuple to return to avoid pointer returns
+
+        return (
+                self._wanted_ShadowColor[0],
+                self._wanted_ShadowColor[1],
+                self._wanted_ShadowColor[2],
+                self._wanted_ShadowColor[3],
+                )
+
+    @ShadowColor.setter
+    def ShadowColor(self, newValue:tuple) -> None:
+        """[SET:]
+            Sets the wanted shadow color and calls the updater.
+        Args:
+            newValue (tuple): the new color.
+        """
+        # [Step 0]: Rebuild the array to avoid pointer passing
+        color = (
+            newValue[0],newValue[1],newValue[2],newValue[3]
+        )
+        # [Step 1]: Update the shape based on the new value
+        if(color != self._wanted_ShadowColor):
+            self._wanted_ShadowSoftness  = color
+            self._UpdateShape()
+    #endregion
+    #region   -- Show
+    @property
+    def ShowShadow(self) -> bool:
+        """[GET]:
+            Returns if the shadow is shown or not.
+            True: The widget shows a shadow
+            False: The widget does not show a shadow
+        """
+        # Build a temporary tuple to return to avoid pointer returns
+        return self._showShadow
+
+    @ShadowColor.setter
+    def ShadowColor(self, newValue:bool) -> None:
+        """[SET:]
+            Sets if a shadow should be shown or not.
+            Will automatically change wanted_color of the shadow
+            to transparent. If you change shadow color, it will
+            also update this if set to transparent.
+        Args:
+            newValue (bool): Show shadow or not.
+        """
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._showShadow):
+            if(newValue):
+                self._wanted_ShadowColor = (self._previousShadowColor[0], self._previousShadowColor[1], self._previousShadowColor[2], self._previousShadowColor[3])
+            else:
+                self._previousShadowColor = (self._wanted_ShadowColor[0], self._wanted_ShadowColor[1], self._wanted_ShadowColor[2], self._wanted_ShadowColor[3])
+                self._wanted_ShadowColor = (0,0,0,0)
+            self._UpdateColors()
+    #endregion
+    
     #endregion
     #region   --------------------------- METHODS
     def _Attribute_Shadow_SetToWanted(self):
         self._current_elevation = self._wanted_Elevation
         self._current_ShadowSoftness = self._wanted_ShadowSoftness
+        self._current_ShadowColor = self._wanted_ShadowColor
 
     def _Attribute_Shadow_GetShapeComparator(self):
         comparator = {
@@ -1289,6 +1390,28 @@ class Attribute_Shadow:
                         "_current_ShadowSoftness" : self._wanted_ShadowSoftness,
                      }
         return attributes
+
+    def _Attribute_Shadow_GetColorComparator(self):
+        comparator = {
+                        "_current_ShadowColor"      : self._current_ShadowColor,
+                     }
+        return comparator
+
+    def _Attribute_Shadow_GetColorArguments(self):
+        attributes = {
+                        "_current_ShadowColor"      : self._wanted_ShadowColor,
+                     }
+        return attributes
+    
+    def _Attribute_Shadow_SetAttributes(self, shadowColor=None, elevation=None, softness=None, showShadow=None):
+        """
+            Sets all the shadow attributes of the widget to something.
+            This is private, use your widgets's SetAttribute function instead.
+        """
+        self._wanted_ShadowColor = self._wanted_ShadowColor if (shadowColor == None) else (shadowColor[0], shadowColor[1], shadowColor[2],shadowColor[3])
+        self._wanted_Elevation = self._wanted_Elevation if (elevation == None) else elevation
+        self._wanted_ShadowSoftness = self._wanted_ShadowSoftness if(softness == None) else softness
+        self._showShadow = self._showShadow if(showShadow==None) else showShadow
     #endregion
     pass
 
@@ -1418,112 +1541,114 @@ class Attribute_Card:
     #endregion
     pass
 
+# UNFINISHED
+class Attribute_Text:
+    #region   --------------------------- DOCSTRING
+    """
+        Inherited class which contains all Animated
+        properties specific to a widget which text
+        is it's main purpose.
 
-# class Attribute_Label:
-#     #region   --------------------------- DOCSTRING
-#     """
-#         Inherited class which contains all Animated
-#         properties specific to labels
+        Contains:
+        - Text: Sets the text displayed by the widget through self.text
+        - Font: Font applied to the label.
+    """
+    #endregion
+    #region   --------------------------- MEMBERS
+    _font:Font = Font()
+    """Private variable storing the BRS font of the widget."""
+    #endregion
+    #region   --------------------------- GET SET
+    #region   -- Text
+    @property
+    def Text(self) -> str:
+        """[GET]:
+            Returns the shown text of the widget.
+        """
+        return self.text
 
-#         Contains:
-#         - Text: Sets the text displayed by the widget
-#         - Font: Font applied to the label.
-#     """
-#     #endregion
-#     #region   --------------------------- MEMBERS
-#     _font:Font = Font()
-#     #endregion
-#     #region   --------------------------- GET SET
-#     #region   -- Text
-#     @property
-#     def Text(self) -> str:
-#         """[GET]:
-#             Returns the current padding of the layout
-#         """
-#         return self._wanted_padding
+    @Text.setter
+    def Text(self, newValue:str) -> None:
+        """[SET:]
+            Sets the text that the widget should
+            display.
+        Args:
+            newValue (str): new text.
+        """
+        # [Step 1]: Test the new text with the old text to avoid useless program executions
+        if(newValue != self.text):
+            self.text  = newValue
+    #endregion
+    #region   -- Font
+    @property
+    def Font(self) -> Font:
+        """[GET]:
+            Returns the private font class representing
+            the font used by the widget's text.
+        """
+        return self._font
 
-#     @Text.setter
-#     def Text(self, newValue:float) -> None:
-#         """[SET:]
-#             Sets the wanted padding of the layout.
-#             Then calls the shape animator of the layout.
-#         Args:
-#             newValue (str): amount of padding.
-#         """
-#         # [Step 1]: Update the shape based on the new value
-#         if(newValue != self._wanted_padding):
-#             self._wanted_padding  = newValue
-#             self._UpdateShape()
-#     #endregion
-#     #region   -- Font
-#     @property
-#     def Spacing(self) -> str:
-#         """[GET]:
-#             Returns the current spacing of the layout
-#         """
-#         return self._wanted_spacing
+    @Font.setter
+    def Font(self, newValue:Font) -> None:
+        """[SET:]
+            Sets the wanted spacing of the layout.
+            Then calls the shape animator of the layout.
+        Args:
+            newValue (str): amount of spacing.
+        """
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._wanted_spacing):
+            self._wanted_spacing  = newValue
+            self._UpdateShape()
+    #endregion
+    #region   -- Orientation
+    @property
+    def Orientation(self) -> str:
+        """[GET]:
+            Returns the current spacing of the layout
+        """
+        return self._MDCard.orientation
 
-#     @Spacing.setter
-#     def Spacing(self, newValue:float) -> None:
-#         """[SET:]
-#             Sets the wanted spacing of the layout.
-#             Then calls the shape animator of the layout.
-#         Args:
-#             newValue (str): amount of spacing.
-#         """
-#         # [Step 1]: Update the shape based on the new value
-#         if(newValue != self._wanted_spacing):
-#             self._wanted_spacing  = newValue
-#             self._UpdateShape()
-#     #endregion
-#     #region   -- Orientation
-#     @property
-#     def Orientation(self) -> str:
-#         """[GET]:
-#             Returns the current spacing of the layout
-#         """
-#         return self._MDCard.orientation
+    @Orientation.setter
+    def Orientation(self, newValue:str) -> None:
+        """[SET:]
+            Sets the wanted spacing of the layout.
+            Then calls the shape animator of the layout.
+        Args:
+            newValue (str): amount of spacing.
+        """
+        # [Step 1]: Update the shape based on the new value
+        if(newValue != self._MDCard.orientation):
+            self._MDCard.orientation  = newValue
+            self._UpdateShape()
+    #endregion
+    #endregion
+    #region   --------------------------- METHODS
+    def _Attribute_Card_SetToWanted(self):
+        self._current_padding = self._wanted_padding
+        self._current_spacing = self._wanted_spacing
 
-#     @Orientation.setter
-#     def Orientation(self, newValue:str) -> None:
-#         """[SET:]
-#             Sets the wanted spacing of the layout.
-#             Then calls the shape animator of the layout.
-#         Args:
-#             newValue (str): amount of spacing.
-#         """
-#         # [Step 1]: Update the shape based on the new value
-#         if(newValue != self._MDCard.orientation):
-#             self._MDCard.orientation  = newValue
-#             self._UpdateShape()
-#     #endregion
-#     #endregion
-#     #region   --------------------------- METHODS
-#     def _Attribute_Card_SetToWanted(self):
-#         self._current_padding = self._wanted_padding
-#         self._current_spacing = self._wanted_spacing
+    def _Attribute_Card_GetShapeComparator(self):
+        comparator = {
+                        "_current_padding"      : self._current_padding,
+                        "_current_spacing"      : self._current_spacing,
+                     }
+        return comparator
 
-#     def _Attribute_Card_GetShapeComparator(self):
-#         comparator = {
-#                         "_current_padding"      : self._current_padding,
-#                         "_current_spacing"      : self._current_spacing,
-#                      }
-#         return comparator
-
-#     def _Attribute_Card_GetShapeArguments(self):
-#         attributes = {
-#                         "_current_padding"      : self._wanted_padding,
-#                         "_current_spacing"      : self._wanted_spacing,
-#                      }
-#         return attributes
+    def _Attribute_Card_GetShapeArguments(self):
+        attributes = {
+                        "_current_padding"      : self._wanted_padding,
+                        "_current_spacing"      : self._wanted_spacing,
+                     }
+        return attributes
     
-#     def Add_Widget(self, widgetToAdd):
-#         """_summary_
-#             Adds a widget to the card. You must build the card in the widgets attribute handler's Init Animations
-#         """
-#         self._MDCard.add_widget(widgetToAdd)
-#     #endregion
-#     pass
+    def Add_Widget(self, widgetToAdd):
+        """_summary_
+            Adds a widget to the card. You must build the card in the widgets attribute handler's Init Animations
+        """
+        self._MDCard.add_widget(widgetToAdd)
+    #endregion
+    pass
 
 
 class Attribute_Value:
@@ -2014,7 +2139,7 @@ class Animated:
     """ List of attribute's functions that sets their current to wanted """
     #endregion
     #region   --------------------------- METHODS
-    def _StartShapeAnimation(self, duration:float=0.1, transition:str="in_out_cubic"):
+    def _StartShapeAnimation(self, duration:float=0.5, transition:str="in_out_cubic"):
         Debug.Start("StartShapeAnimation")
         """
             Call this instead of manually building your widget's
@@ -2072,7 +2197,7 @@ class Animated:
         # endregion
         Debug.End()
         pass
-    def _StartColorAnimation(self, duration:float=0.1, transition:str="in_out_cubic"):
+    def _StartColorAnimation(self, duration:float=0.5, transition:str="in_out_cubic"):
         Debug.Start("StartColorAnimation")
         """
             Call this instead of manually building your widget's
@@ -2132,7 +2257,7 @@ class Animated:
     def _InstantAnimation(self):
         """ Will make all values equal to their wanted equivalent """
         Debug.Start("_InstantAnimation")
-        
+
         for function in self._animation_InstantAnimation_functions:
             function()
 
@@ -2727,7 +2852,10 @@ class BRS_CardLayoutAttributes(
                         showShadow = None,
                         orientation = None,
                         padding = None,
-                        spacing = None
+                        spacing = None,
+                        state = None,
+                        shadowSoftness = None,
+                        elevation = None
                         ):
         """
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
@@ -2735,17 +2863,8 @@ class BRS_CardLayoutAttributes(
         """
         Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
-        # self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
-        # if(self._wanted_FillingWidth <= 0):
-        #     self._wanted_FillingWidth = 1
-
-        # self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
-        # if(self._wanted_TrackWidth <= 0):
-        #     self._wanted_TrackWidth = 1
-
-        # self._wanted_Value        = self._current_value        if (value == None)          else self.Properties.TestValue(value)
-        self._wanted_Pos          = (self._wanted_Pos[0],self._wanted_Pos[1]) if (position == None) else (position[0],position[1])
-        self._wanted_Size         = (self._wanted_Size[0],self._wanted_Size[1]) if (size == None) else (size[0],size[1])
+        self._Attribute_Foundation_SetAttributes(state=state,pos=position,size=size)
+        self._Attribute_Shadow_SetAttributes(elevation=elevation,softness=shadowSoftness,showShadow=showShadow)
 
         # self._showTrack = self._showTrack if(showTrack == None) else showTrack
         # self._showTrack = self._showFilling if(showFilling == None) else showFilling
@@ -2830,54 +2949,45 @@ class BRS_CardLayoutAttributes(
 # --------------------------------------------------
 class BRS_ButtonWidgetAttributes(
                                 Attribute_Foundation,
-                                Attribute_Card,
                                 Attribute_Shadow,
-                                Attribute_Background,
                                 Animated
                                 ):
     #region   --------------------------- DOCSTRING
     '''
         Inherited object containing standard get set
-        and functions used in any BRS Card layouts to avoid
+        and functions used in any BRS MD buttons to avoid
         useless calls.
 
-        Your widgets should inherit this event if not all
-        of it is used
+        Your widgets should inherit this attribute
     '''
     #endregion
     #region   =========================== ANIMATION CONSTRUCTOR
     def InitAnimations(self):
         """Call this at the start of your widget's __init__"""
 
-        self._animation_ShapeArguments_functions = {
-                                                    self._Attribute_Foundation_GetShapeArguments,
-                                                    self._Attribute_Card_GetShapeArguments,
-                                                    self._Attribute_Shadow_GetShapeArguments
+        self._animation_ShapeArguments_functions =  {
+                                                        self._Attribute_Foundation_GetShapeArguments,
+                                                        self._Attribute_Shadow_GetShapeArguments
                                                     }
 
         self._animation_ShapeComparator_functions = {
-                                                    self._Attribute_Foundation_GetShapeComparator,
-                                                    self._Attribute_Card_GetShapeComparator,
-                                                    self._Attribute_Shadow_GetShapeComparator
+                                                        self._Attribute_Foundation_GetShapeComparator,
+                                                        self._Attribute_Shadow_GetShapeComparator
                                                     }
 
-        self._animation_ColoArguments_functions = {
-                                                    self._Attribute_Background_GetColorsArguments
+        self._animation_ColoArguments_functions =   {
+                                                        self._Attribute_Shadow_GetColorArguments
                                                     }
 
         self._animation_ColorComparator_functions = {
-                                                    self._Attribute_Background_GetColorsComparator
+                                                        self._Attribute_Shadow_GetColorComparator
                                                     }
 
         self._animation_InstantAnimation_functions = {
                                                         self._Attribute_Foundation_SetToWanted,
-                                                        self._Attribute_Background_SetToWanted,
-                                                        self._Attribute_Card_SetToWanted,
                                                         self._Attribute_Shadow_SetToWanted
                                                      }
 
-        # Building the card here
-        self._MDCard = MDCard()
     #endregion
     #region   --------------------------- MEMBERS
     #endregion
@@ -2885,13 +2995,16 @@ class BRS_ButtonWidgetAttributes(
     #endregion
     #region   --------------------------- METHODS
     def SetAttributes(self,
-                        position = None,
+                        pos = None,
                         size = None,
-                        showBackground = None,
+                        posHint = None,
+                        sizeHint = None,
+                        radius = None,
+                        state = None,
                         showShadow = None,
-                        orientation = None,
-                        padding = None,
-                        spacing = None
+                        shadowColor = None,
+                        shadowElevation = None,
+                        shadowSoftness = None
                         ):
         """
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
@@ -2899,28 +3012,8 @@ class BRS_ButtonWidgetAttributes(
         """
         Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
-        # self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
-        # if(self._wanted_FillingWidth <= 0):
-        #     self._wanted_FillingWidth = 1
-
-        # self._wanted_TrackWidth   = self._current_trackWidth   if (TrackWidth == None)     else TrackWidth
-        # if(self._wanted_TrackWidth <= 0):
-        #     self._wanted_TrackWidth = 1
-
-        # self._wanted_Value        = self._current_value        if (value == None)          else self.Properties.TestValue(value)
-        self._wanted_Pos          = (self._wanted_Pos[0],self._wanted_Pos[1]) if (position == None) else (position[0],position[1])
-        self._wanted_Size         = (self._wanted_Size[0],self._wanted_Size[1]) if (size == None) else (size[0],size[1])
-
-        # self._showTrack = self._showTrack if(showTrack == None) else showTrack
-        # self._showTrack = self._showFilling if(showFilling == None) else showFilling
-        self._showBackground = self._showBackground if(showBackground == None) else showBackground
-        self._showShadow = self._showShadow if(showShadow == None) else showShadow
-
-        self._wanted_padding = self._wanted_padding if(padding == None) else padding
-        self._wanted_spacing = self._wanted_spacing if(spacing == None) else spacing
-
-        self.Orientation = self.Orientation if(orientation == None) else orientation
-
+        self._Attribute_Foundation_SetAttributes(state=state,pos=pos,size=size,sizeHint=sizeHint,posHint=posHint,radius=radius)
+        self._Attribute_Shadow_SetAttributes(shadowColor=shadowColor,elevation=shadowElevation,softness=shadowSoftness,showShadow=showShadow)
         self._UpdateShape()
         Debug.End()
     # ------------------------------------------------------
@@ -2930,10 +3023,7 @@ class BRS_ButtonWidgetAttributes(
         """
         Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
-        # self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
-        # self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
-        self._wanted_BackgroundColor = GUIColors.Card if self._showBackground else (0,0,0,0)
-        self._wanted_BackgroundShadowColor = GUIColors.CardShadow if self._showShadow else (0,0,0,0)
+        self._wanted = GUIColors.CardShadow if self._showShadow else (0,0,0,0)
 
         # [Step 2]: Start animation
         # Debug.Log("[Step 2]:")
@@ -2977,9 +3067,6 @@ class BRS_ButtonWidgetAttributes(
             Do not call this function outside of this widget
         """
         Debug.Start("_UpdateShape")
-        # [Step 0]: Getting values from widget properties
-        # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
-
         # [Step 1]: Checking if widget should have animations or not
         if(self.animated):
             self._StartShapeAnimation()

@@ -27,8 +27,7 @@ from PIL import Image
 
 import random
 from BRS.Debug.consoleLog import Debug
-from BRS.Utilities.states import StatesColors
-from BRS.Utilities.states import States
+from BRS.Utilities.states import StatesColors,States
 from BRS.GUI.Utilities.font import Font
 from BRS.GUI.Inputs.buttons import TextButton
 from BRS.GUI.Containers.cards import WidgetCard

@@ -4,6 +4,8 @@
 """
     This file contains classes that can be seen as structures.
     The goal is to uniformize how widget are drawn on the screen.
+
+    These are global and referenced to.
 """
 #====================================================================#
 # Imports
@@ -32,7 +34,16 @@ class Shadow:
         """Elevation value when a widget is pressed on."""
 
     class Smoothness:
-        """shadow smootheness attribute of widgets"""
+        """Shadow smootheness attribute of widgets"""
+        default:float = 90
+        """Default value when the widget is not pressed not hovering"""
+        hovering:float = 30
+        """Elevation value when a cursor is above a widget """
+        pressed:float = 10
+        """Elevation value when a widget is pressed on."""
+
+    class Radius:
+        """Shadow radius attribute of widgets"""
         default:float = 90
         """Default value when the widget is not pressed not hovering"""
         hovering:float = 30
@@ -54,6 +65,16 @@ class Rounding:
     #region   --------------------------- MEMBERS
     default:float = "20dp"
     """Default value when the widget is not pressed not hovering"""
+
+    class Cards:
+        """Edge's radius of cards elements"""
+        default:float = "20dp"
+        """Default value when the widget is not pressed not hovering"""
+
+    class Buttons:
+        """Edge's radius of buttons elements"""
+        default:float = "10dp"
+        """Default value when the widget is not pressed not hovering"""
      #endregion
     #region   --------------------------- METHODS
     #endregion

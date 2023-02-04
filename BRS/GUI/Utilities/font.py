@@ -9,6 +9,8 @@ from typing import Any
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+
+from kivymd.uix.button import MDFlatButton
 #====================================================================#
 # Functions
 #====================================================================#

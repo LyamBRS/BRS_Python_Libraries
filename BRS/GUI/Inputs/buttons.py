@@ -6,8 +6,11 @@
 # Imports
 #====================================================================#
 from BRS.Utilities.states import States,StatesColors
+from BRS.GUI.Utilities.attributes import BRS_CardLayoutAttributes, BRS_ButtonWidgetAttributes
 from BRS.GUI.Utilities.font import Font
+from BRS.GUI.Utilities.references import Shadow, Rounding
 from BRS.Debug.consoleLog import Debug
+from BRS.GUI.Utilities.colors import GUIColors
 
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
@@ -17,6 +20,13 @@ from kivy.uix.behaviors import ButtonBehavior
 from kivy.graphics import RoundedRectangle
 from kivy.graphics import Color
 from kivy.event import EventDispatcher
+
+from kivy.properties import (
+    NumericProperty,
+    ObjectProperty,
+)
+
+from kivymd.uix.button import MDRaisedButton, BaseButton
 #====================================================================#
 # Functions
 #====================================================================#
@@ -200,14 +210,69 @@ class TextButton(ButtonBehavior, Widget):
     #endregion
     pass
 #====================================================================#
-class FloatingTextButton(BRS_CardLayoutAttributes, Widget):
+def Get_RaisedButton(text:str=""):
+    """
+        Attempting to uniformize KivyMD buttons when building the application
+        rather than manually setting all the button's values individually each time.
+    """
+
+    # Create the button to return
+    button = MDRaisedButton(text=text)
+
+    button.shadow_color =  GUIColors.CardShadow
+
+    button.theme_cls
+
+    button.size_hint_max = (1,1)
+    button.size_hint_min = (0,0)
+
+    button.size_hint = (None,None)
+
+    return button
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
+class FloatingTextButton(BRS_ButtonWidgetAttributes, Widget):
     #region   --------------------------- DOCSTRING
-    ''' 
-        This class is a simple Layout class which takes the appearence of a simple
-        card style container. This uses KivyMD cards.
-    '''
+    """ 
+        This class builds a simple, Material design floating button.
+        It has BRS_ButtonWidgetAttributes.
+
+        You can directly access the MD button through self.button in order to 
+        set bindings for on_press, on_release for example.
+
+        This class sole purpose is to interface custom BRS attributes easily
+        without needing to redefine 1000 things about the button manually.
+
+        However, these button should not be used inside of cards, but rather outside of them.
+    """
     #endregion
     #region   --------------------------- MEMBERS
+    _default_md_bg_color = None
+    _default_md_bg_color_disabled = None
+    _default_theme_text_color = "Custom"
+    _default_text_color = "PrimaryHue"
     #endregion
     #region   --------------------------- METHODS
     #region   -- Private
@@ -222,14 +287,19 @@ class FloatingTextButton(BRS_CardLayoutAttributes, Widget):
         Debug.Start("_AnimatingShapes")
 
         # [Step 1]: Update drawings based on new values
-        self._MDCard.padding = self._current_padding
-        self._MDCard.spacing = self._current_spacing
-        self._MDCard.elevation = self._current_elevation
-        self._MDCard.shadow_softness = self._current_ShadowSoftness
+        Debug.Log("Setting widget to current values")
+        self.button.elevation = self._current_elevation
+        self.button.shadow_softness = self._current_ShadowSoftness
+        self.button.radius = self._current_radius
 
         # [Step 2]: Update background's positions
-        self._MDCard.pos   = (self._current_pos[0], self._current_pos[1])
-        self._MDCard.size  = (self._current_size[0], self._current_size[1])
+        self.pos   = self.button.pos#(self._current_pos[0], self._current_pos[1])
+        self.size  = self.button.size#(self._current_size[0], self._current_size[1])
+
+        Debug.Warn(f"Elevation is now: {self.button.elevation}")
+        Debug.Warn(f"Radius: {self.button.radius}")
+        Debug.Warn(f"Shadow_softness: {self.button.shadow_softness}")
+        Debug.Log("shadow_color = {}".format(self.buttonshadow_color))
         Debug.End()
     # ------------------------------------------------------
     def _AnimatingColors(self, animation, value, theOtherOne):
@@ -237,55 +307,72 @@ class FloatingTextButton(BRS_CardLayoutAttributes, Widget):
         Debug.Start("_AnimatingColors")
 
         # [Step 0]: Update widget's colors with these colors
-        Debug.Log("Color = {}".format(self._current_trackColor))
-        self._MDCard.md_bg_color = self._current_backgroundColor
-        self._MDCard.shadow_color = self._current_backgroundShadowColor
+        # self.md_bg_color = self._current_backgroundColor
+        self.button.shadow_color = self._current_ShadowColor
+        Debug.Log("shadow_color = {}".format(self.button.shadow_color))
         Debug.End()
     # ------------------------------------------------------
+    def _HandlePressing(self, *args):
+        """
+            Called when on_press is called
+        """
+        Debug.Start("_HandlePressing")
+
+        if(self.state == "normal"):
+            Debug.Log("Setting elevation to pressed")
+            self.Elevation = Shadow.Elevation.pressed
+        else:
+            Debug.Log("Setting elevation to default")
+            self.Elevation = Shadow.Elevation.default
+
+        Debug.End()
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self,
                  initialState = States.Disabled,
+                 text = "",
                  **kwargs):
-        super(WidgetCard, self).__init__(**kwargs)
-        Debug.Start("BoxLayoutCard")
-        #region --------------------------- Initial check ups
+        super(FloatingTextButton, self).__init__(**kwargs)
+        Debug.Start("FloatingTextButton")
+        #region --------------------------- Initial Check ups
         self.InitAnimations()
         x = self.pos[0]
         y = self.pos[1]
         w = self.size[0]
         h = self.size[1]
+
+        self.size_hint_min = (0,0)
+        self.size_hint_max = (1,1)
         #endregion
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")
         self._state = initialState
         #endregion
-        #region --------------------------- Set Card
-        # Setting card attributes
-        self._MDCard.md_bg_color = GUIColors.Card
-        self._MDCard.shadow_color = GUIColors.CardShadow
-        self._MDCard.radius = Rounding.default
+        #region --------------------------- Create MD Button
+        self.button = MDRaisedButton(text = text)
 
-        self._MDCard.spacing = self._current_spacing
-        self._MDCard.padding = self._current_padding
-        self._MDCard.elevation = self._current_elevation
-        self._MDCard.shadow_softness = self._current_ShadowSoftness
+        self.button.shadow_softness = Shadow.Smoothness.default
+        self.button.radius = Rounding.Buttons.default
+        self.button.elevation = self._current_elevation
+
+        self.button.size_hint_max = (1,1)
+        self.button.size_hint_min = (1,1)
         #endregion
-        #region --------------------------- Set Canvas
+        #region --------------------------- Set Binds
         Debug.Log("Creating Canvas")
         with self.canvas:
-            Debug.Log("Binding events to WidgetCard")
-            self.bind(pos = self._UpdatePos, size = self._UpdateSize)
+            Debug.Log("Binding events to FloatingTextButton")
+            self.bind(pos = self._UpdatePos, size = self._UpdateSize)#,state = self._HandlePressing)
 
         #endregion
         #region --------------------------- Set Animation Properties
-        Debug.Log("Setting PieChartDial's color animation properties")
+        # Debug.Log("Setting FloatingTextButton's color animation properties")
 
-        self._current_backgroundColor       = self._MDCard.md_bg_color
-        self._wanted_BackgroundColor        = self._MDCard.md_bg_color
+        #self._current_backgroundColor       = self.md_bg_color
+        #self._wanted_BackgroundColor        = self.md_bg_color
 
-        Debug.Log("Setting PieChartDial's shape animation properties")
+        Debug.Log("Setting FloatingTextButton's shape animation properties")
 
         self._current_pos           = (x, y)
         self._wanted_Pos            = (x, y)
@@ -299,8 +386,10 @@ class FloatingTextButton(BRS_CardLayoutAttributes, Widget):
         self._current_size_hint     = (w, h)
         self._wanted_Size_hint      = (w, h)
 
-        self.add_widget(self._MDCard)
+        self.add_widget(self.button)
+
         #endregion
         Debug.End()
     #endregion
     pass
+'''
