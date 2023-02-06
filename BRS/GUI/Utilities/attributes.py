@@ -1,15 +1,15 @@
 #====================================================================#
 # File Information
 #====================================================================#
-
+print("attributes.py")
 #====================================================================#
 # Imports
 #====================================================================#
 import time
-from BRS.Debug.consoleLog import Debug
-from BRS.Utilities.states import States,StatesColors
-from BRS.GUI.Utilities.colors import GUIColors
-from BRS.GUI.Utilities.references import Shadow
+from ...Debug.consoleLog import Debug
+from ...Utilities.states import States,StatesColors
+from ...GUI.Utilities.colors import GUIColors
+from ...GUI.Utilities.references import Shadow
 from kivy.clock import Clock
 from kivy.graphics import Ellipse
 from kivy.graphics import Line
@@ -18,7 +18,7 @@ from kivy.graphics import svg
 
 from kivymd.uix.card import MDCard
 
-from BRS.GUI.Utilities.font import Font
+from ...GUI.Utilities.font import Font
 
 #====================================================================#
 # Functions

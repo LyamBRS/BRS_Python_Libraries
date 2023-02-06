@@ -1,7 +1,7 @@
 #====================================================================#
 # File Information
 #====================================================================#
-
+print("Indicators.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -13,9 +13,9 @@ from kivy.graphics.transformation import Matrix
 from kivy.uix.image import Image
 
 
-from BRS.GUI.Utilities.attributes import BRS_SVGWidgetAttributes
-from BRS.Utilities.states import States,StatesColors
-from BRS.Debug.consoleLog import Debug
+from ...GUI.Utilities.attributes import BRS_SVGWidgetAttributes
+from ...Utilities.states import States,StatesColors
+from ...Debug.consoleLog import Debug
 #====================================================================#
 # Functions
 #====================================================================#

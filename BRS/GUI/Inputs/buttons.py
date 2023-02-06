@@ -1,16 +1,19 @@
 #====================================================================#
 # File Information
 #====================================================================#
+import os
+import sys
 
+print("buttons.py")
 #====================================================================#
 # Imports
 #====================================================================#
-from BRS.Utilities.states import States,StatesColors
-from BRS.GUI.Utilities.attributes import BRS_CardLayoutAttributes, BRS_ButtonWidgetAttributes
-from BRS.GUI.Utilities.font import Font
-from BRS.GUI.Utilities.references import Shadow, Rounding
-from BRS.Debug.consoleLog import Debug
-from BRS.GUI.Utilities.colors import GUIColors
+from ...Utilities.states import States,StatesColors
+from ...GUI.Utilities.attributes import BRS_CardLayoutAttributes, BRS_ButtonWidgetAttributes
+from ...GUI.Utilities.font import Font
+from ...GUI.Utilities.references import Shadow, Rounding
+from ...Debug.consoleLog import Debug
+from ...GUI.Utilities.colors import GUIColors
 
 from kivy.animation import Animation
 from kivy.uix.widget import Widget

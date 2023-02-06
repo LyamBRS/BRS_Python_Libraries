@@ -5,7 +5,6 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from email.policy import default
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.app import App
@@ -134,6 +133,8 @@ class Application(MDApp):
         self.theme_cls.material_style = 'M3'
         self.theme_cls.primary_palette = "Purple"
         self.theme_cls.accent_palette = "Teal"
+        self.theme_cls.theme_style = "Light"
+        self.theme_cls.theme_style_switch_animation_duration = 0.5
 
         AppManager.manager = ScreenManager()
         AppManager.manager.add_widget(WindowManager(name="WindowManager"))

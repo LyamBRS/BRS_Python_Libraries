@@ -5,9 +5,9 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from BRS.Utilities.states import States,StatesColors
-from BRS.GUI.Utilities.font import Font
-from BRS.Debug.consoleLog import Debug
+from ...Utilities.states import States,StatesColors
+from ...GUI.Utilities.font import Font
+from ...Debug.consoleLog import Debug
 
 from kivy.uix.progressbar import ProgressBar
 from kivy.uix.widget import Widget

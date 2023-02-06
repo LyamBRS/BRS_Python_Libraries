@@ -1,20 +1,20 @@
 #====================================================================#
 # File Information
 #====================================================================#
-
+print("cards.py")
 #====================================================================#
 # Imports
 #====================================================================#
 import time
-from BRS.Debug.consoleLog import Debug
-from BRS.Utilities.states import States,StatesColors
-from BRS.GUI.Utilities.colors import GUIColors
-from BRS.GUI.Utilities.font import Font
-from BRS.GUI.Utilities.attributes import DrawingProperties
-from BRS.GUI.Utilities.attributes import GetEllipse,GetLine
-from BRS.GUI.Utilities.attributes import UpdateEllipse,UpdateLine
-from BRS.GUI.Utilities.attributes import BRS_ValueWidgetAttributes, BRS_BarGraphWidgetAttributes, BRS_CardLayoutAttributes
-from BRS.GUI.Utilities.references import Shadow,Rounding
+from ...Debug.consoleLog import Debug
+from ...Utilities.states import States,StatesColors
+from ...GUI.Utilities.colors import GUIColors
+from ...GUI.Utilities.font import Font
+from ...GUI.Utilities.attributes import DrawingProperties
+from ...GUI.Utilities.attributes import GetEllipse,GetLine
+from ...GUI.Utilities.attributes import UpdateEllipse,UpdateLine
+from ...GUI.Utilities.attributes import BRS_ValueWidgetAttributes, BRS_BarGraphWidgetAttributes, BRS_CardLayoutAttributes
+from ...GUI.Utilities.references import Shadow,Rounding
 
 from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
 
