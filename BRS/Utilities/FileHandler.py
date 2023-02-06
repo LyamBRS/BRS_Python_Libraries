@@ -8,9 +8,9 @@
 #====================================================================#
 # Imports
 #====================================================================#
-import errno, os
+import errno, os, sys
 import json
-from BRS.Debug.consoleLog import Debug
+from ..Debug.consoleLog import Debug
 #====================================================================#
 # Functions
 #====================================================================#
@@ -194,7 +194,7 @@ class JSONdata:
                 self.fileName = fileName
 
         # Create the path to the specified JSON and try to open it.
-        jsonPath = self.pathToDirectory + self.fileName
+        jsonPath = self.pathToDirectory + "/" + self.fileName
         data = None
 
         # Validate that the path can exist.
