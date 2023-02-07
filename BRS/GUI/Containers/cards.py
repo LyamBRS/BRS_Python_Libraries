@@ -6,6 +6,7 @@ print("cards.py")
 # Imports
 #====================================================================#
 import time
+from typing import Text
 from ...Debug.consoleLog import Debug
 from ...Utilities.states import States,StatesColors
 from ...GUI.Utilities.colors import GUIColors
@@ -19,7 +20,7 @@ from ...Utilities.FileHandler import JSONdata
 
 from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
 from kivymd.icon_definitions import md_icons
-# from kivymd.uix.label import 
+from kivymd.uix.label import MDLabel
 
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
@@ -29,7 +30,7 @@ from kivy.graphics import Line
 from kivy.graphics import Color
 from kivy.graphics import Ellipse
 from kivy.event import EventDispatcher
-from kivy.uix.label import Label
+from kivymd.uix.label import MDIcon
 #====================================================================#
 # Functions
 #====================================================================#
@@ -153,6 +154,9 @@ class ProfileCard(BRS_CardLayoutAttributes, Widget):
     Name:str = "Error"
     IconType:str = "Kivy"
     IconPath:str = "exclamation"
+    Style:str = "Light"
+    Primary:str = "Purple"
+    Accent:str = "Teal"
     #endregion
     #region   --------------------------- METHODS
     #region   -- Private
@@ -206,15 +210,56 @@ class ProfileCard(BRS_CardLayoutAttributes, Widget):
         #endregion
         #region --------------------------- Read JSON
         self.json = JSONdata(fileName,jsonPath)
-        self.Icon = MDI
+        self._MDCard.Icon = MDLabel(text="exclamation", font_style='Icon')
+        self._MDCard.Title = MDLabel(text="Error", font_style = "H5")
+        self._MDCard.orientation = "vertical"
 
+        # Icon building.
         if(self.json == None):
-            self.IconPath = self.json["Generic"]["IconPath"]
-            self.IconType = self.json["Generic"]["IconType"]
+            self.IconPath = "exclamation"
+            self.IconType = "Kivy"
+            self.Name = "Error"
         else:
+            self.IconPath = self.json.jsonData["Generic"]["IconPath"]
+            self.IconType = self.json.jsonData["Generic"]["IconType"]
+            self.Name     = self.json.jsonData["Generic"]["Username"]
+            self.Style = self.json.jsonData["Theme"]["Style"]
+            self.Primary  = self.json.jsonData["Theme"]["Primary"]
+            self.Accent   = self.json.jsonData["Theme"]["Accent"]
 
+        if(self.Style == "Dark"):
+            CardBackground = (0.12,0.12,0.12,1)
+            TextColor = (1,1,1,1)
+        else:
+            CardBackground = (1,1,1,1)
+            TextColor = (0.12,0.12,0.12,1)
 
-        print(self.json.jsonData["Generic"]["IconPath"])
+        self._MDCard.md_bg_color       = CardBackground
+        self._MDCard.Title.color       = TextColor
+        self._MDCard.Icon.color        = TextColor
+        # self._MDCard.Icon.theme_cls.theme_style  = self.Style
+
+        # self._MDCard.theme_cls.primary_palette       = self.Primary
+        # self._MDCard.Title.theme_cls.primary_palette = self.Primary
+        # self._MDCard.Icon.
+
+        # self._MDCard.theme_cls.accent_palette       = self.Accent
+        # self._MDCard.Title.theme_cls.accent_palette = self.Accent
+        # self._MDCard.Icon.theme_cls.accent_palette  = self.Accent
+
+        if(self.IconType == "Kivy"):
+            self._MDCard.Icon.text = md_icons[self.IconPath]
+
+        self._MDCard.Title.text = self.Name
+        self._MDCard.Title.halign = "center"
+        self._MDCard.Icon.font_size = "100sp"
+        self._MDCard.Icon.halign = "center"
+
+        print(" ==== " + self.Style)
+
+        self._MDCard.add_widget(self._MDCard.Icon)
+        self._MDCard.add_widget(self._MDCard.Title)
+
         #endregion
         #region --------------------------- Set Variables
         Debug.Log("Setting internal variables to new specified values")
@@ -222,12 +267,12 @@ class ProfileCard(BRS_CardLayoutAttributes, Widget):
         #endregion
         #region --------------------------- Set Card
         # Setting card attributes
-        self._MDCard.md_bg_color = GUIColors.Card
+        # self._MDCard.md_bg_color = GUIColors.Card
         self._MDCard.shadow_color = GUIColors.CardShadow
         self._MDCard.radius = Rounding.default
 
-        self._MDCard.spacing = self._current_spacing
-        self._MDCard.padding = self._current_padding
+        self._MDCard.spacing = 0#self._current_spacing
+        self._MDCard.padding = 0#self._current_padding
         self._MDCard.elevation = self._current_elevation
         self._MDCard.shadow_softness = self._current_ShadowSoftness
         #endregion
