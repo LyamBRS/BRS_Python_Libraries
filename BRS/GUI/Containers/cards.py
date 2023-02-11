@@ -5,6 +5,7 @@ print("cards.py")
 #====================================================================#
 # Imports
 #====================================================================#
+import random
 import time
 from typing import Text
 from ...Debug.consoleLog import Debug
@@ -19,8 +20,13 @@ from ...GUI.Utilities.references import Shadow,Rounding
 from ...Utilities.FileHandler import JSONdata
 
 from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
+from kivymd.uix.progressbar import MDProgressBar
+from kivymd.uix.button import BaseButton
 from kivymd.icon_definitions import md_icons
 from kivymd.uix.label import MDLabel
+from kivymd.color_definitions import palette,colors
+from kivymd.theming import ThemeManager
+from kivy.utils import get_color_from_hex
 
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
@@ -143,7 +149,7 @@ class WidgetCard(BRS_CardLayoutAttributes, Widget):
     #endregion
     pass
 
-class ProfileCard(BRS_CardLayoutAttributes, Widget):
+class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
     #region   --------------------------- DOCSTRING
     ''' 
         This class is a simple Layout class which takes the appearence of a simple
@@ -207,11 +213,18 @@ class ProfileCard(BRS_CardLayoutAttributes, Widget):
         y = self.pos[1]
         w = self.size[0]
         h = self.size[1]
+
+        self.padding = 0
+        self.spacing = 0
         #endregion
         #region --------------------------- Read JSON
         self.json = JSONdata(fileName,jsonPath)
-        self._MDCard.Icon = MDLabel(text="exclamation", font_style='Icon')
-        self._MDCard.Title = MDLabel(text="Error", font_style = "H5")
+        self._MDCard.Icon = MDLabel(text="exclamation", font_style='Icon', font_size = "100sp", halign = "center")
+        self._MDCard.Icon.font_size = "100sp"
+        self._MDCard.Title = MDLabel(text="Error", font_style = "H4", halign = "center")
+        self._MDCard.Separator = MDProgressBar()
+
+        self._MDCard.Separator.value_normalized = 1
         self._MDCard.orientation = "vertical"
 
         # Icon building.
@@ -223,10 +236,11 @@ class ProfileCard(BRS_CardLayoutAttributes, Widget):
             self.IconPath = self.json.jsonData["Generic"]["IconPath"]
             self.IconType = self.json.jsonData["Generic"]["IconType"]
             self.Name     = self.json.jsonData["Generic"]["Username"]
-            self.Style = self.json.jsonData["Theme"]["Style"]
+            self.Style    = self.json.jsonData["Theme"]["Style"]
             self.Primary  = self.json.jsonData["Theme"]["Primary"]
             self.Accent   = self.json.jsonData["Theme"]["Accent"]
 
+        # Get the palette themes (Dark / Light)
         if(self.Style == "Dark"):
             CardBackground = (0.12,0.12,0.12,1)
             TextColor = (1,1,1,1)
@@ -234,31 +248,27 @@ class ProfileCard(BRS_CardLayoutAttributes, Widget):
             CardBackground = (1,1,1,1)
             TextColor = (0.12,0.12,0.12,1)
 
-        self._MDCard.md_bg_color       = CardBackground
-        self._MDCard.Title.color       = TextColor
-        self._MDCard.Icon.color        = TextColor
-        # self._MDCard.Icon.theme_cls.theme_style  = self.Style
+        # Get the primary palette color.
+        print(colors[self.Primary]["500"])
+        secondaryColor = get_color_from_hex(colors[self.Primary]["500"])
 
-        # self._MDCard.theme_cls.primary_palette       = self.Primary
-        # self._MDCard.Title.theme_cls.primary_palette = self.Primary
-        # self._MDCard.Icon.
-
-        # self._MDCard.theme_cls.accent_palette       = self.Accent
-        # self._MDCard.Title.theme_cls.accent_palette = self.Accent
-        # self._MDCard.Icon.theme_cls.accent_palette  = self.Accent
+        # - Set widget colors here
+        self._MDCard.md_bg_color = CardBackground
+        self._MDCard.Title.color = TextColor
+        self._MDCard.Icon.color  = TextColor
+        self._MDCard.Separator.color = secondaryColor
 
         if(self.IconType == "Kivy"):
             self._MDCard.Icon.text = md_icons[self.IconPath]
+            print(self.IconPath)
 
         self._MDCard.Title.text = self.Name
-        self._MDCard.Title.halign = "center"
-        self._MDCard.Icon.font_size = "100sp"
-        self._MDCard.Icon.halign = "center"
 
         print(" ==== " + self.Style)
 
         self._MDCard.add_widget(self._MDCard.Icon)
         self._MDCard.add_widget(self._MDCard.Title)
+        self._MDCard.add_widget(self._MDCard.Separator)
 
         #endregion
         #region --------------------------- Set Variables
