@@ -228,71 +228,71 @@ class MainWidget(Widget):
 #====================================================================#
 # Application Building
 #====================================================================#
-# class KivyUIApp(MDApp):
-#     def build(self):
-#         Debug.Start()
-#         Debug.Log("Building application's parameters...")
-#         #---------------------------------------------------------# Title
-#         Debug.Log("Setting Name...")
-#         self.title = "BRS Dial Tester"
-#         #---------------------------------------------------------# Window properties
-#         Debug.Log("Setting Window configurations...")
+class KivyUIApp(MDApp):
+    def build(self):
+        Debug.Start()
+        Debug.Log("Building application's parameters...")
+        #---------------------------------------------------------# Title
+        Debug.Log("Setting Name...")
+        self.title = "BRS Dial Tester"
+        #---------------------------------------------------------# Window properties
+        Debug.Log("Setting Window configurations...")
 
-#         Window.borderless = False
-#         Window.resizable = True
-#         # Window.left = -1024
-#         # Window.top = 600
-#         Window.fullscreen = 'auto'
-#         #---------------------------------------------------------#
-#         Debug.Log("Building layouts")
-#         self.windowLayout = WindowLayout()
+        Window.borderless = False
+        Window.resizable = True
+        # Window.left = -1024
+        # Window.top = 600
+        Window.fullscreen = 'auto'
+        #---------------------------------------------------------#
+        Debug.Log("Building layouts")
+        self.windowLayout = WindowLayout()
 
-#         self.theme_cls.theme_style = "Dark"
-#         self.theme_cls.primary_palette = "Orange"
-#         self.theme_cls.theme_style_switch_animation = True
-#         self.theme_cls.theme_style_switch_animation_duration = 0.5
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "Orange"
+        self.theme_cls.theme_style_switch_animation = True
+        self.theme_cls.theme_style_switch_animation_duration = 0.5
 
-#         Debug.Log("Attributing functions to buttons")
-#         self.windowLayout.buttons.card.MainTheme.on_press = self.SwitchMainTheme
-#         self.windowLayout.buttons.card.Primary.on_press = self.SwitchPrimaryTheme
-#         Debug.End()
-#         return self.windowLayout
+        Debug.Log("Attributing functions to buttons")
+        self.windowLayout.buttons.card.MainTheme.on_press = self.SwitchMainTheme
+        self.windowLayout.buttons.card.Primary.on_press = self.SwitchPrimaryTheme
+        Debug.End()
+        return self.windowLayout
 
-#     def run(self):
-#         Debug.Start()
-#         Debug.Warn("Kivy application called the run function")
-#         Debug.End()
-#         return super().run()
+    def run(self):
+        Debug.Start()
+        Debug.Warn("Kivy application called the run function")
+        Debug.End()
+        return super().run()
 
-#     def on_start(self):
-#         Debug.Start("on_start")
-#         Debug.End()
+    def on_start(self):
+        Debug.Start("on_start")
+        Debug.End()
 
-#     def SwitchMainTheme(self, *args):
-#         if self.theme_cls.theme_style == "Dark":
-#             self.theme_cls.theme_style = "Light"
-#             self.windowLayout.buttons.card.MainTheme.text = "Light"
+    def SwitchMainTheme(self, *args):
+        if self.theme_cls.theme_style == "Dark":
+            self.theme_cls.theme_style = "Light"
+            self.windowLayout.buttons.card.MainTheme.text = "Light"
 
-#         elif self.theme_cls.theme_style == "Light":
-#             self.theme_cls.theme_style = "Dark"
-#             self.windowLayout.buttons.card.MainTheme.text = "Dark"
+        elif self.theme_cls.theme_style == "Light":
+            self.theme_cls.theme_style = "Dark"
+            self.windowLayout.buttons.card.MainTheme.text = "Dark"
 
-#     def SwitchPrimaryTheme(self, *args):
-#         Debug.Start("SwitchPrimaryTheme")
-#         self.windowLayout.buttons.card.Primary.text = "Pressed"
+    def SwitchPrimaryTheme(self, *args):
+        Debug.Start("SwitchPrimaryTheme")
+        self.windowLayout.buttons.card.Primary.text = "Pressed"
 
-#         ColorsRange = ("Red", "Blue", "Brown", "Lime", "Green", "Orange", "Yellow", "Pink", "DeepPurple", "Indigo", "LightBlue", "Cyan", "Teal", "Amber", "DeepOrange", "Gray", "BlueGray")
-#         index = random.randint(0,16)
-#         Debug.Log("New color is: {}".format(ColorsRange[index]))
-#         self.theme_cls.primary_palette = ColorsRange[index]
-#         self.windowLayout.buttons.card.Primary.text = self.theme_cls.primary_palette
-#         Debug.End()
+        ColorsRange = ("Red", "Blue", "Brown", "Lime", "Green", "Orange", "Yellow", "Pink", "DeepPurple", "Indigo", "LightBlue", "Cyan", "Teal", "Amber", "DeepOrange", "Gray", "BlueGray")
+        index = random.randint(0,16)
+        Debug.Log("New color is: {}".format(ColorsRange[index]))
+        self.theme_cls.primary_palette = ColorsRange[index]
+        self.windowLayout.buttons.card.Primary.text = self.theme_cls.primary_palette
+        Debug.End()
 
-# #====================================================================#
-# # Application Running
-# #====================================================================#
-# Debug.enableConsole = True
-# Debug.Warn(logged = "Launching KivyUIApp through .run")
-# KivyUIApp().run()
-# Debug.Warn(logged = "============================END OF SCRIPT============================")
+#====================================================================#
+# Application Running
+#====================================================================#
+Debug.enableConsole = True
+Debug.Warn(logged = "Launching KivyUIApp through .run")
+KivyUIApp().run()
+Debug.Warn(logged = "============================END OF SCRIPT============================")
 

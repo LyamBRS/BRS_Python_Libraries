@@ -221,15 +221,15 @@ def Get_RaisedButton(text:str=""):
 
     # Create the button to return
     button = MDRaisedButton(text=text)
-
+    button.size_hint_min_y = 0
+    button.size_hint_min_x = 0
+    button.size_hint_max_y = 1
+    button.size_hint_max_x = 1
     button.shadow_color =  GUIColors.CardShadow
 
-    button.theme_cls
-
-    button.size_hint_max = (1,1)
-    button.size_hint_min = (0,0)
-
-    button.size_hint = (None,None)
+    # button.size_hint_max = (1,1)
+    # button.size_hint_min = (0,0)
+    # button.size_hint = (None,None)
 
     return button
 

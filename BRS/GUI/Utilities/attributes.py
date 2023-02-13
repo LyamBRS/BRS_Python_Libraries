@@ -2879,7 +2879,7 @@ class BRS_CardLayoutAttributes(
         self._UpdateShape()
         Debug.End()
     # ------------------------------------------------------
-    def _UpdateColors(self, instance, value):
+    def _UpdateColors(self, *args):
         """
             Updates the color based on the widget's State
         """
