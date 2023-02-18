@@ -124,7 +124,7 @@ class JSONdata:
         The name of the JSON file to parse at the location specified by `pathToDirectory`
     """
 
-    jsonData = None
+    jsonData: dict = None
     """
         Holds the retrived JSON data. Build the class to have access to this.
     """

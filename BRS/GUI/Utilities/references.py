@@ -82,3 +82,22 @@ class Rounding:
     #endregion
     pass
 #====================================================================#
+class Styles:
+    #region   --------------------------- DOCSTRING
+    '''
+        Reference class used for uniformizations of widgets styles
+        such as outlines etc
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    class Outline:
+        """
+            When a widget style is outlined
+        """
+        line_width = "2sp"
+     #endregion
+    #region   --------------------------- METHODS
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    #endregion
+    pass
