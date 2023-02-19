@@ -6,6 +6,8 @@
 # Imports
 #====================================================================#
 from kivy.uix.screenmanager import Screen,ScreenManager
+import os
+import gettext
 #====================================================================#
 # Functions
 #====================================================================#
@@ -17,8 +19,6 @@ class AppManager():
     """
         Static reference class used for screen building scripts to access
         the manager globally without 100000 references through input parameters.
-
-        Also contains the current language used by the application.
     """
     manager = ScreenManager()
 #====================================================================#

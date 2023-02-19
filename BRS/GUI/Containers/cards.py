@@ -11,6 +11,7 @@ from ...GUI.Utilities.colors import GUIColors
 from ...GUI.Utilities.attributes import BRS_ValueWidgetAttributes, BRS_BarGraphWidgetAttributes, BRS_CardLayoutAttributes
 from ...GUI.Utilities.references import Shadow,Rounding,Styles
 from ...Utilities.FileHandler import JSONdata
+from ...Utilities.LanguageHandler import _
 
 from kivymd.app import MDApp
 from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
@@ -313,25 +314,25 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
                 self._MDCard.Icon.text = md_icons["alert"]
                 self._MDCard.Icon.theme_text_color = "Error"
                 self._MDCard.Title.theme_text_color = "Error"
-                self._MDCard.Title.text = self.Integrity
+                self._MDCard.Title.text = _(self.Integrity)
             else:
                 if(self.Integrity == "Corrupted"):
                     self._MDCard.Icon.text = md_icons["file-alert"]
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
-                    self._MDCard.Title.text = self.Integrity
+                    self._MDCard.Title.text = _(self.Integrity)
 
                 elif(self.Integrity == "Outdated"):
                     self._MDCard.Icon.text = md_icons["file-arrow-up-down"]
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
-                    self._MDCard.Title.text = self.Integrity
+                    self._MDCard.Title.text = _(self.Integrity)
 
                 elif(self.Integrity == "Ahead"):
                     self._MDCard.Icon.text = md_icons["file-arrow-up-down"]
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
-                    self._MDCard.Title.text = self.Integrity
+                    self._MDCard.Title.text = _(self.Integrity)
 
                 elif(self.Integrity == "Good"):
                     self.IconPath = self.json.jsonData["Generic"]["IconPath"]
@@ -357,7 +358,7 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
                         self._MDCard.bg_color = CardBackground
                         self._MDCard.Title.opposite_colors = True
                         self._MDCard.Icon.opposite_colors = True
-                        print("INVERTED")
+                        Debug.Log("Colors are inverted")
 
                     # - Set widget colors here
                     self._MDCard.md_bg_color = CardBackground
@@ -372,11 +373,11 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
                     # Get the profile picture saved in the JSON
                     if(self.IconType == "Kivy"):
                         self._MDCard.Icon.text = md_icons[self.IconPath]
-                        print(self.IconPath)
+                        Debug.Log(f"Using default KivyMD icon: {self.IconPath}")
 
                     # Place the Username in the card
                     self._MDCard.Title.text = self.Name
-                    print(" ==== " + self.Style)
+                    Debug.Log(f"Profile style is: {self.Style}")
 
         self._MDCard.add_widget(self._MDCard.Icon)
         self._MDCard.add_widget(self._MDCard.Title)
