@@ -4,6 +4,8 @@
 """
     This file contains KivyMD theme used in BRS applications.
 """
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("Application_Themes.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -124,3 +126,4 @@ custom_theme = {
 }
 
 # ThemableBehavior.set_current_theme(custom_theme)
+LoadingLog.End("Application_Themes.py")

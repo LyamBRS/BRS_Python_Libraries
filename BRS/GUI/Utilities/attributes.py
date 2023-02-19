@@ -1,7 +1,8 @@
 #====================================================================#
 # File Information
 #====================================================================#
-print("attributes.py")
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("attributes.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -3078,3 +3079,5 @@ class BRS_ButtonWidgetAttributes(
     #region   --------------------------- CONSTRUCTOR
     #endregion
     pass
+
+LoadingLog.End("attributes.py")

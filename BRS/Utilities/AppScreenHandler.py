@@ -5,6 +5,9 @@
 #====================================================================#
 # Imports
 #====================================================================#
+from ..Debug.LoadingLog import LoadingLog
+LoadingLog.Start("AppScreenHandler.py")
+
 from kivy.uix.screenmanager import Screen,ScreenManager
 import os
 import gettext
@@ -22,3 +25,4 @@ class AppManager():
     """
     manager = ScreenManager()
 #====================================================================#
+LoadingLog.End("AppScreenHandler.py")

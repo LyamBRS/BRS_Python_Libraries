@@ -1,3 +1,6 @@
+from .LoadingLog import LoadingLog
+LoadingLog.Start("consoleLog.py")
+
 
 class Debug:
     #region --------------------------------- MEMBERS
@@ -58,3 +61,5 @@ class Debug:
 
             print(indentation + " [ERROR]:\t" + logged)
         pass
+
+LoadingLog.End("consoleLog.py")

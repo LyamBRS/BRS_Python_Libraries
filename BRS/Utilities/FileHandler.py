@@ -8,6 +8,9 @@
 #====================================================================#
 # Imports
 #====================================================================#
+from ..Debug.LoadingLog import LoadingLog
+LoadingLog.Start("FileHandler.py")
+
 import errno, os, sys
 import json
 from ..Debug.consoleLog import Debug
@@ -334,3 +337,5 @@ class FilesFinder:
         fileFound:bool = self.LoadFiles()
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("FileHandler.py")

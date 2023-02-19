@@ -4,7 +4,8 @@
 import os
 import sys
 
-print("buttons.py")
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("buttons.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -232,6 +233,8 @@ def Get_RaisedButton(text:str=""):
     # button.size_hint = (None,None)
 
     return button
+#====================================================================#
+LoadingLog.End("buttons.py")
 
 
 

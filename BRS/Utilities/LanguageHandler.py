@@ -5,6 +5,9 @@
 #====================================================================#
 # Imports
 #====================================================================#
+from Libraries.BRS_Python_Libraries.BRS.Debug.LoadingLog import LoadingLog
+LoadingLog.Start("LanguageHandler.py")
+
 import os
 from .FileHandler import FilesFinder,IsPathValid
 from ..Debug.consoleLog import Debug
@@ -12,6 +15,8 @@ import gettext
 #====================================================================#
 # Functions
 #====================================================================#
+OverwriteCount:int = 0
+
 def _(string:str) ->str:
     """
         Translation unit used by gettext GNU API.
@@ -19,6 +24,7 @@ def _(string:str) ->str:
         Otherwise, it will simply return the input string no less.
     """
     Debug.Start("_ translator")
+    Debug.Log(f"Amount of times overwrote: {OverwriteCount}")
     string = AppLanguage.Translate(string)
     Debug.Log(f"Result: {string}")
     Debug.End()
@@ -90,6 +96,7 @@ class AppLanguage:
                     trans.add_fallback(gettext.translation(langFile, localedir=path, languages=[language]))
 
             Debug.Warn("Overwriting _ function")
+            OverwriteCount = OverwriteCount + 1
             AppLanguage.Translate = trans.gettext
             Debug.End()
             return True
@@ -133,3 +140,5 @@ class AppLanguage:
         Debug.End()
     #endregion
     pass
+
+LoadingLog.End("LanguageHandler.py")

@@ -6,7 +6,8 @@
 # Imports
 #====================================================================#
 from typing import TypeVar
-
+from ..Debug.LoadingLog import LoadingLog
+LoadingLog.Start("states.py")
 #====================================================================#
 # Functions
 #====================================================================#
@@ -181,3 +182,5 @@ class StatesColors:
     Text.MultiplyColorsBy(0.25)
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("states.py")

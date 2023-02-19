@@ -11,6 +11,8 @@ import subprocess
 import base64
 from github import Github as git
 from BRS.Debug.consoleLog import Debug
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("GitHub.py")
 #====================================================================#
 # Functions
 #====================================================================#
@@ -270,3 +272,5 @@ class GitHub:
     #region   --------------------------- CONSTRUCTOR
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("GitHub.py")

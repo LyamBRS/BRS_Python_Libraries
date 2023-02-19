@@ -7,6 +7,8 @@
 
     These are global and referenced to.
 """
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("references.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -101,3 +103,5 @@ class Styles:
     #region   --------------------------- CONSTRUCTOR
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("references.py")

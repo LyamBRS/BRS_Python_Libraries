@@ -1,7 +1,8 @@
 #====================================================================#
 # File Information
 #====================================================================#
-print("ValueDisplay.py")
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("ValueDisplay.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -493,3 +494,5 @@ class LineGraph(BRS_BarGraphWidgetAttributes, Widget):
         Debug.End()
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("ValueDisplay.py")

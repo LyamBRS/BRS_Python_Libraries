@@ -1,7 +1,8 @@
 #====================================================================#
 # File Information
 #====================================================================#
-print("Indicators.py")
+from ...Debug.LoadingLog import LoadingLog
+LoadingLog.Start("Indicators.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -93,3 +94,5 @@ class SVGDisplay(Widget, BRS_SVGWidgetAttributes):
         Debug.End()
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("Indicators.py")
