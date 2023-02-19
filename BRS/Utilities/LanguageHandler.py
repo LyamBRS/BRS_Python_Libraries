@@ -70,14 +70,23 @@ class AppLanguage:
         """
         Debug.Start("AppLanguage.LoadLanguage")
         path = AppLanguage.pathToLanguageFolders
+
         if(IsPathValid(path)):
             AppLanguage.LanguageFiles = FilesFinder(".po", path)
             Debug.Log(f"Locale path: {path}")
             Debug.Log(f"Loading language: {language}")
-            trans = gettext.translation("Messages", localedir=path, languages=[language])
 
+            Debug.Log("Loading available files...")
+            AppLanguage.LanguageFiles.pathToDirectory = path + "\\"  + language + "\\LC_MESSAGES\\"
+            AppLanguage.LanguageFiles.fileExtension = ".mo"
+            AppLanguage.LanguageFiles.LoadFiles()
+            Debug.Log(f"Compiled files found: {AppLanguage.LanguageFiles.fileList}")
+
+            trans = gettext.translation("Messages", localedir=path, languages=[language])
             for langFile in AppLanguage.LanguageFiles.fileList:
-                if(langFile != "Messages"):
+                if(langFile != "Messages.mo"):
+                    langFile = langFile.replace(".mo","")
+                    Debug.Log(f"Added {langFile} as fallback")
                     trans.add_fallback(gettext.translation(langFile, localedir=path, languages=[language]))
 
             Debug.Warn("Overwriting _ function")
