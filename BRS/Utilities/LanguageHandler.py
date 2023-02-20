@@ -15,8 +15,6 @@ import gettext
 #====================================================================#
 # Functions
 #====================================================================#
-OverwriteCount:int = 0
-
 def _(string:str) ->str:
     """
         Translation unit used by gettext GNU API.
@@ -24,7 +22,9 @@ def _(string:str) ->str:
         Otherwise, it will simply return the input string no less.
     """
     Debug.Start("_ translator")
-    Debug.Log(f"Amount of times overwrote: {OverwriteCount}")
+    Debug.Log(f"Amount of times overwrote: {AppLanguage.OverWriteCount}")
+    Debug.Log(f"Language used: {AppLanguage.Current}")
+
     string = AppLanguage.Translate(string)
     Debug.Log(f"Result: {string}")
     Debug.End()
@@ -43,6 +43,8 @@ class AppLanguage:
     '''
     #endregion
     #region   --------------------------- MEMBERS
+    OverWriteCount:int = 0
+
     pathToLanguageFolders:str = None
     """
         The path to the folder which contains the language folders.
@@ -77,26 +79,30 @@ class AppLanguage:
         Debug.Start("AppLanguage.LoadLanguage")
         path = AppLanguage.pathToLanguageFolders
 
+        # - Setting new current language
+        AppLanguage.Current = language
+
+        # - Check if the locale path is still valid
         if(IsPathValid(path)):
-            AppLanguage.LanguageFiles = FilesFinder(".po", path)
+            # - Find all the language files available at the specified path.
+            AppLanguage.LanguageFiles = FilesFinder(".mo", path + "\\"  + language + "\\LC_MESSAGES\\")
             Debug.Log(f"Locale path: {path}")
             Debug.Log(f"Loading language: {language}")
-
-            Debug.Log("Loading available files...")
-            AppLanguage.LanguageFiles.pathToDirectory = path + "\\"  + language + "\\LC_MESSAGES\\"
-            AppLanguage.LanguageFiles.fileExtension = ".mo"
-            AppLanguage.LanguageFiles.LoadFiles()
             Debug.Log(f"Compiled files found: {AppLanguage.LanguageFiles.fileList}")
 
+            # - Create the translation from the main Messages file.
             trans = gettext.translation("Messages", localedir=path, languages=[language])
+
+            # - Add the fallback .mo files to the main Messages file
             for langFile in AppLanguage.LanguageFiles.fileList:
                 if(langFile != "Messages.mo"):
                     langFile = langFile.replace(".mo","")
-                    Debug.Log(f"Added {langFile} as fallback")
+                    Debug.Log(f"Added: {langFile}, as a fallback")
                     trans.add_fallback(gettext.translation(langFile, localedir=path, languages=[language]))
 
+            # - Overwrite the translation function to the gettext equivalent
             Debug.Warn("Overwriting _ function")
-            OverwriteCount = OverwriteCount + 1
+            AppLanguage.OverWriteCount = AppLanguage.OverWriteCount+1
             AppLanguage.Translate = trans.gettext
             Debug.End()
             return True

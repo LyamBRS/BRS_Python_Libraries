@@ -25,11 +25,11 @@ from ...GUI.Utilities.font import Font
 # Functions
 #====================================================================#
 def UpdateEllipse(widget, type:str, ellipse):
-    Debug.Start("UpdateEllipse")
+    ##Debug.Start("UpdateEllipse")
     """Updates an already existing Ellipse from DrawingProperties"""
 
     if(type == "Track"):
-        # Debug.Log("\nGetting Track ellipse")
+        # ##Debug.Log("\nGetting Track ellipse")
         ellipse.pos  = (widget._current_pos[0] + widget._current_trackWidth/2,
                         widget._current_pos[1] + widget._current_trackWidth/2)
         ellipse.size = (widget._current_size[0] - widget._current_trackWidth,
@@ -57,10 +57,10 @@ def UpdateEllipse(widget, type:str, ellipse):
         ellipse.pos = (widget._current_pos[0] + widget._current_trackWidth, widget._current_pos[1] + widget._current_trackWidth)
         ellipse.size = (widget._current_size[0] - widget._current_trackWidth*2, widget._current_size[1] - widget._current_trackWidth*2)
 
-    Debug.End()
+    ##Debug.End()
 #---------------------------------------------------------------------
 def GetEllipse(widget, type:str):
-    # Debug.Start()
+    # ##Debug.Start()
     """Draws an ellipse from given values"""
 
     if(type == "Track"):
@@ -87,11 +87,11 @@ def GetEllipse(widget, type:str):
 
     position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
 
-    # Debug.End()
+    # ##Debug.End()
     return Ellipse(pos=position, size=(width,height), angle_start=startAngle, angle_end=endAngle, line=(2, (1, 0, 0, 1)))
 #---------------------------------------------------------------------
 def UpdateLine(widget, type:str, line):
-    Debug.Start("UpdateLine")
+    ##Debug.Start("UpdateLine")
     """
         Updates an already existing Border from a widget's
         attributes.
@@ -187,7 +187,7 @@ def UpdateLine(widget, type:str, line):
                 startY = y2 - offsetHeight
                 endX   = x1
                 endY   = y2 - (distance + offsetHeight)
-                Debug.Log("startY : {}, endY : {}".format(startY, endY))
+                ##Debug.Log("startY : {}, endY : {}".format(startY, endY))
 
             elif(widget._orientation == "Right"):
                 distance = (widget._current_size[0]) * ratio
@@ -217,10 +217,10 @@ def UpdateLine(widget, type:str, line):
             line.points = (x1, y1, x2, y2)
             line.width = maxWidth
 
-    Debug.End()
+    ##Debug.End()
 #---------------------------------------------------------------------
 def GetLine(widget, type:str):
-    Debug.Start("GetLine")
+    ##Debug.Start("GetLine")
     """
         Draws a border from given values.
         if your widget has end and start angles attributes,
@@ -257,7 +257,7 @@ def GetLine(widget, type:str):
         position = (widget.pos[0] + ellipseWidth, widget.pos[1] + ellipseWidth)
 
         # [Step 3]: Return the line resulting from the previous settings
-        Debug.End()
+        ##Debug.End()
         return Line(ellipse=(position[0], position[1], width, height, startAngle, endAngle), width=ellipseWidth)
 
     else:
@@ -284,7 +284,7 @@ def GetLine(widget, type:str):
             if(width <= 0):
                 width = 1
 
-            Debug.End()
+            ##Debug.End()
             return Line(points=(x1, y1, x2, y2), width=width)
 
         elif(type == "Filling"):
@@ -308,7 +308,7 @@ def GetLine(widget, type:str):
                 startY = y2 - offsetHeight
                 endX   = x1
                 endY   = y2 - (distance + offsetHeight)
-                Debug.Log("startY : {}, endY : {}".format(startY, endY))
+                ##Debug.Log("startY : {}, endY : {}".format(startY, endY))
 
             elif(widget._orientation == "Right"):
                 distance = (widget._current_size[0]) * ratio
@@ -329,14 +329,14 @@ def GetLine(widget, type:str):
                 endX   = x1 + (distance + offsetWidth)
                 endY   = y2
 
-            Debug.End()
+            ##Debug.End()
             return Line(points=(startX, startY, endX, endY), width=width)
 
         elif(type == "Background"):
             if(maxWidth <= 0):
                 maxWidth = 1
 
-            Debug.End()
+            ##Debug.End()
             return Line(points=(x1, y1, x2, y2), width=maxWidth)
 
 
@@ -593,8 +593,8 @@ class Attribute_Foundation:
             Returns the current Size of the widget.
             This returns a new array and not an address
         """
-        Debug.Start("GET Size")
-        Debug.End()
+        ##Debug.Start("GET Size")
+        ##Debug.End()
         return (self.size[0], self.size[1])
 
     @Size.setter
@@ -606,12 +606,12 @@ class Attribute_Foundation:
         Args:
             newValue (float): the new size of the widget
         """
-        Debug.Start("SET Size")
+        ##Debug.Start("SET Size")
         # [Step 0]: Save newValue
         self._wanted_Size = (newValue[0], newValue[1])
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape()
-        Debug.End()
+        ##Debug.End()
     #endregion
     #region   -- Pos
     @property
@@ -620,8 +620,8 @@ class Attribute_Foundation:
         Returns the current position of the widget (x,y)
         This returns a new array, not an address
         """
-        Debug.Start("Pos: Get")
-        Debug.End()
+        ##Debug.Start("Pos: Get")
+        ##Debug.End()
         return (self.pos[0], self.pos[1])
 
     @Pos.setter
@@ -633,13 +633,13 @@ class Attribute_Foundation:
         Args:
             newValue (float): the new position of the widget (x,y)
         """
-        Debug.Start("SET Pos")
+        #Debug.Start("SET Pos")
         # [Step 0]: Save newValue
         self._wanted_Pos = (newValue[0], newValue[1])
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   -- Size_hint
     @property
@@ -659,13 +659,13 @@ class Attribute_Foundation:
         Args:
             newValue (float): the new size_hint of the widget
         """
-        Debug.Start("Size_hint")
+        #Debug.Start("Size_hint")
         # [Step 0]: Save newValue
         self._wanted_Size_hint = (newValue[0], newValue[1])
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   -- Pos_hint
     @property
@@ -685,43 +685,43 @@ class Attribute_Foundation:
         Args:
             newValue (float): the new Pos_hint of the widget (x,y)
         """
-        Debug.Start("Pos_hint")
+        #Debug.Start("Pos_hint")
         # [Step 0]: Save newValue
         self._wanted_Pos_hint = (newValue[0], newValue[1])
 
         # [Step 1]: Update the shape based on the new value
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #endregion
     #region   --------------------------- METHODS
     def _Attribute_Foundation_SetToWanted(self):
-        Debug.Start("_Attribute_Foundation_SetToWanted")
+        #Debug.Start("_Attribute_Foundation_SetToWanted")
         self._current_pos = (self._wanted_Pos[0], self._wanted_Pos[1])
         self._current_pos_hint = (self._wanted_Pos_hint[0], self._wanted_Pos_hint[1])
         self._current_size = (self._wanted_Size[0], self._wanted_Size[1])
         self._current_size_hint = (self._wanted_Size_hint[0], self._wanted_Size_hint[1])
-        Debug.End()
+        #Debug.End()
 
     def _Attribute_Foundation_GetShapeComparator(self):
-        Debug.Start("_Attribute_Foundation_GetShapeComparator")
+        #Debug.Start("_Attribute_Foundation_GetShapeComparator")
         comparator = {
                         "_current_pos"  : self._current_pos,
                         "_current_size" : self._current_size,
                         "_current_pos_hint" : self._current_pos_hint,
                         "_current_size_hint" : self._current_size_hint
                      }
-        Debug.End()
+        #Debug.End()
         return comparator
     def _Attribute_Foundation_GetShapeArguments(self):
-        Debug.Start("_Attribute_Foundation_GetShapeComparator")
+        #Debug.Start("_Attribute_Foundation_GetShapeComparator")
         attributes = {
                         "_current_pos"  : self._wanted_Pos,
                         "_current_size" : self._wanted_Size,
                         "_current_pos_hint"  : self._wanted_Pos_hint,
                         "_current_size_hint" : self._wanted_Size_hint
                      }
-        Debug.End()
+        #Debug.End()
         return attributes
 
     def _Attribute_Foundation_SetAttributes(self, state=None, pos=None, size=None, radius=None, posHint=None, sizeHint=None):
@@ -803,17 +803,17 @@ class Attribute_Track:
         Args:
             newValue (float): the new width of the widget's track
         """
-        Debug.Start("TrackWidth")
+        #Debug.Start("TrackWidth")
 
         if(newValue == 0):
-            Debug.Warn("Attempted to set width at 0. Automatically set back to 1")
+            #Debug.Warn("Attempted to set width at 0. Automatically set back to 1")
             newValue = 1
 
         # [Step 1]: Update the shape based on the new value
         if(newValue != self._wanted_TrackWidth):
             # self._wanted_TrackWidth  = newValue
             self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   -- ShowTrack
     @property
@@ -832,13 +832,13 @@ class Attribute_Track:
         Args:
             newValue (bool): the new showing or not
         """
-        Debug.Start("ShowTrack")
+        #Debug.Start("ShowTrack")
 
         # [Step 1]: Update the shape based on the new value if its a new value
         if(newValue != self._showTrack):
             self._showTrack = newValue
             self._UpdateColors(None,None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #endregion
     #region   --------------------------- METHODS
@@ -936,17 +936,17 @@ class Attribute_Filling:
         Args:
             newValue (float): the new width of the PieChartDial's filling
         """
-        Debug.Start("FillingWidth")
+        #Debug.Start("FillingWidth")
 
         if(newValue == 0):
-            Debug.Warn("Attempted to set width at 0. Automatically set back to 1")
+            #Debug.Warn("Attempted to set width at 0. Automatically set back to 1")
             newValue = 1
 
         # [Step 1]: Update the shape based on the new value
         if(newValue != self._wanted_FillingWidth):
             self._wanted_FillingWidth  = newValue
             self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   -- ShowFilling
     @property
@@ -965,13 +965,13 @@ class Attribute_Filling:
         Args:
             newValue (bool): the new showing or not
         """
-        Debug.Start("ShowFilling")
+        #Debug.Start("ShowFilling")
 
         # [Step 1]: Update the shape based on the new value if its a new value
         if(newValue != self._showFilling):
             self._showFilling = newValue
             self._UpdateColors(None,None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #endregion
     #region   --------------------------- METHODS
@@ -1067,7 +1067,7 @@ class Attribute_Background:
         Args:
             newValue (bool): the new showing or not
         """
-        Debug.Start("ShowBackground")
+        #Debug.Start("ShowBackground")
 
         # [Step 1]: Update the shape based on the new value if its a new value
         if(newValue != self._showBackground):
@@ -1077,7 +1077,7 @@ class Attribute_Background:
                 self._showShadow = False
 
             self._UpdateColors(None,None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   -- ShowShadow
     @property
@@ -1094,13 +1094,13 @@ class Attribute_Background:
         Args:
             newValue (bool): the new showing or not
         """
-        Debug.Start("ShowShadow")
+        #Debug.Start("ShowShadow")
 
         # [Step 1]: Update the shape based on the new value if its a new value
         if((newValue != self._showShadow) and self._showBackground):
             self._showShadow = newValue
             self._UpdateColors(None,None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #endregion
     #region   --------------------------- METHODS
@@ -1281,12 +1281,12 @@ class Attribute_Shadow:
         """
 
         # [Step 1]: Update the shape based on the new value
-        Debug.Start("Elevation.setter")
+        #Debug.Start("Elevation.setter")
         if(newValue != self._wanted_Elevation):
-            Debug.Log("New value saved in wanted.")
+            #Debug.Log("New value saved in wanted.")
             self._wanted_Elevation  = newValue
             self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   -- Softness
     @property
@@ -2002,14 +2002,14 @@ class Attribute_Orientation:
         Args:
             newValue (str): the new orientation
         """
-        Debug.Start("Orientation")
+        #Debug.Start("Orientation")
         # [Step 1]: Update the shape based on the new start angle
         if(newValue != self._orientation):
             self._orientation  = newValue
-            Debug.Log("Forcing animation")
+            #Debug.Log("Forcing animation")
             self._forceAnimation = True
             self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     #endregion
     #endregion
     #region   --------------------------- METHODS
@@ -2141,7 +2141,7 @@ class Animated:
     #endregion
     #region   --------------------------- METHODS
     def _StartShapeAnimation(self, duration:float=0.5, transition:str="in_out_cubic"):
-        Debug.Start("StartShapeAnimation")
+        #Debug.Start("StartShapeAnimation")
         """
             Call this instead of manually building your widget's
             animation objects each time you need to transition values.
@@ -2163,11 +2163,11 @@ class Animated:
         for function in self._animation_ShapeComparator_functions:
             comparator.update(function())
 
-        Debug.Log("Arguments before pop: {}".format(arguments))
-        Debug.Log("comparator before pop: {}".format(comparator))
+        #Debug.Log("Arguments before pop: {}".format(arguments))
+        #Debug.Log("comparator before pop: {}".format(comparator))
         # endregion
         # region --- [Step 1]: Pop arguments equal to themselves
-        Debug.Log("Removing unused arguments from argument list...")
+        #Debug.Log("Removing unused arguments from argument list...")
         keys_to_remove = []
 
         for current, wanted in arguments.items():
@@ -2179,7 +2179,7 @@ class Animated:
 
         if(len(arguments) == 0):
             if(not self._forceAnimation):
-                Debug.Warn("No animations were made due to no attributes needing change")
+                #Debug.Warn("No animations were made due to no attributes needing change")
                 return
             else:
                 self._forceAnimation = False
@@ -2187,19 +2187,19 @@ class Animated:
         # Add duration and transition
         arguments["d"] = duration
         arguments["t"] = transition
-        Debug.Log(str(arguments))
-        Debug.Log("Success")
+        #Debug.Log(str(arguments))
+        #Debug.Log("Success")
         # endregion
         # region --- [Step 2]: Build and return the Animation to execute
-        Debug.Error("Arguments : {}".format(arguments))
+        #Debug.Error("Arguments : {}".format(arguments))
         animation = Animation(**arguments)
         animation.bind(on_progress = self._AnimatingShapes)
         animation.start(self)
         # endregion
-        Debug.End()
+        #Debug.End()
         pass
     def _StartColorAnimation(self, duration:float=0.5, transition:str="in_out_cubic"):
-        Debug.Start("StartColorAnimation")
+        #Debug.Start("StartColorAnimation")
         """
             Call this instead of manually building your widget's
             animation objects each time you need to transition values.
@@ -2213,7 +2213,7 @@ class Animated:
             Will automatically start the animation
         """
         # region --- [Step 0]: Build argument dictionary
-        Debug.Log("Building original arguments for Animation")
+        #Debug.Log("Building original arguments for Animation")
         arguments = {"_" : 0}
         comparator = {"_" : 0}
 
@@ -2224,7 +2224,7 @@ class Animated:
             comparator.update(function())
         # endregion
         # region --- [Step 1]: Pop arguments equal to themselves
-        Debug.Log("Removing unused arguments from argument list...")
+        #Debug.Log("Removing unused arguments from argument list...")
         keys_to_remove = []
 
         for current, wanted in arguments.items():
@@ -2235,34 +2235,35 @@ class Animated:
             arguments.pop(key)
 
         if(len(arguments) == 0):
-            Debug.Warn("No animations were made due to no attributes needing change")
+            #Debug.Warn("No animations were made due to no attributes needing change")
             return
         else:
-            Debug.Log("Arguments : {}".format(arguments))
+            #Debug.Log("Arguments : {}".format(arguments))
+            pass
 
         # Add duration and transition
         arguments["d"] = duration
         arguments["t"] = transition
-        Debug.Log("Success")
+        #Debug.Log("Success")
         # endregion
         # region --- [Step 2]: Build and return the Animation to execute
-        Debug.Log("Generating and launching Animation()")
-        Debug.Error("Arguments : {}".format(arguments))
+        #Debug.Log("Generating and launching Animation()")
+        #Debug.Error("Arguments : {}".format(arguments))
         animation = Animation(**arguments)
         animation.bind(on_progress = self._AnimatingColors)
         animation.start(self)
-        Debug.Log("End of function")
+        #Debug.Log("End of function")
         # endregion
-        Debug.End()
+        #Debug.End()
         pass
     def _InstantAnimation(self):
         """ Will make all values equal to their wanted equivalent """
-        Debug.Start("_InstantAnimation")
+        #Debug.Start("_InstantAnimation")
 
         for function in self._animation_InstantAnimation_functions:
             function()
 
-        Debug.End()
+        #Debug.End()
     def _Animated_Get(self, type:str, fromTheseProperties:DrawingProperties=None):
         """
             Transfer specified currently stored value of your class's
@@ -2272,7 +2273,7 @@ class Animated:
 
             copy = from theseProperty, copy ("None","All","Colors","Shapes")
         """
-        Debug.Start("_current_Get")
+        #Debug.Start("_current_Get")
         def Check(thisProperty):
             return (thisProperty != None)
 
@@ -2295,13 +2296,13 @@ class Animated:
                 self._current_value        = fromTheseProperties.value
 
                 # if(Check(self.pos)):
-                    # Debug.Log("Gotten pos: {}".format(self.pos))
+                    # #Debug.Log("Gotten pos: {}".format(self.pos))
                     # self._current_pos = (self.pos[0], self.pos[1])
 
                 # if(Check(self.size)):
-                    # Debug.Log("Gotten size: {}".format(self.size))
+                    # #Debug.Log("Gotten size: {}".format(self.size))
                     # self._current_size = (self.size[0], self.size[1])
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -2390,7 +2391,7 @@ class BRS_ValueWidgetAttributes(
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
             This will only call UpdateShapes Once.
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
         if(self._wanted_FillingWidth <= 0):
@@ -2411,27 +2412,27 @@ class BRS_ValueWidgetAttributes(
         self.Properties.showBackground  = self.Properties.showBackground    if (showBackground == None) else showBackground
 
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateColors(self, instance, value):
         """
             Updates the color based on the widget's State
         """
-        Debug.Start("_UpdateColors")
+        #Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
         self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
         self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
 
         # [Step 2]: Start animation
-        # Debug.Log("[Step 2]:")
+        # #Debug.Log("[Step 2]:")
         if(self.animated):
             self._StartColorAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingColors(None, None, None)
-        Debug.End()
-        Debug.End()
+        #Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdatePos(self, *args):
         """
@@ -2440,10 +2441,10 @@ class BRS_ValueWidgetAttributes(
 
             *args = [object, (x,y)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
         self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateSize(self, *args):
         """
@@ -2452,10 +2453,10 @@ class BRS_ValueWidgetAttributes(
 
             *args = [object, (width,height)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
         self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self):
         """
@@ -2464,7 +2465,7 @@ class BRS_ValueWidgetAttributes(
 
             Do not call this function outside of this widget
         """
-        Debug.Start("_UpdateShape")
+        #Debug.Start("_UpdateShape")
         # [Step 0]: Getting valus from widget properties
         self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
@@ -2474,7 +2475,7 @@ class BRS_ValueWidgetAttributes(
         else:
             self._InstantAnimation()
             self._AnimatingShapes(None, None, None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -2556,7 +2557,7 @@ class BRS_BarGraphWidgetAttributes(
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
             This will only call UpdateShapes Once.
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
         if(self._wanted_FillingWidth <= 0):
@@ -2577,27 +2578,27 @@ class BRS_BarGraphWidgetAttributes(
         self._orientation = self._orientation if(orientation == None) else orientation
 
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateColors(self, instance, value):
         """
             Updates the color based on the widget's State
         """
-        Debug.Start("_UpdateColors")
+        #Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
         self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
         self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
 
         # [Step 2]: Start animation
-        # Debug.Log("[Step 2]:")
+        # #Debug.Log("[Step 2]:")
         if(self.animated):
             self._StartColorAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingColors(None, None, None)
-        Debug.End()
-        Debug.End()
+        #Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdatePos(self, *args):
         """
@@ -2606,10 +2607,10 @@ class BRS_BarGraphWidgetAttributes(
 
             *args = [object, (x,y)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
         self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateSize(self, *args):
         """
@@ -2618,10 +2619,10 @@ class BRS_BarGraphWidgetAttributes(
 
             *args = [object, (width,height)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
         self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self):
         """
@@ -2630,7 +2631,7 @@ class BRS_BarGraphWidgetAttributes(
 
             Do not call this function outside of this widget
         """
-        Debug.Start("_UpdateShape")
+        #Debug.Start("_UpdateShape")
         # [Step 0]: Getting values from widget properties
         # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
@@ -2640,7 +2641,7 @@ class BRS_BarGraphWidgetAttributes(
         else:
             self._InstantAnimation()
             self._AnimatingShapes(None, None, None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -2700,7 +2701,7 @@ class BRS_SVGWidgetAttributes(
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
             This will only call UpdateShapes Once.
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         # self._wanted_FillingWidth = self._current_fillingWidth if (FillingWidth == None)   else FillingWidth
         # if(self._wanted_FillingWidth <= 0):
@@ -2721,27 +2722,27 @@ class BRS_SVGWidgetAttributes(
         # self._orientation = self._orientation if(orientation == None) else orientation
 
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateColors(self, instance, value):
         """
             Updates the color based on the widget's State
         """
-        Debug.Start("_UpdateColors")
+        #Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         # self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
         # self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
         self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
 
         # [Step 2]: Start animation
-        # Debug.Log("[Step 2]:")
+        # #Debug.Log("[Step 2]:")
         if(self.animated):
             self._StartColorAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingColors(None, None, None)
-        Debug.End()
-        Debug.End()
+        #Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdatePos(self, *args):
         """
@@ -2750,10 +2751,10 @@ class BRS_SVGWidgetAttributes(
 
             *args = [object, (x,y)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
         self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateSize(self, *args):
         """
@@ -2762,10 +2763,10 @@ class BRS_SVGWidgetAttributes(
 
             *args = [object, (width,height)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
         self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self, *args):
         """
@@ -2774,7 +2775,7 @@ class BRS_SVGWidgetAttributes(
 
             Do not call this function outside of this widget
         """
-        Debug.Start("_UpdateShape")
+        #Debug.Start("_UpdateShape")
         # [Step 0]: Getting values from widget properties
         # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
@@ -2784,7 +2785,7 @@ class BRS_SVGWidgetAttributes(
         else:
             self._InstantAnimation()
             self._AnimatingShapes(None, None, None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -2862,7 +2863,7 @@ class BRS_CardLayoutAttributes(
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
             This will only call UpdateShapes Once.
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         self._Attribute_Foundation_SetAttributes(state=state,pos=position,size=size)
         self._Attribute_Shadow_SetAttributes(elevation=elevation,softness=shadowSoftness,showShadow=showShadow)
@@ -2878,13 +2879,13 @@ class BRS_CardLayoutAttributes(
         self.Orientation = self.Orientation if(orientation == None) else orientation
 
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateColors(self, *args):
         """
             Updates the color based on the widget's State
         """
-        Debug.Start("_UpdateColors")
+        #Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         # self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
         # self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
@@ -2892,14 +2893,14 @@ class BRS_CardLayoutAttributes(
         self._wanted_BackgroundShadowColor = GUIColors.CardShadow if self._showShadow else (0,0,0,0)
 
         # [Step 2]: Start animation
-        # Debug.Log("[Step 2]:")
+        # #Debug.Log("[Step 2]:")
         if(self.animated):
             self._StartColorAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingColors(None, None, None)
-        Debug.End()
-        Debug.End()
+        #Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdatePos(self, *args):
         """
@@ -2908,10 +2909,10 @@ class BRS_CardLayoutAttributes(
 
             *args = [object, (x,y)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
         self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateSize(self, *args):
         """
@@ -2920,10 +2921,10 @@ class BRS_CardLayoutAttributes(
 
             *args = [object, (width,height)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
         self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self, *args):
         """
@@ -2932,7 +2933,7 @@ class BRS_CardLayoutAttributes(
 
             Do not call this function outside of this widget
         """
-        Debug.Start("_UpdateShape")
+        #Debug.Start("_UpdateShape")
         # [Step 0]: Getting values from widget properties
         # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
@@ -2942,7 +2943,7 @@ class BRS_CardLayoutAttributes(
         else:
             self._InstantAnimation()
             self._AnimatingShapes(None, None, None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -3011,30 +3012,30 @@ class BRS_ButtonWidgetAttributes(
             Allows you to set multiple properties at once instead of creating an animation for each one you change.
             This will only call UpdateShapes Once.
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: SetAttributes")
         # [Step 0]: Set wanted animation goals
         self._Attribute_Foundation_SetAttributes(state=state,pos=pos,size=size,sizeHint=sizeHint,posHint=posHint,radius=radius)
         self._Attribute_Shadow_SetAttributes(shadowColor=shadowColor,elevation=shadowElevation,softness=shadowSoftness,showShadow=showShadow)
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateColors(self, instance, value):
         """
             Updates the color based on the widget's State
         """
-        Debug.Start("_UpdateColors")
+        #Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
         self._wanted = GUIColors.CardShadow if self._showShadow else (0,0,0,0)
 
         # [Step 2]: Start animation
-        # Debug.Log("[Step 2]:")
+        # #Debug.Log("[Step 2]:")
         if(self.animated):
             self._StartColorAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingColors(None, None, None)
-        Debug.End()
-        Debug.End()
+        #Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdatePos(self, *args):
         """
@@ -3043,10 +3044,10 @@ class BRS_ButtonWidgetAttributes(
 
             *args = [object, (x,y)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdatePos")
         self._wanted_Pos = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateSize(self, *args):
         """
@@ -3055,10 +3056,10 @@ class BRS_ButtonWidgetAttributes(
 
             *args = [object, (width,height)]
         """
-        Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
+        #Debug.Start("[BRS_ValueWidgetAttributes]: _UpdateSize")
         self._wanted_Size = (args[1][0], args[1][1])
         self._UpdateShape()
-        Debug.End()
+        #Debug.End()
     # ------------------------------------------------------
     def _UpdateShape(self, *args):
         """
@@ -3067,14 +3068,14 @@ class BRS_ButtonWidgetAttributes(
 
             Do not call this function outside of this widget
         """
-        Debug.Start("_UpdateShape")
+        #Debug.Start("_UpdateShape")
         # [Step 1]: Checking if widget should have animations or not
         if(self.animated):
             self._StartShapeAnimation()
         else:
             self._InstantAnimation()
             self._AnimatingShapes(None, None, None)
-        Debug.End()
+        #Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
