@@ -8,11 +8,12 @@ LoadingLog.Start("cards.py")
 #====================================================================#
 from ...Debug.consoleLog import Debug
 from ...Utilities.states import States,StatesColors
+from ...Utilities.LanguageHandler import _
+from ...Utilities.FileHandler import JSONdata
+from ...Utilities.Enums import FileIntegrity
 from ...GUI.Utilities.colors import GUIColors
 from ...GUI.Utilities.attributes import BRS_ValueWidgetAttributes, BRS_BarGraphWidgetAttributes, BRS_CardLayoutAttributes
 from ...GUI.Utilities.references import Shadow,Rounding,Styles
-from ...Utilities.FileHandler import JSONdata
-from ...Utilities.LanguageHandler import _
 
 from kivymd.app import MDApp
 from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
@@ -244,8 +245,6 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
 
             See PieChartDial for an example.
         """
-        Debug.Start("_AnimatingShapes")
-
         # [Step 1]: Update drawings based on new values
         self._MDCard.padding = self._current_padding
         self._MDCard.spacing = self._current_spacing
@@ -255,7 +254,6 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
         # [Step 2]: Update background's positions
         self._MDCard.pos   = (self._current_pos[0], self._current_pos[1])
         self._MDCard.size  = (self._current_size[0], self._current_size[1])
-        Debug.End()
     # ------------------------------------------------------
     def _AnimatingColors(self, animation, value, theOtherOne):
         """ Called when color related animations are executed """
@@ -296,46 +294,45 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
         self.json = JSONdata(fileName,jsonPath)
         self.Integrity = IntegrityChecker(self.json)
 
-        if(self.Integrity == "Blank"):
+        if(self.Integrity == FileIntegrity.Blank):
             self.clear_widgets()
             self.CanBeUsed = False
             return
         else:
             # There is a profile, thus we can create the widgets to put inside the card
+            self._MDCard.orientation = "vertical"
             self._MDCard.Icon = MDLabel(text=md_icons["exclamation"], font_style='Icon', font_size = "100sp", halign = "center")
-            self._MDCard.Icon.font_size = "100sp"
-            self._MDCard.Title = MDLabel(text="Error", font_style = "H4", halign = "center")
+            self._MDCard.Title = MDLabel(text="Error", font_style = "H5", halign = "center")
+            self._MDCard.Title.text = _(FileIntegrity.GetName(self.Integrity))
             self._MDCard.Separator = MDProgressBar()
+            self._MDCard.Icon.font_size = "100sp"
+            # self._MDCard.Icon.theme_text_color = "Error"
+            # self._MDCard.Title.theme_text_color = "Error"
             self._MDCard.Separator.size_hint = (1,0.05)
             self._MDCard.Separator.value_normalized = 1
-            self._MDCard.orientation = "vertical"
 
-            if(self.Integrity == "Error"):
+            if(self.Integrity == FileIntegrity.Error):
                 self._MDCard.Separator.color = MDApp.get_running_app().theme_cls.error_color
                 self._MDCard.Icon.text = md_icons["alert"]
                 self._MDCard.Icon.theme_text_color = "Error"
                 self._MDCard.Title.theme_text_color = "Error"
-                self._MDCard.Title.text = _(self.Integrity)
             else:
-                if(self.Integrity == "Corrupted"):
+                if(self.Integrity == FileIntegrity.Corrupted):
                     self._MDCard.Icon.text = md_icons["file-alert"]
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
-                    self._MDCard.Title.text = _(self.Integrity)
 
-                elif(self.Integrity == "Outdated"):
+                elif(self.Integrity == FileIntegrity.Outdated):
                     self._MDCard.Icon.text = md_icons["file-arrow-up-down"]
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
-                    self._MDCard.Title.text = _(self.Integrity)
 
-                elif(self.Integrity == "Ahead"):
+                elif(self.Integrity == FileIntegrity.Ahead):
                     self._MDCard.Icon.text = md_icons["file-arrow-up-down"]
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
-                    self._MDCard.Title.text = _(self.Integrity)
 
-                elif(self.Integrity == "Good"):
+                elif(self.Integrity == FileIntegrity.Good):
                     self.IconPath = self.json.jsonData["Generic"]["IconPath"]
                     self.IconType = self.json.jsonData["Generic"]["IconType"]
                     self.Name     = self.json.jsonData["Generic"]["Username"]
