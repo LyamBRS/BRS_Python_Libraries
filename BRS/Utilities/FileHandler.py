@@ -146,7 +146,13 @@ class JSONdata:
         # Check if JSONdata has anything
         if(len(self.jsonData) > 0):
             try:
+                if self.pathToDirectory.endswith("\\"):
+                    pass
+                else:
+                    self.pathToDirectory = self.pathToDirectory + "\\"
+
                 with open(self.pathToDirectory + self.fileName, "w") as file:
+                    Debug.Log(f"JSONdata -> saving log at: -> {self.pathToDirectory + self.fileName}")
                     json.dump(self.jsonData, file)
                 return True
             except:
@@ -253,6 +259,7 @@ class FilesFinder:
             If the function returns False, no files were loaded.
         """
         #endregion
+        Debug.Start("LoadFiles")
         filenames:list = []
         fileFound:bool = False
 
@@ -264,10 +271,15 @@ class FilesFinder:
                 if filename.endswith(self.fileExtension):
                     filenames.append(filename)
                     fileFound = True
+                    Debug.Log(f"found: ({filename})")
 
             self.fileList = filenames
+            Debug.Log(f"fileFound: {fileFound}")
+            Debug.End()
             return fileFound
         else:
+            Debug.Error("Failed to validate FilesFinder's attributes.")
+            Debug.End()
             return False
     def SelfCheck(self) -> bool:
         #region   --------------------------- DOCSTRING
@@ -306,17 +318,20 @@ class FilesFinder:
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, fileExtension:str = "", path:str = None) -> None:
+        Debug.Start("FilesFinder: __init__")
         # Check if path valid
         if(path == None):
             if(self.pathToDirectory == None):
                 raise Exception("[BRS]: FilesFinder: No path specified.")
             else:
                 if(IsPathValid(self.pathToDirectory)):
+                    Debug.Log("specified pathToDirectory is valid")
                     pass
                 else:
                     raise Exception("[BRS]: FilesFinder: stored path was not valid")
         else:
             if(IsPathValid(path)):
+                Debug.Log("specified path is valid. Putting it as pathToDirectory")
                 self.pathToDirectory = path
             else:
                 raise Exception("[BRS]: FilesFinder: specified path is not valid")
@@ -328,13 +343,16 @@ class FilesFinder:
         else:
             if(fileExtension.__contains__(".")):
                 self.fileExtension = fileExtension
+                Debug.Log("specified extension already contains a dot.")
             else:
-                fileName = f".{fileName}"
-                self.fileName = fileName
+                self.fileExtension = f".{fileExtension}"
+                Debug.Log("adding dot to file extension")
 
-
+        Debug.Log(f"Resulted pathtodirectory: {self.pathToDirectory}")
+        Debug.Log(f"Resulted fileExtension: {self.fileExtension}")
         # Check the class's parameters
         fileFound:bool = self.LoadFiles()
+        Debug.End()
     #endregion
     pass
 #====================================================================#

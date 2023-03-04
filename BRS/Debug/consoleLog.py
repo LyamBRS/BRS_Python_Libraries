@@ -37,7 +37,7 @@ class Debug:
                 for x in range(0, Debug._currentDepth):
                     indentation = indentation + Debug._indentationStyle
 
-            print(indentation + logged)
+            print(indentation + str(logged))
         pass
 
     def Warn(logged:str):
