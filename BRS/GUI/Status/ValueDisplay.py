@@ -242,33 +242,25 @@ class OutlineDial(BRS_ValueWidgetAttributes, Widget):
 
             See PieChartDial for an example.
         """
-        Debug.Start("_AnimatingShapes")
+        # Debug.Start("_AnimatingShapes")
         # [Step 0]: Save private values as actual Widget properties
-        # self.Properties.value         = self._current_value
-        # self.Properties.endAngle      = self._current_endAngle
-        # self.Properties.startAngle    = self._current_startAngle
-        # self.Properties.fillingWidth  = self._current_fillingWidth
-        # self.Properties.trackWidth    = self._current_trackWidth
-        # self.Properties.pos           = (self._current_pos[0], self._current_pos[1])
-        # self.Properties.size          = (self._current_size[0], self._current_size[1])
 
         # [Step 1]: Update drawings based on new values
         UpdateLine(self, "Track", self.Track)
         UpdateLine(self, "Filling", self.Filling)
         UpdateEllipse(self, "Background", self.background)
 
-        Debug.End()
+        # Debug.End()
     # ------------------------------------------------------
     def _AnimatingColors(self, animation, value, theOtherOne):
         """ Called when color related animations are executed """
-        Debug.Start("_AnimatingColors")
+        # Debug.Start("_AnimatingColors")
 
         # [Step 0]: Update widget's colors with these colors
-        Debug.Log("Color = {}".format(self._current_trackColor))
         self.trackColor.rgba        = self._current_trackColor
         self.fillingColor.rgba      = self._current_fillingColor
         self.backgroundColor.rgba   = self._current_backgroundColor
-        Debug.End()
+        # Debug.End()
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
@@ -298,7 +290,7 @@ class OutlineDial(BRS_ValueWidgetAttributes, Widget):
         self.Properties.trackWidth      = trackWidth
         self.Properties.max             = max
         self.Properties.min             = min
-        self.Properties.value           = 50
+        self.Properties.value           = self._current_value
         self.Properties.endAngle        = endAngle
         self.Properties.startAngle      = startAngle
 

@@ -4,6 +4,7 @@ The Network folder contains sub directories which holds scripts and classes used
 ### - - Hardware Categories:
 - **APIs**: Holds script used to interface with APIs inside Python classes. Such APIs can be GitHub or Discord for example.
 - **Utilities**: Contains sub-scripts and classes used by a majority of larger objects within the Network folder.
+- **Web**: Holds script used to interface with the internet.
 
 ## - Class structures & Planning
 To visualize how classes are planned, view them through the documentation available in Google Drive: https://drive.google.com/drive/folders/1iPn1Ec0YsjzzDJay5vYSwzTZpcx0zcKS?usp=share_link

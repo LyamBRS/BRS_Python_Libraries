@@ -29,6 +29,21 @@ class Debug:
             print(indentation + "-")
         pass
 
+    def End(functionName:str=None):
+        '''Closes an indentation when debugging. Put this at the end of debugged functions, along with a start at the top'''
+        if Debug.enableConsole == True and Debug._currentDepth > 0:
+            indentation = ""
+
+            Debug._currentDepth = Debug._currentDepth - 1
+            if Debug._currentDepth > 0:
+                for x in range(0, Debug._currentDepth):
+                    indentation = indentation + Debug._indentationStyle
+            if(functionName != None):
+                print(indentation + f"-{functionName}-")
+            else:
+                print(indentation + "-")
+        pass
+
     def Log(logged:str):
         if Debug.enableConsole:
             #Calculate and create indentations
@@ -48,7 +63,7 @@ class Debug:
                 for x in range(0, Debug._currentDepth):
                     indentation = indentation + Debug._indentationStyle
 
-            print(indentation + " [WARNING]:\t" + logged)
+            print(indentation + "[WARNING]:\t" + logged)
         pass
 
     def Error(logged:str):
@@ -59,7 +74,7 @@ class Debug:
                 for x in range(0, Debug._currentDepth):
                     indentation = indentation + Debug._indentationStyle
 
-            print(indentation + " [ERROR]:\t" + logged)
+            print(indentation + "[ERROR]:\t" + logged)
         pass
 
 LoadingLog.End("consoleLog.py")

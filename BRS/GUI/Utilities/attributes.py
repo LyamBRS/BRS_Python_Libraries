@@ -783,8 +783,33 @@ class Attribute_Track:
     """
     _showTrack : bool = True
     """Enables the tracks's drawing"""
+    _useCustomTrackColor:list = None
     #endregion
     #region   --------------------------- GET SET
+    #region   -- UseCustomTrackColor
+    @property
+    def UseCustomTrackColor(self) -> list:
+        """ [GET]:
+        Returns wether the track is a custom color or not
+        """
+        return self._useCustomTrackColor
+
+    @UseCustomTrackColor.setter
+    def UseCustomTrackColor(self, newValue:list) -> None:
+        """ [SET]:
+            Sets wether the track is a custom color or not.
+            If `None`, then no custom colors will be used anymore
+        Args:
+            newValue (list): the new color
+        """
+        #Debug.Start("ShowBackground")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self._useCustomTrackColor):
+            self._useCustomTrackColor = newValue
+            self._UpdateColors(None,None)
+        #Debug.End()
+    #endregion
     #region   -- TrackWidth
     @property
     def TrackWidth(self) -> int:
@@ -917,8 +942,34 @@ class Attribute_Filling:
     """
     _showFilling : bool = True
     """Defines if the filling should be displayed"""
+    _useCustomFillingColor:list = None
     #endregion
     #region   --------------------------- GET SET
+    #region   -- UseCustomFillingColor
+    @property
+    def UseCustomFillingColor(self) -> list:
+        """ [GET]:
+        Returns wether the filling is a custom color or not
+        `None`: not a custom color
+        """
+        return self._useCustomFillingColor
+
+    @UseCustomFillingColor.setter
+    def UseCustomFillingColor(self, newValue:list) -> None:
+        """ [SET]:
+            Sets wether the filling is a custom color or not.
+            if `None`, no custom colors will be used
+        Args:
+            newValue (list): the new color
+        """
+        #Debug.Start("ShowBackground")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self._useCustomFillingColor):
+            self._useCustomFillingColor = newValue
+            self._UpdateColors(None,None)
+        #Debug.End()
+    #endregion
     #region   -- FillingWidth
     @property
     def FillingWidth(self) -> int:
@@ -1050,8 +1101,34 @@ class Attribute_Background:
     """ Defines wether the background of the widget should be shown or not. Defaults to True """
     _showShadow : bool = False
     """ Defines wether the background of the widget or layout should have a shadow or not. Defaults to False"""
+    _useCustomBackgroundColor:list = None
     #endregion
     #region   --------------------------- GET SET
+    #region   -- UseCustomBackgroundColor
+    @property
+    def UseCustomBackgroundColor(self) -> list:
+        """ [GET]:
+        Returns wether the background is a custom color or not
+        if `None`, then no custom color is used
+        """
+        return self._useCustomBackgroundColor
+
+    @UseCustomBackgroundColor.setter
+    def UseCustomBackgroundColor(self, newValue:list) -> None:
+        """ [SET]:
+            Sets wether the background is a custom color or not.
+            if `None`, no custom colors will be used
+        Args:
+            newValue (list): the new showing or not
+        """
+        #Debug.Start("ShowBackground")
+
+        # [Step 1]: Update the shape based on the new value if its a new value
+        if(newValue != self._useCustomBackgroundColor):
+            self._useCustomBackgroundColor = newValue
+            self._UpdateColors(None,None)
+        #Debug.End()
+    #endregion
     #region   -- ShowBackground
     @property
     def ShowBackground(self) -> bool:
@@ -2420,9 +2497,21 @@ class BRS_ValueWidgetAttributes(
         """
         #Debug.Start("_UpdateColors")
         # [Step 0]: Set wanted animation results
-        self._wanted_FillingColor    = StatesColors.Default.GetColorFrom(self._state) if self._showFilling    else (0,0,0,0)
-        self._wanted_TrackColor      = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack      else (0,0,0,0)
-        self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state)    if self._showBackground else (0,0,0,0)
+        if(self._useCustomFillingColor != None):
+            self._wanted_FillingColor = self._useCustomFillingColor if self._showFilling else (0,0,0,0)
+        else:
+            self._wanted_FillingColor = StatesColors.Default.GetColorFrom(self._state) if self._showFilling else (0,0,0,0)
+
+        if(self._useCustomTrackColor != None):
+            self._wanted_TrackColor = self._useCustomTrackColor if self._showTrack else (0,0,0,0)
+        else:
+            self._wanted_TrackColor = StatesColors.Pressed.GetColorFrom(self._state) if self._showTrack else (0,0,0,0)
+
+        if(self._useCustomBackgroundColor != None):
+            self._wanted_BackgroundColor = self._useCustomBackgroundColor if self._showBackground else (0,0,0,0)
+        else:
+            self._wanted_BackgroundColor = StatesColors.Text.GetColorFrom(self._state) if self._showBackground else (0,0,0,0)
+
 
         # [Step 2]: Start animation
         # #Debug.Log("[Step 2]:")
@@ -2467,7 +2556,7 @@ class BRS_ValueWidgetAttributes(
         """
         #Debug.Start("_UpdateShape")
         # [Step 0]: Getting valus from widget properties
-        self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
+        # self._Animated_Get("Shapes", fromTheseProperties = self.Properties)
 
         # [Step 1]: Checking if widget should have animations or not
         if(self.animated):

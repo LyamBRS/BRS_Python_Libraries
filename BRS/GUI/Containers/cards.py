@@ -306,8 +306,6 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
             self._MDCard.Title.text = _(FileIntegrity.GetName(self.Integrity))
             self._MDCard.Separator = MDProgressBar()
             self._MDCard.Icon.font_size = "100sp"
-            # self._MDCard.Icon.theme_text_color = "Error"
-            # self._MDCard.Title.theme_text_color = "Error"
             self._MDCard.Separator.size_hint = (1,0.05)
             self._MDCard.Separator.value_normalized = 1
 

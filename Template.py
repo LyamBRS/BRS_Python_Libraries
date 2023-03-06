@@ -1,11 +1,30 @@
 #====================================================================#
 # File Information
 #====================================================================#
-
+"""
+    AppLoading.py
+    =============
+    This file is used to control and coordinate the loading of the
+    application's various things. It uses a list of things to do where
+    each element is paired with a function that returns `True` if an
+    error occured and `False` if that loading step was successful.
+"""
+#====================================================================#
+# Loading Logs
+#====================================================================#
+from .BRS.Debug.LoadingLog import LoadingLog
+LoadingLog.Start("AppLoading.py")
 #====================================================================#
 # Imports
 #====================================================================#
-
+#region ------------------------------------------------------ Python
+#endregion
+#region --------------------------------------------------------- BRS
+#endregion
+#region -------------------------------------------------------- Kivy
+#endregion
+#region ------------------------------------------------------ KivyMD
+#endregion
 #====================================================================#
 # Functions
 #====================================================================#
@@ -30,3 +49,5 @@ class Example:
     #region   --------------------------- CONSTRUCTOR
     #endregion
     pass
+#====================================================================#
+LoadingLog.End("AppLoading.py")
