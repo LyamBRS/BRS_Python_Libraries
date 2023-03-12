@@ -55,35 +55,36 @@ class FileIntegrity(Enum):
             enum as input parameter and returns the string representation
             of that value. Usually used for GUI displays.
         """
-        try:
-            match Integrity:
-                case FileIntegrity.Ahead:
-                    return "Ahead"
-                case FileIntegrity.Good:
-                    return "Good"
-                case FileIntegrity.Blank:
-                    return "Blank"
-                case FileIntegrity.Corrupted:
-                    return "Corrupted"
-                case FileIntegrity.Outdated:
-                    return "Outdated"
-                case FileIntegrity.Error:
-                    return "Error"
-                case _:
-                    return "No Match"
-        except:
-            if(Integrity == FileIntegrity.Ahead):
-                return "Ahead"
-            if(Integrity == FileIntegrity.Good):
-                return "Good"
-            if(Integrity == FileIntegrity.Blank):
-                return "Blank"
-            if(Integrity == FileIntegrity.Corrupted):
-                return "Corrupted"
-            if(Integrity == FileIntegrity.Outdated):
-                return "Outdated"
-            if(Integrity == FileIntegrity.Error):
-                return "Error"
+        # try:
+        #     match Integrity:
+        #         case FileIntegrity.Ahead:
+        #             return "Ahead"
+        #         case FileIntegrity.Good:
+        #             return "Good"
+        #         case FileIntegrity.Blank:
+        #             return "Blank"
+        #         case FileIntegrity.Corrupted:
+        #             return "Corrupted"
+        #         case FileIntegrity.Outdated:
+        #             return "Outdated"
+        #         case FileIntegrity.Error:
+        #             return "Error"
+        #         case _:
+        #             return "No Match"
+        # except:
+        if(Integrity == FileIntegrity.Ahead):
+            return "Ahead"
+        if(Integrity == FileIntegrity.Good):
+            return "Good"
+        if(Integrity == FileIntegrity.Blank):
+            return "Blank"
+        if(Integrity == FileIntegrity.Corrupted):
+            return "Corrupted"
+        if(Integrity == FileIntegrity.Outdated):
+            return "Outdated"
+        if(Integrity == FileIntegrity.Error):
+            return "Error"
+        return "No Match"
 #====================================================================#
 
 # LoadingLog.End("Enums.py")
