@@ -95,7 +95,7 @@ class Information:
         """
         Debug.Start("Information -> __init__")
 
-        self.platform = platform.processor()
+        self.platform = platform.system()
         self.PCName = platform.node()
         self.processorType = platform.machine()
         self.pythonVersion = platform.python_version

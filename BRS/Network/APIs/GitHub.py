@@ -10,8 +10,9 @@ import requests
 import subprocess
 import base64
 from github import Github as git
-from BRS.Debug.consoleLog import Debug
+from ...Debug.consoleLog import Debug
 from ...Debug.LoadingLog import LoadingLog
+from ...Utilities.Enums import GitHubFail
 LoadingLog.Start("GitHub.py")
 #====================================================================#
 # Functions
@@ -159,8 +160,8 @@ class GitHub:
                 Debug.End()
                 return None
 
-        return "No matching repositories. Make sure you are using a cloned repository."
         Debug.End()
+        return "No matching repositories. Make sure you are using a cloned repository."
     #------------------------------------------------
     def GetMatchingRepositoryTag() -> None:
         Debug.Start("GetMatchingRepositoryTag")
@@ -170,25 +171,37 @@ class GitHub:
             return "No matched repositories to use. Make sure you are using a cloned repository."
 
         Debug.Log("Getting master branch")
-        GitHub.MasterBranch = GitHub.MatchedRepository.get_branch("master")
+        try:
+            GitHub.MasterBranch = GitHub.MatchedRepository.get_branch("master")
+        except:
+            return "Failed to get master branch of matched repository"
 
         Debug.Log("Getting latest commit of the master branch")
-        GitHub.LatestCommit = GitHub.MasterBranch.commit
+        try:
+            GitHub.LatestCommit = GitHub.MasterBranch.commit
+        except:
+            return "Failed to get master branch's commits"
 
         Debug.Log("Getting the tags of that latest commit")
-        GitHub.CommitTags = GitHub.MatchedRepository.get_tags()
+        try:
+            GitHub.CommitTags = GitHub.MatchedRepository.get_tags()
+        except:
+            return "Failed to get tags of the matching repository"
+        Debug.Log(f"CommitTags = {GitHub.CommitTags}")
 
         Debug.Log("Getting the latest tag of that commit")
-        GitHub.LatestTag = sorted(GitHub.CommitTags, key=lambda t: t.commit.commit.committer.date)[-1]
-        GitHub.LatestTag = GitHub.LatestTag.name
-        # Debug.Log("Latest tag is: ", GitHub.LatestTag)
+        try:
+            GitHub.LatestTag = sorted(GitHub.CommitTags, key=lambda t: t.commit.commit.committer.date)[-1]
+            GitHub.LatestTag = GitHub.LatestTag.name
+        except:
+            return "Failed to sort repositories commit tags"
 
         Debug.End()
     #------------------------------------------------
     def GetAll(username:str = "LyamBRS") -> int:
         """
         Initializes GitHub class automatically.
-        it will return 0 if everything went well and 1 if an error occured.
+        it will return `None` if everything went well and a message if an error occured.
 
         Make sure the repository is cloned from GitHub and not initialized.
         Otherwise, it will be impossible to get the name of the repository.
@@ -201,7 +214,7 @@ class GitHub:
         if(error != None):
             Debug.Error(error)
             Debug.End()
-            return 1
+            return error
 
         # try:
         # [Step 2]: Getting GitHub user's information.
@@ -209,28 +222,28 @@ class GitHub:
         if(error != None):
             Debug.Error(error)
             Debug.End()
-            return 1
+            return error
 
         # [Step 3]: Getting all repositories of the specified user
         error = GitHub.GetUserRepositories()
         if(error != None):
             Debug.Error(error)
             Debug.End()
-            return 1
+            return error
 
         # [Step 4]: Checking if the local repository exist within the user's repositories.
         error = GitHub.GetMatchingRepository()
         if(error != None):
             Debug.Error(error)
             Debug.End()
-            return 1
+            return error
 
         # [Step 5]: Get the latest tag of the repository
         error = GitHub.GetMatchingRepositoryTag()
         if(error != None):
             Debug.Error(error)
             Debug.End()
-            return 1
+            return error
 
         # except socket.error:
             # Debug.Error(f"Network Error")
@@ -268,6 +281,28 @@ class GitHub:
 
         Debug.End()
         return gitStuff
+    #------------------------------------------------
+    def GetRequests() -> bool:
+        """
+            GetRequests:
+            -----------------
+            This function's purpose is to check if
+            GitHub's API can be accessed.
+
+            Returns `False` if API cannot be accessed
+            Returns a number correlating to the request limit available
+        """
+        Debug.Start("GetRequests")
+
+        try:
+            requests = GitHub.Object.get_rate_limit()
+            Debug.Log(f"You have {requests.core.remaining} requests available")
+            Debug.End()
+            return requests.core.remaining
+        except:
+            Debug.Error("Could not execute: get_rate_limit")
+            Debug.End()
+            return False
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion

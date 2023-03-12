@@ -7,31 +7,40 @@ class Debug:
     enableConsole = False
     _currentDepth = 0
     _indentationStyle = "|\t"
+    _DontDebugEnabled:bool = False
     #endregion
 
-    def Start(functionName:str=None):
+    def Start(functionName:str=None, DontDebug:bool=False):
         '''Indicates the start of a debugging chain for fast, auto indentation that doesn't rely on getting the stack size'''
-        if Debug.enableConsole == True:
+        if(DontDebug):
+            Debug._DontDebugEnabled = True
+
+        if Debug.enableConsole == True and not Debug._DontDebugEnabled:
+            
+            if(DontDebug):
+                Debug._DontDebugEnabled = True
+
             if(functionName != None):
                 Debug.Log("["+functionName+"]:")
             Debug._currentDepth = Debug._currentDepth + 1
         pass
 
-    def End():
+    def End(ContinueDebug:bool = False):
         '''Closes an indentation when debugging. Put this at the end of debugged functions, along with a start at the top'''
-        if Debug.enableConsole == True and Debug._currentDepth > 0:
+        if Debug.enableConsole == True and Debug._currentDepth > 0 and not Debug._DontDebugEnabled:
             indentation = ""
-
             Debug._currentDepth = Debug._currentDepth - 1
             if Debug._currentDepth > 0:
                 for x in range(0, Debug._currentDepth):
                     indentation = indentation + Debug._indentationStyle
             print(indentation + "-")
-        pass
 
-    def End(functionName:str=None):
+        if(ContinueDebug and Debug._DontDebugEnabled):
+            Debug._DontDebugEnabled = False
+
+    def End(functionName:str=None, ContinueDebug:bool = False):
         '''Closes an indentation when debugging. Put this at the end of debugged functions, along with a start at the top'''
-        if Debug.enableConsole == True and Debug._currentDepth > 0:
+        if Debug.enableConsole == True and Debug._currentDepth > 0 and not Debug._DontDebugEnabled:
             indentation = ""
 
             Debug._currentDepth = Debug._currentDepth - 1
@@ -42,10 +51,12 @@ class Debug:
                 print(indentation + f"-{functionName}-")
             else:
                 print(indentation + "-")
-        pass
+
+        if(ContinueDebug and Debug._DontDebugEnabled):
+            Debug._DontDebugEnabled = False
 
     def Log(logged:str):
-        if Debug.enableConsole:
+        if Debug.enableConsole and not Debug._DontDebugEnabled:
             #Calculate and create indentations
             indentation = ""
             if Debug._currentDepth > 0:
@@ -56,7 +67,7 @@ class Debug:
         pass
 
     def Warn(logged:str):
-        if Debug.enableConsole:
+        if Debug.enableConsole and not Debug._DontDebugEnabled:
             #Calculate and create indentations
             indentation = ""
             if Debug._currentDepth > 0:
@@ -67,7 +78,7 @@ class Debug:
         pass
 
     def Error(logged:str):
-        if Debug.enableConsole:
+        if Debug.enableConsole and not Debug._DontDebugEnabled:
             #Calculate and create indentations
             indentation = ""
             if Debug._currentDepth > 0:

@@ -21,13 +21,13 @@ def _(string:str) ->str:
         You need to have built Applanguage prior to using this.
         Otherwise, it will simply return the input string no less.
     """
-    Debug.Start("_ translator")
+    Debug.Start("_ translator", DontDebug=True)
     Debug.Log(f"Amount of times overwrote: {AppLanguage.OverWriteCount}")
     Debug.Log(f"Language used: {AppLanguage.Current}")
 
     string = AppLanguage.Translate(string)
     Debug.Log(f"Result: {string}")
-    Debug.End()
+    Debug.End(ContinueDebug=True)
     return string
 #====================================================================#
 # Classes
@@ -114,9 +114,9 @@ class AppLanguage:
         """
             Interfaces gettext api and returns the translated string
         """
-        Debug.Start("AppLanguage.Translate default function")
+        Debug.Start("AppLanguage.Translate default function", DontDebug=True)
         Debug.Warn(f"Returning {string} untranslated")
-        Debug.End()
+        Debug.End(ContinueDebug=True)
         return string
     #endregion
     #region   --------------------------- CONSTRUCTOR

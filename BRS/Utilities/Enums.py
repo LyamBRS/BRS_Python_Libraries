@@ -86,5 +86,62 @@ class FileIntegrity(Enum):
             return "Error"
         return "No Match"
 #====================================================================#
+class GitHubFail(Enum):
+    """
+        GitHubFail:
+        -----------
+        This enumeration class is used to identify the type of error
+        being returned from the GitHub API.
+    """
+    Good:int = 0
+    """ GitHub function was successful. """
+    LocalRepository:int = 1
+    """ Failed to get local repository """
+    User:int = 2
+    """ The specified user did not exist, or an error occured while accessing it. """
+    UserRepositories:int = 3
+    """ Failed to get the specified user's repositories """
+    MatchingRepository:int = 4
+    """ No user repositories matched the local repository. """
+    MatchingRepositoryTag:int = 5
+    """ Failed to get tags from matching repository. """
 
+    def GetName(Integrity:int) -> str:
+        """
+            GetName:
+            --------
+            Standard BRS enum function that takes a value from this
+            enum as input parameter and returns the string representation
+            of that value. Usually used for GUI displays.
+        """
+        # try:
+        #     match Integrity:
+        #         case FileIntegrity.Ahead:
+        #             return "Ahead"
+        #         case FileIntegrity.Good:
+        #             return "Good"
+        #         case FileIntegrity.Blank:
+        #             return "Blank"
+        #         case FileIntegrity.Corrupted:
+        #             return "Corrupted"
+        #         case FileIntegrity.Outdated:
+        #             return "Outdated"
+        #         case FileIntegrity.Error:
+        #             return "Error"
+        #         case _:
+        #             return "No Match"
+        # except:
+        if(Integrity == FileIntegrity.Ahead):
+            return "Ahead"
+        if(Integrity == FileIntegrity.Good):
+            return "Good"
+        if(Integrity == FileIntegrity.Blank):
+            return "Blank"
+        if(Integrity == FileIntegrity.Corrupted):
+            return "Corrupted"
+        if(Integrity == FileIntegrity.Outdated):
+            return "Outdated"
+        if(Integrity == FileIntegrity.Error):
+            return "Error"
+        return "No Match"
 # LoadingLog.End("Enums.py")
