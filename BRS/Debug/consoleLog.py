@@ -77,7 +77,7 @@ class Debug:
             print(indentation + "[WARNING]:\t" + logged)
         pass
 
-    def Error(logged:str):
+    def Error(logged:str, FileName:str = None, Line:int = None):
         if Debug.enableConsole and not Debug._DontDebugEnabled:
             #Calculate and create indentations
             indentation = ""
@@ -85,7 +85,10 @@ class Debug:
                 for x in range(0, Debug._currentDepth):
                     indentation = indentation + Debug._indentationStyle
 
-            print(indentation + "[ERROR]:\t" + logged)
+            if(FileName != None and Line != None):
+                print(f"{indentation} [ERROR -> {FileName};ln{str(Line)}]:\t {logged}")
+            else:
+                print(indentation + "[ERROR]:\t" + logged)
         pass
 
 LoadingLog.End("consoleLog.py")

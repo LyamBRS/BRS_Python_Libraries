@@ -19,14 +19,58 @@
 # Imports
 #====================================================================#
 from enum import Enum
-# from ..Debug.LoadingLog import LoadingLog
-# LoadingLog.Start("Enums.py")
+from ..Debug.LoadingLog import LoadingLog
+LoadingLog.Start("Enums.py")
 #====================================================================#
 # Functions
 #====================================================================#
 
 #====================================================================#
 # Enums
+#====================================================================#
+class Dates(Enum):
+    """
+        Dates:
+        ------
+        Enumeration of possible dates to save. These dates types can
+        be used to store types of dates into logs. The following
+        dates type are stored in this enumeration:
+        - `Creation`
+        - `Current`
+        - `Exit`
+        - `Open`
+        - `Updated`
+    """
+    Creation:str = "Creation"
+    """Date corresponding to the creation of something."""
+    Current:str = "Current"
+    """Date corresponding to the current date."""
+    Exit:str = "Exit"
+    """Date corresponding to something's exiting."""
+    Open:str = "Open"
+    """Date corresponding to the opening of something or the loading of something."""
+    Updated:str = "Updated"
+    """Date corresponding to the updating of something."""
+
+    def GetName(DateEnum:str) -> str:
+        """
+            GetName:
+            --------
+            Standard BRS enum function that takes a value from this
+            enum as input parameter and returns the string representation
+            of that value. Usually used for GUI displays.
+        """
+        if(DateEnum == Dates.Creation):
+            return "Creation"
+        if(DateEnum == Dates.Current):
+            return "Current"
+        if(DateEnum == Dates.Exit):
+            return "Exit"
+        if(DateEnum == Dates.Open):
+            return "Open"
+        if(DateEnum == Dates.Updated):
+            return "Updated"
+        return "No Match"
 #====================================================================#
 class FileIntegrity(Enum):
     """
@@ -144,4 +188,4 @@ class GitHubFail(Enum):
         if(Integrity == FileIntegrity.Error):
             return "Error"
         return "No Match"
-# LoadingLog.End("Enums.py")
+LoadingLog.End("Enums.py")
