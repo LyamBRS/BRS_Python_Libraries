@@ -8,6 +8,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
+from .Enums import FileIntegrity
 from ..Debug.LoadingLog import LoadingLog
 LoadingLog.Start("FileHandler.py")
 
@@ -100,6 +101,35 @@ def GetJsonData(file_path):
     with open(file_path, 'r') as f:
         data = json.load(f)
     return data
+
+def CompareKeys(struct, obj, prefix=''):
+    """
+        CompareKeys:
+        ------------
+        This function's purpose is to recursively compare the keys
+        in a Json file with a structure variable.
+        If the keys don't match, `FileIntegrity.Corrupted` is returned.
+        Otherwise, `FileIntegrity.Good` is returned
+
+        struct : JsonStructure
+        obj : JSONData
+    """
+    Debug.Start("CompareKeys")
+    for key in struct.keys():
+        Debug.Log(f"Checking: {key}")
+        if key not in obj:
+            Debug.Log(f"Key '{prefix}.{key}' not found in loaded JSON file.")
+            Debug.End()
+            return FileIntegrity.Corrupted
+        elif isinstance(struct[key], dict):
+            if not isinstance(obj[key], dict):
+                Debug.Log(f"Value of '{prefix}.{key}' in loaded JSON file is not a dictionary.")
+                Debug.End()
+                return FileIntegrity.Corrupted
+            else:
+                CompareKeys(struct[key], obj[key], f"{prefix}.{key}")
+    Debug.End()
+    return FileIntegrity.Good
 #====================================================================#
 # Classes
 #====================================================================#
