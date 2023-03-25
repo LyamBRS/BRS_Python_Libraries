@@ -140,7 +140,7 @@ class WidgetCard(BRS_CardLayoutAttributes, Widget):
         Debug.End()
     #endregion
     pass
-
+# -------------------------------------------------------------------
 class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
     #region   --------------------------- DOCSTRING
     ''' 
@@ -426,7 +426,7 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
         Debug.End()
     #endregion
     pass
-
+# -------------------------------------------------------------------
 class CreateCard(BaseButton, Widget):
     #region   --------------------------- DOCSTRING
     ''' 
