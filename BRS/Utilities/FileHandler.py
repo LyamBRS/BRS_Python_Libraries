@@ -96,12 +96,12 @@ def IsPathValid(pathname: str) -> bool:
         return True
     # If any other exception was raised, this is an unrelated fatal issue
     # (e.g., a bug). Permit this exception to unwind the call stack.
-
+# -------------------------------------------------------------------
 def GetJsonData(file_path):
     with open(file_path, 'r') as f:
         data = json.load(f)
     return data
-
+# -------------------------------------------------------------------
 def CompareKeys(struct, obj, prefix=''):
     """
         CompareKeys:
@@ -130,6 +130,26 @@ def CompareKeys(struct, obj, prefix=''):
                 CompareKeys(struct[key], obj[key], f"{prefix}.{key}")
     Debug.End()
     return FileIntegrity.Good
+# -------------------------------------------------------------------
+def AppendPath(systemPath:str, pathB):
+    """
+        AppendPath:
+        -----------
+        Append path is used to add and get a new path from another
+        one. The first path given will define if \\ or / is used in
+        the path.
+    """
+    Debug.Start("AppendPath")
+
+    if("\\" in systemPath):
+        Debug.Log("Path is using \\")
+        pathB = pathB.replace("/","\\")
+    elif("/" in systemPath):
+        Debug.Log("Path is using /")
+        pathB = pathB.replace("\\","/")
+
+    Debug.End()
+    return systemPath + pathB
 #====================================================================#
 # Classes
 #====================================================================#
@@ -172,23 +192,27 @@ class JSONdata:
             Returns True if successful, False if not.
         """
         #endregion
-
+        Debug.Start("SaveFile")
         # Check if JSONdata has anything
         if(len(self.jsonData) > 0):
             try:
-                if self.pathToDirectory.endswith("\\"):
+                if (self.pathToDirectory.endswith("\\") or self.pathToDirectory.endswith("/")):
                     pass
                 else:
-                    self.pathToDirectory = self.pathToDirectory + "\\"
+                    self.pathToDirectory = AppendPath(self.pathToDirectory, "\\")
 
                 with open(self.pathToDirectory + self.fileName, "w") as file:
                     Debug.Log(f"JSONdata -> saving log at: -> {self.pathToDirectory + self.fileName}")
                     json.dump(self.jsonData, file)
+                Debug.End()
                 return True
             except:
                 Debug.Error("COULD NOT SAVE JSON DATA")
+                Debug.End()
                 return False
         else:
+            Debug.Error("jsonData is of lenght 0")
+            Debug.End()
             return False
     def CreateFile(self, structure) -> bool:
         #region   --------------------------- DOCSTRING

@@ -12,6 +12,7 @@ import os
 from .FileHandler import FilesFinder,IsPathValid
 from ..Debug.consoleLog import Debug
 import gettext
+from .FileHandler import AppendPath
 #====================================================================#
 # Functions
 #====================================================================#
@@ -85,7 +86,9 @@ class AppLanguage:
         # - Check if the locale path is still valid
         if(IsPathValid(path)):
             # - Find all the language files available at the specified path.
-            AppLanguage.LanguageFiles = FilesFinder(".mo", path + "\\"  + language + "\\LC_MESSAGES\\")
+            newPath = AppendPath(path, "\\")
+            newPath = AppendPath(newPath, language + "\\LC_MESSAGES\\")
+            AppLanguage.LanguageFiles = FilesFinder(".mo", newPath)
             Debug.Log(f"Locale path: {path}")
             Debug.Log(f"Loading language: {language}")
             Debug.Log(f"Compiled files found: {AppLanguage.LanguageFiles.fileList}")
