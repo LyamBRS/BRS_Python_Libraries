@@ -22,8 +22,12 @@ LoadingLog.Start("Information.py")
 #region ---- Imports
 #====================================================================#
 #region ------------------------------------------------------ Python
+LoadingLog.Import("Python")
+import platform
 #endregion
 #region --------------------------------------------------------- BRS
+LoadingLog.Import("Libraries")
+from ..Debug.consoleLog import Debug
 #endregion
 #region -------------------------------------------------------- Kivy
 #endregion
@@ -37,8 +41,8 @@ LoadingLog.Start("Information.py")
 #====================================================================#
 #region ---- Classes
 #====================================================================#
-LoadingLog.Class("AppInfo")
-class AppInfo:
+LoadingLog.Class("Information")
+class Information:
     #region   --------------------------------------------- DOCSTRING
     '''
         AppInfo:
@@ -87,7 +91,7 @@ class AppInfo:
         - `"Android"`: The application is running on Android
     '''
     # ---------------------------------------------------------------
-    Hardware:str = None
+    hardware:str = None
     '''
         Hardware:
         =========
@@ -110,7 +114,7 @@ class AppInfo:
         - `VM`  : The application is running on a virtual machine of some sort.
     '''
     # ---------------------------------------------------------------
-    Framework:str = None
+    framework:str = None
     '''
         Framework:
         =========
@@ -129,7 +133,7 @@ class AppInfo:
         - `"KivyMD"` : The application is running KivyMD
     '''
     # ---------------------------------------------------------------
-    Version:str = None
+    version:str = None
     '''
         Version:
         ========
@@ -148,7 +152,7 @@ class AppInfo:
         - `"Dev"` : Developement version.
     '''
     # ---------------------------------------------------------------
-    Name:str = None
+    name:str = None
     '''
         Name:
         =====
@@ -158,7 +162,7 @@ class AppInfo:
         your application. Defaults to `None`.
     '''
     # ---------------------------------------------------------------
-    Description:str = None
+    description:str = None
     '''
         Description:
         ============
@@ -170,6 +174,54 @@ class AppInfo:
         Defaults to `None`.
     '''
     # ---------------------------------------------------------------
+    LoadingLog.Member("platform")
+    platform:str = None
+    """
+        Holds the platform type which is running this script.
+        A platform represents the OS type that is running.
+        "Windows", "Linux", "Darwin", "Java"
+
+        Defaults to `None`
+    """
+    # ---------------------------------------------------------------
+    LoadingLog.Member("processorType")
+    processorType:str = None
+    """
+        Holds the style of the processor.
+        - 32-bit x86: `"i386"`, `"i486"`, `"i586"`, `"i686"`
+        - 64-bit x86: `"x86_64"`, `"amd64"`, `"arm64"`
+        - ARM based:  `"armv6l"`, `"armv7l"`, `"aarch64"` -> Raspberry pies IoTs
+        - PowerPC:    `"ppc64"`, `"ppc64le"`
+        - IBM Z:      `"s390x"`
+
+        Defaults to `None`
+    """
+    # ---------------------------------------------------------------
+    LoadingLog.Member("pythonVersion")
+    pythonVersion:str = None
+    """
+        Holds the python version which is executing the script.
+
+        Defaults to `None`
+    """
+    # ---------------------------------------------------------------
+    LoadingLog.Member("PCName")
+    PCName:str = None
+    """
+        Holds the actual name of the device being used.
+        This is used as network name and not a user/profile name
+        in most cases.
+
+        Defaults to `None`
+
+    """
+    # ---------------------------------------------------------------
+    LoadingLog.Member("initialized")
+    initialized:bool = False
+    """
+        if `True` the class is ready to be used, otherwise don't read the values,
+        they default to `None`.
+    """
     #endregion
     #region   ----------------------------------------------- CLASSES
     class CanUse:
@@ -340,8 +392,42 @@ class AppInfo:
         '''
     #endregion
     #region   ----------------------------------------------- METHODS
+    LoadingLog.Method("__init__")
+    def __init__(self) -> None:
+        """
+            Builds the System information's class.
+        """
+        Debug.Start("Information -> __init__")
+
+        self.platform = platform.system()
+        self.PCName = platform.node()
+        self.processorType = platform.machine()
+        self.pythonVersion = platform.python_version
+
+        try:
+            Debug.Log("processor: \t"    + str(platform.processor()))
+            Debug.Log("system: \t"       + str(platform.system()))
+            Debug.Log("version: \t"      + str(platform.version()))
+            Debug.Log("machine: \t"      + str(platform.machine()))
+            Debug.Log("architecture: \t" + str(platform.architecture()))
+            Debug.Log("platform: \t" + str(platform.platform()))
+            Debug.Log("node: \t" + str(platform.node()))
+            Debug.Log("python_branch: \t" + str(platform.python_branch()))
+            Debug.Log("python_version: \t" + str(platform.python_version()))
+            Debug.Log("python_revision: \t" + str(platform.python_revision()))
+            Debug.Log("python_implementation: \t" + str(platform.python_implementation()))
+            Debug.Log("mac_ver: \t" + str(platform.mac_ver()))
+            Debug.Log("win32_ver: \t" + str(platform.win32_ver()))
+            Debug.Log("win32_edition: \t" + str(platform.win32_edition()))
+        except:
+            Debug.Warn("Not all information could be gathered.")
+
+        initialized = True
+        Debug.End()
     #endregion
     pass
 #endregion
 #====================================================================#
+LoadingLog.Log("Initializing Information class")
+Information.__init__(Information)
 LoadingLog.End("Information.py")

@@ -7,7 +7,7 @@ class LoadingLog:
     #region --------------------------------- MEMBERS
     _currentDepth = 0
     _indentationStyle = "!\t"
-    useANSI = True
+    useANSI = False
 
     _start      = "START   "
     _end        = "END     "
@@ -148,6 +148,10 @@ class LoadingLog:
             message = f"[{message}]:"
         elif(messageStyle == "Class"):
             message = f"({message}):"
+        elif(messageStyle == "End"):
+            message = f"[END]"
+        elif(messageStyle == "Member" or messageStyle == "Method"):
+            message = f"    > {message}"
         else:
             message = f"> {message}"
 

@@ -17,9 +17,12 @@ LoadingLog.Start("web.py")
 # Imports
 #====================================================================#
 #region ------------------------------------------------------ Python
+LoadingLog.Import("Python")
 import requests
 #endregion
 #region --------------------------------------------------------- BRS
+LoadingLog.Import("Libraries")
+from ...Utilities.Information import Information
 #endregion
 #region -------------------------------------------------------- Kivy
 #endregion
@@ -37,6 +40,12 @@ def IsWebsiteOnline(url:str = 'http://www.google.com/', timeout:int = 5):
 
         Returns:
             - `bool`: `True`: Website could not be accessed. `False`: Website could be accessed.
+
+        Warning:
+        --------
+        This function automatically sets wether or not your application
+        has internet access. Information.CanUse.Internet will be set automatically
+        when calling this function.
     """
     Debug.Start("IsWebsiteOnline")
     try:
@@ -44,12 +53,15 @@ def IsWebsiteOnline(url:str = 'http://www.google.com/', timeout:int = 5):
         # HTTP errors are not raised by default, this statement does that
         request.raise_for_status()
         Debug.Log("Website request was successful")
+        Information.CanUse.Internet = True
         Debug.End()
         return False
     except requests.HTTPError as exception:
         Debug.Error("Checking internet connection failed, status code {0}.".format(exception.response.status_code))
+        Information.CanUse.Internet = False
     except requests.ConnectionError:
         Debug.Error("No internet connection available.")
+        Information.CanUse.Internet = False
         Debug.End()
     return True
 #====================================================================#
