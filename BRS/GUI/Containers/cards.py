@@ -18,7 +18,7 @@ from ...GUI.Utilities.references import Shadow,Rounding,Styles
 from kivymd.app import MDApp
 from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
 from kivymd.uix.progressbar import MDProgressBar
-from kivymd.uix.button import BaseButton
+from kivymd.uix.button import BaseButton, MDIconButton
 from kivymd.icon_definitions import md_icons
 from kivymd.uix.label import MDLabel
 from kivymd.color_definitions import palette,colors
@@ -301,11 +301,14 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
         else:
             # There is a profile, thus we can create the widgets to put inside the card
             self._MDCard.orientation = "vertical"
-            self._MDCard.Icon = MDLabel(text=md_icons["exclamation"], font_style='Icon', font_size = "100sp", halign = "center")
+            # self._MDCard.Icon = MDLabel(text=md_icons["exclamation"], font_style='Icon', font_size = "100sp", halign = "center")
+            self._MDCard.Icon = MDIconButton(icon = md_icons["exclamation"], halign = "center", icon_size = 80)
             self._MDCard.Title = MDLabel(text="Error", font_style = "H5", halign = "center")
             self._MDCard.Title.text = _(FileIntegrity.GetName(self.Integrity))
             self._MDCard.Separator = MDProgressBar()
-            self._MDCard.Icon.font_size = "100sp"
+            self._MDCard.Icon.size_hint = (1,1)
+            self._MDCard.Icon.disabled = True
+            self._MDCard.Icon.disabled_color = (1,0,0,1)
             self._MDCard.Separator.size_hint = (1,0.05)
             self._MDCard.Separator.value_normalized = 1
 
@@ -316,17 +319,17 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
                 self._MDCard.Title.theme_text_color = "Error"
             else:
                 if(self.Integrity == FileIntegrity.Corrupted):
-                    self._MDCard.Icon.text = md_icons["file-alert"]
+                    self._MDCard.Icon.icon = "file-alert"
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
 
                 elif(self.Integrity == FileIntegrity.Outdated):
-                    self._MDCard.Icon.text = md_icons["file-arrow-up-down"]
+                    self._MDCard.Icon.icon = "file-arrow-up-down"
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
 
                 elif(self.Integrity == FileIntegrity.Ahead):
-                    self._MDCard.Icon.text = md_icons["file-arrow-up-down"]
+                    self._MDCard.Icon.icon = "file-arrow-up-down"
                     self._MDCard.Icon.theme_text_color = "Error"
                     self._MDCard.Title.theme_text_color = "Error"
 
@@ -347,6 +350,7 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
                         TextColor = (0.12,0.12,0.12,1)
 
                     secondaryColor = get_color_from_hex(colors[self.Primary]["500"])
+                    self._MDCard.Icon.disabled_color = TextColor
 
                     # Inverse colors of widget if theme is not the same
                     if(MDApp.get_running_app().theme_cls.theme_style != self.Style):
@@ -368,7 +372,8 @@ class ProfileCard(BRS_CardLayoutAttributes, BaseButton, Widget):
 
                     # Get the profile picture saved in the JSON
                     if(self.IconType == "Kivy"):
-                        self._MDCard.Icon.text = md_icons[self.IconPath]
+                        # self._MDCard.Icon.text = md_icons[self.IconPath]
+                        self._MDCard.Icon.icon = self.IconPath
                         Debug.Log(f"Using default KivyMD icon: {self.IconPath}")
 
                     # Place the Username in the card
@@ -555,7 +560,7 @@ class DriverCard(BRS_CardLayoutAttributes, BaseButton, Widget):
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self,
-                 pathToDriverFolder:str,
+                 nameOfDriver:str,
                  pathToDriverJson:str,
                  IntegrityChecker,
                  **kwargs):
@@ -579,8 +584,10 @@ class DriverCard(BRS_CardLayoutAttributes, BaseButton, Widget):
         self.bind(_finishing_ripple = self._RippleHandling)
         #endregion
         #region --------------------------- Read Integrity
-        self.Integrity = IntegrityChecker(pathToDriverFolder)
+        Debug.Log("Integrity")
+        self.Integrity = IntegrityChecker(nameOfDriver)
         self.json = JSONdata("Config.json",pathToDriverJson)
+
 
         if(self.Integrity == FileIntegrity.Blank):
             self.clear_widgets()
@@ -590,15 +597,12 @@ class DriverCard(BRS_CardLayoutAttributes, BaseButton, Widget):
             return
         else:
             # There is a profile, thus we can create the widgets to put inside the card
-            # self._MDCard.size_hint = (1,1)
+            Debug.Log("Setting Card attributes")
             self._MDCard.orientation = "vertical"
             self._MDCard.Icon = MDLabel(text=md_icons["exclamation"], font_style='Icon', font_size = "100sp", halign = "center")
             self._MDCard.Title = MDLabel(text="Error", font_style = "H5", halign = "center")
             self._MDCard.Title.text = _(FileIntegrity.GetName(self.Integrity))
-            # self._MDCard.Separator = MDProgressBar()
             self._MDCard.Icon.font_size = "100sp"
-            # self._MDCard.Separator.size_hint = (1,0.10)
-            # self._MDCard.Separator.value_normalized = 1
 
             if(self.Integrity == FileIntegrity.Error):
                 # self._MDCard.Separator.color = MDApp.get_running_app().theme_cls.error_color
@@ -622,6 +626,7 @@ class DriverCard(BRS_CardLayoutAttributes, BaseButton, Widget):
                     self._MDCard.Title.theme_text_color = "Error"
 
                 elif(self.Integrity == FileIntegrity.Good):
+                    Debug.Log("Good Integrity")
                     self.IconPath       = self.json.jsonData["Information"]["IconPath"]
                     self.IconType       = self.json.jsonData["Information"]["IconType"]
                     self.Name           = self.json.jsonData["Information"]["Name"]

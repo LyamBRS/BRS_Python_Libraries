@@ -18,12 +18,16 @@ LoadingLog.Start("AppLoading.py")
 # Imports
 #====================================================================#
 #region ------------------------------------------------------ Python
+LoadingLog.Import("Python")
 #endregion
 #region --------------------------------------------------------- BRS
+LoadingLog.Import("Libraries")
 #endregion
 #region -------------------------------------------------------- Kivy
+LoadingLog.Import("Kivy")
 #endregion
 #region ------------------------------------------------------ KivyMD
+LoadingLog.Import('KivyMD')
 #endregion
 #====================================================================#
 # Functions

@@ -139,7 +139,7 @@ def AppendPath(systemPath:str, pathB):
         one. The first path given will define if \\ or / is used in
         the path.
     """
-    Debug.Start("AppendPath")
+    Debug.Start("AppendPath", True)
 
     if("\\" in systemPath):
         Debug.Log("Path is using \\")
@@ -148,7 +148,7 @@ def AppendPath(systemPath:str, pathB):
         Debug.Log("Path is using /")
         pathB = pathB.replace("\\","/")
 
-    Debug.End()
+    Debug.End(ContinueDebug=True)
     return systemPath + pathB
 #====================================================================#
 # Classes
