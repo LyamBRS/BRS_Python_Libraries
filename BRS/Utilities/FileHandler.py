@@ -139,7 +139,7 @@ def AppendPath(systemPath:str, pathB):
         one. The first path given will define if \\ or / is used in
         the path.
     """
-    Debug.Start("AppendPath", True)
+    Debug.Start("AppendPath", DontDebug=True)
 
     if("\\" in systemPath):
         Debug.Log("Path is using \\")
@@ -220,59 +220,92 @@ class JSONdata:
             This function creates a JSON file that
             follows a specified architecture and uses
             the data from when this class was built to save it.
+
+                - `True` : Success
         """
         #endregion
-
+        Debug.Start("JSONdata -> CreateFile")
         # Attempt to save the JSON structure.
         try:
+            Debug.Log(f">>> self.pathToDirectory = {self.pathToDirectory}")
+            Debug.Log(f">>> self.fileName = {self.fileName}")
             with open(self.pathToDirectory + self.fileName, "w") as file:
                 json.dump(structure, file)
+            Debug.Log(">>> CreateFile -> SUCCESS")
+            Debug.End()
             return True
         except:
-            Debug.Error("COULD NOT SAVE JSON DATA")
+            Debug.Error(">>> CreateFile -> COULD NOT SAVE JSON DATA")
+            Debug.End()
             return False
 
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, fileName:str = "", path:str = None) -> None:
         # Test given paths
+        Debug.Start("JSONdata -> __init__")
         if(path == None):
             if(self.pathToDirectory == None):
                 raise Exception("[BRS]: JSONdata: NO PATH SPECIFIED")
+            else:
+                Debug.Log(f">>> Using self.pathToDirectory: {self.pathToDirectory}")
         else:
             if(IsPathValid(path)):
+                Debug.Log(">>> Path specified is valid.")
                 self.pathToDirectory = path
             else:
+                Debug.End()
                 raise Exception("[BRS]: Invalid path given to JSONdata.")
 
         # Check the class and parameter's file name.
         if(fileName == None):
             if(self.fileName == None):
+                Debug.End()
                 raise Exception("[BRS]: No file name specified")
+            else:
+                Debug.Log(f">>> Using self.fileName: {self.fileName}")
         else:
             if(fileName.__contains__(".json") or fileName.__contains__(".JSON")):
                 self.fileName = fileName
+                Debug.Log(f">>> self.fileName = {fileName}")
             else:
                 fileName = f"{fileName}.json"
                 self.fileName = fileName
+                Debug.Log(f">>> self.fileName = {fileName}")
 
         # Create the path to the specified JSON and try to open it.
-        jsonPath = self.pathToDirectory + "/" + self.fileName
+        if(self.pathToDirectory.endswith("/") or self.pathToDirectory.endswith("\\")):
+            jsonPath = AppendPath(self.pathToDirectory, self.fileName)
+        else:
+            jsonPath = AppendPath(self.pathToDirectory, "/" + self.fileName)
         data = None
+
+        Debug.Log(f">>> jsonPath = {jsonPath}")
 
         # Validate that the path can exist.
         if(IsPathValid(jsonPath)):
+            Debug.Log(">>> jsonPath is valid")
             try:
                 with open(jsonPath, 'r') as file:
                     data = json.load(file)
+                Debug.Log(">>> SUCCESS")
             except:
                 Debug.Error(f"[BRS]: Could not open {self.fileName} at {self.pathToDirectory}")
+                Debug.Log(">>> Second try")
+                try:
+                    with open(jsonPath, 'r') as file:
+                        data = json.load(file)
+                    Debug.Log(">>> SUCCESS")
+                except:
+                    Debug.Error("Failed at the second try. Please create the file before loading it.")
+                    Debug.Error(f"data -> {data}")
         else:
+            Debug.End()
             raise Exception(f"[BRS]: JSONdata path is not valid once built: {jsonPath}")
 
         #Put the data in the class.
         self.jsonData = data
-
+        Debug.End()
     #endregion
     pass
 #====================================================================#
