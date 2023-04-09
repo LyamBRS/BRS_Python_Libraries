@@ -188,4 +188,41 @@ class GitHubFail(Enum):
         if(Integrity == FileIntegrity.Error):
             return "Error"
         return "No Match"
+#====================================================================#
+class Execution(Enum):
+    """
+        Execution:
+        ==========
+        Summary:
+        --------
+        This enum is used to define what happened when trying to
+        execute a function.
+        
+        Members:
+        --------
+        - Good
+        - Exception
+        - Bad
+    """
+
+    Passed:int = 0
+    """ The execution was successful. """
+
+    Crashed:int = 1
+    """ An exception occured. The execution failed through a try catch."""
+
+    Failed:int = 2
+    """ The execution simply failed. """
+
+    NoConnection:int = 3
+    """ The execution failed due to no connection available. Wether it's bluetooth or WiFi"""
+
+    Incompatibility:int = 4
+    """ The execution failed because there is an incompatibility issue that couldn't be resolved."""
+
+    ByPassed:int = 5
+    """ The execution was bypassed with NO ERRORS."""
+
+    Unecessary:int = 6
+    """ The execution was bypassed because there was no point in executing it."""
 LoadingLog.End("Enums.py")
