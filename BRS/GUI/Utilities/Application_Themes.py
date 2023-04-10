@@ -4,6 +4,7 @@
 """
     This file contains KivyMD theme used in BRS applications.
 """
+from Libraries.BRS_Python_Libraries.BRS.Utilities.FileHandler import IsPathValid
 from ...Debug.LoadingLog import LoadingLog
 LoadingLog.Start("Application_Themes.py")
 #====================================================================#
@@ -11,6 +12,44 @@ LoadingLog.Start("Application_Themes.py")
 #====================================================================#
 from kivymd.theming import ThemeManager
 from kivymd.theming import ThemableBehavior
+from kivy.uix.image import Image
+from ...Debug.consoleLog import Debug
+from kivymd.app import MDApp
+#====================================================================#
+# Functions
+#====================================================================#
+def GetBackgroundImage(DarkPath:str, LightPath:str) -> Image:
+    """
+        GetBackgroundImage
+        ==================
+        Summary:
+        --------
+        This function returns an image widget depending on the application's
+        theme color (Light / Dark). You need to give it a path for the
+        dark image and a path for the light image. It will automatically
+        detect the path to take.
+
+        Make sure your image is 960 by 560.
+    """
+    Debug.Start("GetBackgroundImage")
+
+    background = Image(
+                        size_hint=(1, 1),
+                        pos_hint={'center_x': 0.5, 'center_y': 0.5},
+                        allow_stretch = True)
+
+    if (MDApp.get_running_app().theme_cls.theme_style == "Light"):
+        if(IsPathValid(LightPath)):
+            background.source = LightPath
+        else:
+            Debug.Error("INVALID BACKGROUND IMAGE PATH")
+    else:
+        if(IsPathValid(DarkPath)):
+            background.source = DarkPath
+        else:
+            Debug.Error("INVALID BACKGROUND IMAGE PATH")
+    Debug.End()
+    return background
 #====================================================================#
 # Themes
 #====================================================================#
