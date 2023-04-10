@@ -8,7 +8,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from .Enums import FileIntegrity
+from .Enums import Execution, FileIntegrity
 from ..Debug.LoadingLog import LoadingLog
 LoadingLog.Start("FileHandler.py")
 
@@ -150,6 +150,52 @@ def AppendPath(systemPath:str, pathB):
 
     Debug.End(ContinueDebug=True)
     return systemPath + pathB
+# -------------------------------------------------------------------
+def CompareList(expected:list, current:list, exceptions:list=None) -> Execution:
+    """
+        CompareList:
+        ============
+        Summary:
+        --------
+        This function compares an expected list with an other list
+        and depending on the comparaison results, an `Execution` enum
+        value is returned.
+
+        exception parameter is used as an optional input list that is
+        simply not taken into account when comparing the 2 other lists.
+        This means you can specify things that won't be taken into
+        account during comparaison if they are found in the 2 other
+        lists.
+    """
+    Debug.Start("CompareList", DontDebug=True)
+    ContinueDebug = True
+
+    if exceptions != None:
+        Debug.Log(">>> Removing exceptions from given lists")
+        current = [item for item in current if item not in exceptions]
+        expected = [item for item in expected if item not in exceptions]
+
+    #region ------------------------------------- [0]
+    Debug.Log("[0]: List sizes")
+    if(len(expected) != len(current)):
+        Debug.Error(">>> Lenght of current did not match lenght of expected.")
+        Debug.End(ContinueDebug=ContinueDebug)
+        return Execution.Failed
+    #endregion
+    #region ------------------------------------- [1]
+    Debug.Log("[1]: List content")
+    if all(elem in current for elem in expected):
+        Debug.Log(">>> SUCCESS")
+    else:
+        Debug.Error(">>> Content did not match.")
+        Debug.End(ContinueDebug=ContinueDebug)
+        return Execution.Failed
+    #endregion
+    #region ------------------------------------- [2]
+    Debug.Log(">>> Comparaison successful.")
+    Debug.End(ContinueDebug=ContinueDebug)
+    return Execution.Passed
+    #endregion
 #====================================================================#
 # Classes
 #====================================================================#
