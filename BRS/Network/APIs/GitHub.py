@@ -64,13 +64,23 @@ class GitHub:
             to this function's calling.
         """
         Debug.Start("GetUserRepositories")
-        if(GitHub.username == None):
+        try:
+            if(GitHub.username == None):
+                Debug.End()
+                return "No username stored in the GitHub class. Make sure to call GetAll"
+        except:
+            Debug.Error("ERROR while getting username")
             Debug.End()
-            return "No username stored in the GitHub class. Make sure to call GetAll"
+            return "Error occured while getting username"
 
-        if(GitHub.userInformation == None):
+        try:
+            if(GitHub.userInformation == None):
+                Debug.End()
+                return "No user information were stored. Verify network connected and call GetAll"
+        except:
+            Debug.Error("ERROR while getting user informations")
             Debug.End()
-            return "No user information were stored. Verify network connected and call GetAll"
+            return "Error occured while getting user information"
 
         GitHub.ListOfRepositories = {}
 
