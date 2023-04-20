@@ -70,6 +70,19 @@ class Information:
     '''
     #endregion
     #region   ----------------------------------------------- MEMBERS
+    usingWrongDisplay:bool = None
+    """
+        usingWrongDisplay:
+        ------------------
+        This member is set to `True` if the display size detected
+        is 720x576. This would mean that the rendered size is really
+        small and some adjustments will need to be made throughout
+        the application.
+
+        This is set in the __init__ function automatically through
+        Kivy.core.Window.width and Kivy.core.Window.height
+    """
+
     OS:str = None
     '''
         OS:
@@ -403,6 +416,13 @@ class Information:
         Information.PCName = platform.node()
         Information.processorType = platform.machine()
         Information.pythonVersion = platform.python_version
+
+        from kivy.core.window import Window
+
+        if(Window.height == 576 and Window.width == 720):
+            Information.usingWrongDisplay = True
+        else:
+            Information.usingWrongDisplay = False
 
         try:
             Debug.Log("processor: \t"    + str(platform.processor()))
