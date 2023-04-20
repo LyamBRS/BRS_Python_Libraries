@@ -131,25 +131,29 @@ def CompareKeys(struct, obj, prefix=''):
     Debug.End()
     return FileIntegrity.Good
 # -------------------------------------------------------------------
-def AppendPath(systemPath:str, pathB):
+def AppendPath(pathA:str, pathB:str):
     """
         AppendPath:
         -----------
         Append path is used to add and get a new path from another
-        one. The first path given will define if \\ or / is used in
+        one. os.getcwd() will define if \\ or / is used in
         the path.
     """
     Debug.Start("AppendPath", DontDebug=True)
 
-    if("\\" in systemPath):
+    reference = os.getcwd()
+
+    if("\\" in reference):
         Debug.Log("Path is using \\")
         pathB = pathB.replace("/","\\")
-    elif("/" in systemPath):
+        pathA = pathA.replace("/","\\")
+    elif("/" in reference):
         Debug.Log("Path is using /")
         pathB = pathB.replace("\\","/")
+        pathA = pathA.replace("\\","/")
 
     Debug.End(ContinueDebug=True)
-    return systemPath + pathB
+    return pathA + pathB
 # -------------------------------------------------------------------
 def CompareList(expected:list, current:list, exceptions:list=None) -> Execution:
     """
