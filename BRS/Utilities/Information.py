@@ -399,10 +399,10 @@ class Information:
         """
         Debug.Start("Information -> __init__")
 
-        self.platform = platform.system()
-        self.PCName = platform.node()
-        self.processorType = platform.machine()
-        self.pythonVersion = platform.python_version
+        Information.platform = platform.system()
+        Information.PCName = platform.node()
+        Information.processorType = platform.machine()
+        Information.pythonVersion = platform.python_version
 
         try:
             Debug.Log("processor: \t"    + str(platform.processor()))
