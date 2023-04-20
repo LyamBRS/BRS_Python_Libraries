@@ -36,7 +36,8 @@ def GetBackgroundImage(DarkPath:str, LightPath:str) -> Image:
     background = Image(
                         size_hint=(1, 1),
                         pos_hint={'center_x': 0.5, 'center_y': 0.5},
-                        allow_stretch = True)
+                        allow_stretch = True,
+                        keep_ratio = False)
 
     if (MDApp.get_running_app().theme_cls.theme_style == "Light"):
         if(IsPathValid(LightPath)):
