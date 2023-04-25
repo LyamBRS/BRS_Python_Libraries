@@ -5,8 +5,6 @@
 #====================================================================#
 # Imports
 #====================================================================#
-import socket
-import requests
 import subprocess
 import base64
 from github import Github as git
@@ -20,6 +18,38 @@ LoadingLog.Start("GitHub.py")
 
 #====================================================================#
 # Classes
+#====================================================================#
+class ManualGitHub:
+    #region   --------------------------- DOCSTRING
+    '''
+        ManualGitHub:
+        =============
+        Summary:
+        --------
+        This class holds manual functions used to facilitate
+        the use of the GitHub API functions without the need of
+        setting up credentials or various other step based inputs
+        like the regular GitHub class.
+    '''
+    #endregion
+    #region   --------------------------- METHODS
+    def GetRequestsLeft() -> int:
+        """
+            GetRequestsLeft:
+            ================
+            Summary:
+            --------
+            This function returns how many requests the GitHub
+            API has left. it will return 0 if no internet
+            connection can be established or if an error occured.
+        """
+        Debug.Start("ManualGitHub -> GetRequestsLeft")
+        object = git()
+        rateLimit = object.get_rate_limit()
+        remaining = rateLimit.core.remaining
+        Debug.End()
+        return remaining
+    #endregion
 #====================================================================#
 class GitHub:
     #region   --------------------------- DOCSTRING
