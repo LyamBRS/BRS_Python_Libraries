@@ -81,6 +81,7 @@ class GitHub:
         GitHub.username = username
         try:
             GitHub.userInformation = GitHub.Object.get_user(username)
+            Debug.Log("Username: {username}")
         except:
             Debug.Error(f"Could not get username")
             Debug.End()
@@ -96,6 +97,7 @@ class GitHub:
         Debug.Start("GetUserRepositories")
         try:
             if(GitHub.username == None):
+                Debug.Error("No username stored in the GitHub class. Make sure to call GetAll")
                 Debug.End()
                 return "No username stored in the GitHub class. Make sure to call GetAll"
         except:
@@ -105,6 +107,7 @@ class GitHub:
 
         try:
             if(GitHub.userInformation == None):
+                Debug.Error("No user information were stored. Verify network connected and call GetAll")
                 Debug.End()
                 return "No user information were stored. Verify network connected and call GetAll"
         except:
@@ -114,7 +117,9 @@ class GitHub:
 
         GitHub.ListOfRepositories = {}
 
+        Debug.Log(f"Repositories of user: {GitHub.username}")
         for repo in GitHub.userInformation.get_repos():
+            Debug.Log(f"Found: {repo}")
             GitHub.ListOfRepositories[str(repo.full_name)] = repo
         Debug.End()
     #------------------------------------------------
@@ -171,6 +176,9 @@ class GitHub:
             if ".git" in word:
                 repo_name = word.replace(".git", "")
 
+        Debug.Log(f"repository name:    {repo_name}")
+        Debug.Log(f"repository version: {repo_version}")
+        Debug.Log(f"repository branch:  {repo_branch}")
         # Save local repository's information in the GitHub class.
         GitHub.LocalRepository = {"url": repo_url, "branch": repo_branch, "commit_hash": repo_commit_hash, "version": repo_version, "name": repo_name}
         Debug.End()
@@ -179,14 +187,17 @@ class GitHub:
         Debug.Start("GetMatchingRepository")
         # [Step 0]: Check if the needed information is present.
         if(GitHub.LocalRepository == None):
+            Debug.Error("The local repository was not initialized.")
             Debug.End()
             return "The local repository was not initialized."
 
         if(GitHub.userInformation == None):
+            Debug.Error("No GitHub users were initialized.")
             Debug.End()
             return "No GitHub users were initialized."
 
         if(GitHub.ListOfRepositories == None):
+            Debug.Error("User's repositories were not initialized")
             Debug.End()
             return "User's repositories were not initialized"
 
@@ -196,10 +207,12 @@ class GitHub:
 
         for name,repo in GitHub.ListOfRepositories.items():
             if wanted in name:
+                Debug.Log(f"Found matching repository: {repo}")
                 GitHub.MatchedRepository = repo
                 Debug.End()
                 return None
 
+        Debug.Error("No matching repositories. Make sure you are using a cloned repository.")
         Debug.End()
         return "No matching repositories. Make sure you are using a cloned repository."
     #------------------------------------------------
@@ -207,25 +220,35 @@ class GitHub:
         Debug.Start("GetMatchingRepositoryTag")
 
         if(GitHub.MatchedRepository == None):
+            Debug.Error("No matched repositories to use. Make sure you are using a cloned repository.")
             Debug.End()
             return "No matched repositories to use. Make sure you are using a cloned repository."
 
         Debug.Log("Getting master branch")
         try:
             GitHub.MasterBranch = GitHub.MatchedRepository.get_branch("master")
+            Debug.Log("Master branch found")
         except:
+            Debug.Error("Failed to get master branch of matched repository")
+            Debug.End()
             return "Failed to get master branch of matched repository"
 
         Debug.Log("Getting latest commit of the master branch")
         try:
             GitHub.LatestCommit = GitHub.MasterBranch.commit
+            Debug.Log("Latest commit found")
         except:
+            Debug.Error("Failed to get master branch's commits")
+            Debug.End()
             return "Failed to get master branch's commits"
 
         Debug.Log("Getting the tags of that latest commit")
         try:
             GitHub.CommitTags = GitHub.MatchedRepository.get_tags()
+            Debug.Log("Found tags of matche repository")
         except:
+            Debug.Error("Failed to get tags of the matching repository")
+            Debug.End()
             return "Failed to get tags of the matching repository"
         Debug.Log(f"CommitTags = {GitHub.CommitTags}")
 
@@ -233,9 +256,13 @@ class GitHub:
         try:
             GitHub.LatestTag = sorted(GitHub.CommitTags, key=lambda t: t.commit.commit.committer.date)[-1]
             GitHub.LatestTag = GitHub.LatestTag.name
+            Debug.Log(f"Found latest tag of repository: {GitHub.LatestTag}")
         except:
+            Debug.Error("Failed to sort repositories commit tags")
+            Debug.End()
             return "Failed to sort repositories commit tags"
 
+        Debug.Log("Success")
         Debug.End()
     #------------------------------------------------
     def GetAll(username:str = "LyamBRS") -> int:
