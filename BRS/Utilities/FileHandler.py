@@ -154,6 +154,7 @@ def AppendPath(pathA:str, pathB:str):
 
     Debug.End(ContinueDebug=True)
     return pathA + pathB
+
 # -------------------------------------------------------------------
 def CompareList(expected:list, current:list, exceptions:list=None) -> Execution:
     """

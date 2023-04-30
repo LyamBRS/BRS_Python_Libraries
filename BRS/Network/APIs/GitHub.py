@@ -7,15 +7,113 @@
 #====================================================================#
 import subprocess
 import base64
-from github import Github as git
+import asyncio
+import threading
+import git
+from github import Github as Git
 from ...Debug.consoleLog import Debug
 from ...Debug.LoadingLog import LoadingLog
 from ...Utilities.Enums import GitHubFail
+from ...Utilities.Enums import Execution
+from kivymd.uix.progressbar import MDProgressBar
 LoadingLog.Start("GitHub.py")
 #====================================================================#
 # Functions
 #====================================================================#
+def DownloadRepositoryAtPath(gitUrl:str, downloadPath:str, progressBar: MDProgressBar, DownloadProgressHandler) -> Execution:
+    """
+        DownloadRepositoryAtPath:
+        ========================
+        Summary:
+        --------
+        This function will download any Git URL at a specified
+        path location. You can also specify a callback function
+        which will be executed each time something happens
+        during the download progress.
 
+        Parameters:
+        -----------
+        - `gitUrl` = Url to clone the repository from
+        - `downloadPath` = system path where the repository will be cloned
+        - `progressBar` : MDProgressbar updated by download functions running asynchronously. This way your kivy app gets a live update of the download's progression.
+        - `DownloadProgressHandler`: a class which contains : GoodDownload() and FailedDownload()
+
+        Returns:
+        --------
+        - `Execution.Passed` = Repository successfully downloaded at specified path.
+        - `Execution.Failed` = Something failed during download process.
+        - `Execution.NoConnection` = Cannot download due to no internet access.
+        - `Execution.APIRanOutOfRequest` = Cannot download due to no API requests left.
+    """
+    Debug.Start("DownloadRepositoryAtPath")
+    Debug.Log("Starting async process")
+
+    # Call the download_git_repo_async function asynchronously
+    _start_download_thread(repo_url=gitUrl,
+                            local_path=downloadPath,
+                            progressBar=progressBar,
+                            DownloadProgressHandler=DownloadProgressHandler)
+
+    Debug.End()
+    return Execution.Passed
+# ----------------------------------------------------------------
+def _start_download_thread(repo_url: str, local_path: str, progressBar: MDProgressBar, DownloadProgressHandler):
+
+    class PassedValues():
+        result = Execution.ByPassed
+    # Define the function to run in the separate thread
+    def download_thread():
+        # Create a new event loop for this thread
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        # Define the progress update function for the callback
+        def update_progress(op_code, cur_count, max_count=None, message=''):
+            # Update the progress bar with the current progress
+            progress = cur_count / max_count if max_count else 0
+            progressBar.value = progress * 100
+
+        # Call the download_git_repo_async function asynchronously with the progress update callback
+        loop.run_until_complete(_download_git_repo_async(repo_url, local_path, update_progress, PassedValues))
+
+        # Stop the event loop
+        loop.stop()
+        loop.close()
+        
+        if(loop.is_running()):
+            print("What? loop is still running... interesting")
+        else:
+            if(loop.is_closed()):
+                print("Loop is closed!")
+            else:
+                print("Loop isnt running but isnt closed? what the fuck?")
+
+        print("FINISHED")
+        if(PassedValues.result == Execution.Passed):
+            DownloadProgressHandler.downloadResult = Execution.Passed
+        else:
+            DownloadProgressHandler.downloadResult = Execution.Failed
+        progressBar.value = progressBar.max
+
+    # Start a new thread for the download function
+    thread = threading.Thread(target=download_thread)
+    thread.start()
+
+async def _download_git_repo_async(repo_url: str, local_path: str, callback_fn=None, passedClass=None) -> Execution:
+    try:
+        # Clone the Git repository asynchronously
+        async def download():
+            git.Repo.clone_from(repo_url, local_path, progress=callback_fn, recursive=True)
+
+        await asyncio.create_task(download())
+        # Create a new repo object from the local path and return the execution status
+        git.Repo(local_path)
+        passedClass.result = Execution.Passed
+        return Execution.Passed
+    except Exception as e:
+        print(f"Failed to download Git repo: {e}")
+        passedClass.result = Execution.Failed
+        return Execution.Failed
 #====================================================================#
 # Classes
 #====================================================================#
@@ -44,7 +142,7 @@ class ManualGitHub:
             connection can be established or if an error occured.
         """
         Debug.Start("ManualGitHub -> GetRequestsLeft")
-        object = git()
+        object = Git()
         rateLimit = object.get_rate_limit()
         remaining = rateLimit.core.remaining
         Debug.End()
@@ -57,7 +155,7 @@ class GitHub:
     '''
     #endregion
     #region   --------------------------- MEMBERS
-    Object = git()
+    Object = Git()
     user:str = None
     userInformation:list = None
     LocalRepository:list = None
@@ -67,6 +165,7 @@ class GitHub:
     LatestCommit:list = None
     CommitTags:list = None
     LatestTag:str = None
+    CurrentTag:str = None
 
     LatestError:str = "None"
     """Stores the latest error that happened while using this class"""
@@ -130,7 +229,7 @@ class GitHub:
         print("Description:", nameOfRepository.description)
         # the date of when the repo was created
         print("Date created:", nameOfRepository.created_at)
-        # the date of the last git push
+        # the date of the last Git push
         print("Date of last push:", nameOfRepository.pushed_at)
         # home website (if available)
         print("Home Page:", nameOfRepository.homepage)
@@ -175,6 +274,8 @@ class GitHub:
         for word in parsedLink:
             if ".git" in word:
                 repo_name = word.replace(".git", "")
+
+        GitHub.CurrentTag = repo_version
 
         Debug.Log(f"repository name:    {repo_name}")
         Debug.Log(f"repository version: {repo_version}")
