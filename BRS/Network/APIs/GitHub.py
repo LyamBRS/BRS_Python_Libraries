@@ -147,6 +147,25 @@ class ManualGitHub:
         remaining = rateLimit.core.remaining
         Debug.End()
         return remaining
+    
+    def GetLocalVersion() -> str:
+        """
+            GetLocalVersion:
+            ================
+            Summary:
+            --------
+            This function returns the version of your
+            Kontrol branch (usually master) in the
+            form of a string. If no branch release
+            version is found, `"None"` is returned.
+
+            Returns:
+            --------
+            String containing Kontrol's release version.
+        """
+        Debug.Start("ManualGitHub -> GetLocalVersion")
+
+        Debug.End()
     #endregion
 #====================================================================#
 class GitHub:
@@ -158,23 +177,52 @@ class GitHub:
     Object = Git()
     user:str = None
     userInformation:list = None
-    LocalRepository:list = None
+    LocalRepository:list = {"url": None, "branch": None, "commit_hash": None, "version": None, "name": None}
+    """
+        LocalRepository:
+        ================
+        Summary:
+        --------
+        A list of the local repository's information.
+        This list is updated when `GetLocalRepository` is called.
+
+        Default:
+        --------
+        `{"url": None, "branch": None, "commit_hash": None, "version": None, "name": None}`
+        - `"url"`: .git url to the repository
+        - `"branch"`: Name of the local branch (example: "master")
+        - `"commit_hash"`: The local branch's commit value
+        - `"version"`: The local branch's release version (example: "0.0.0")
+        - `"name"`: The name of the local branch (example: "brs-kontrol")
+    """
     ListOfRepositories:list = None
     MatchedRepository:list = None
     MasterBranch:list = None
     LatestCommit:list = None
     CommitTags:list = None
+
     LatestTag:str = None
+    """ The latest release available on GitHub. For example: "0.0.0" """
     CurrentTag:str = None
+    """ The local tag of Kontrol's release saved locally. For example: "0.0.0" """
 
     LatestError:str = "None"
     """Stores the latest error that happened while using this class"""
     #endregion
     #region   --------------------------- METHODS
-    def GetUser(username):
+    def GetUser(username:str):
         """
-            Saves the user in the GitHub class to avoid useless requests
-            To view the user's information, use "Object"
+            GetUser:
+            ========
+            Summary:
+            --------
+            Gets a user's object and updates the GitHub class
+            with it to avoid useless API requests. To view
+            the user's information, use `GitHub.Object`.
+
+            Args:
+            -----
+            - `username` = the username which published the device's branch.
         """
         Debug.Start("GetUser")
         GitHub.username = username
@@ -183,36 +231,52 @@ class GitHub:
             Debug.Log("Username: {username}")
         except:
             Debug.Error(f"Could not get username")
+            GitHub.LatestError = "Could not get username"
             Debug.End()
             return "Could not get username"
         Debug.End()
     #------------------------------------------------
     def GetUserRepositories():
         """
+            GetUserRepositories:
+            ====================
+            Summary:
+            --------
             Saves all of the user's repositories inside of
-            ListOfRepositories. GetUser must have been called prior
-            to this function's calling.
+            `ListOfRepositories`. `GetUser()` must have
+            been called prior to this function's calling.
+            Otherwise, the function has no idea which user
+            to get repositories from.
+
+            Returns:
+            --------
+            - `None`: No errors occured while executing.
+            - `(str)`: Description of what went wrong.
         """
         Debug.Start("GetUserRepositories")
         try:
             if(GitHub.username == None):
-                Debug.Error("No username stored in the GitHub class. Make sure to call GetAll")
+                GitHub.LatestError = "No username stored in the GitHub class. Make sure to call GetAll"
+                Debug.Error(GitHub.LatestError)
                 Debug.End()
-                return "No username stored in the GitHub class. Make sure to call GetAll"
+                return GitHub.LatestError
         except:
-            Debug.Error("ERROR while getting username")
+            GitHub.LatestError = "Error occured while getting username"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "Error occured while getting username"
+            return GitHub.LatestError
 
         try:
             if(GitHub.userInformation == None):
-                Debug.Error("No user information were stored. Verify network connected and call GetAll")
+                GitHub.LatestError = "No user information were stored. Verify network connected and call GetAll"
+                Debug.Error(GitHub.LatestError)
                 Debug.End()
-                return "No user information were stored. Verify network connected and call GetAll"
+                return GitHub.LatestError
         except:
-            Debug.Error("ERROR while getting user informations")
+            GitHub.LatestError = "ERROR while getting user information"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "Error occured while getting user information"
+            return GitHub.LatestError
 
         GitHub.ListOfRepositories = {}
 
@@ -261,6 +325,28 @@ class GitHub:
         print("Latest release: ", str(nameOfRepository.get_latest_release()))
     #------------------------------------------------
     def GetLocalRepository():
+        """
+            GetLocalRepository:
+            ===================
+            Summary:
+            --------
+            This method's purpose is to get the
+            information from the repository which
+            currently host this python script. It
+            will gather its information, especially
+            its release tag and store it in the
+            `GitHub` class.
+
+            See:
+            - `GitHub.CurrentTag`: The local branch's release
+            - `GitHub.LocalRepository`: The local branch's information
+
+            Returns:
+            --------
+            - `None`: No errors occurred while executing.
+            - `(str)`: Description of what went wrong.
+        """
+
         Debug.Start("GetLocalRepository")
         # Get current repository information through Git terminal
         repo_url = subprocess.run(['git', 'config', '--get', 'remote.origin.url'], capture_output=True, text=True).stdout.strip()
@@ -285,22 +371,40 @@ class GitHub:
         Debug.End()
     #------------------------------------------------
     def GetMatchingRepository() -> str:
+        """
+            GetMatchingRepository:
+            ======================
+            Summary:
+            --------
+            This method's purpose is to find a repository
+            in the list gathered when `GetUserRepositories`
+            that matches the local repository found when
+            `GetLocalRepository` was called.
+
+            Returns:
+            --------
+            - `(str)`: Name of the repository that matched
+            - `(str)`: Error that occured when calling this method.
+        """
         Debug.Start("GetMatchingRepository")
         # [Step 0]: Check if the needed information is present.
         if(GitHub.LocalRepository == None):
-            Debug.Error("The local repository was not initialized.")
+            GitHub.LatestError = "The local repository was not initialized."
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "The local repository was not initialized."
+            return GitHub.LatestError
 
         if(GitHub.userInformation == None):
-            Debug.Error("No GitHub users were initialized.")
+            GitHub.LatestError = "No GitHub users were initialized."
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "No GitHub users were initialized."
+            return GitHub.LatestError
 
         if(GitHub.ListOfRepositories == None):
-            Debug.Error("User's repositories were not initialized")
+            GitHub.LatestError = "User's repositories were not initialized"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "User's repositories were not initialized"
+            return GitHub.LatestError
 
         # [Step 1]: Find the matching repository names in the list of repositories
         wanted = GitHub.LocalRepository["name"]
@@ -313,11 +417,27 @@ class GitHub:
                 Debug.End()
                 return None
 
-        Debug.Error("No matching repositories. Make sure you are using a cloned repository.")
+        GitHub.LatestError = "No matching repositories. Make sure you are using a cloned repository."
+        Debug.Error(GitHub.LatestError)
         Debug.End()
-        return "No matching repositories. Make sure you are using a cloned repository."
+        return GitHub.LatestError
     #------------------------------------------------
     def GetMatchingRepositoryTag() -> None:
+        """
+            GetMatchingRepositoryTag:
+            =========================
+            Summary:
+            --------
+            Method that gets the release
+            tags of the matching repository
+            found when `GetMatchingRepository`
+            was called.
+
+            Returns:
+            --------
+            - (str): Error that occurred while executing this method
+            - None : No error occurred while executing this method
+        """
         Debug.Start("GetMatchingRepositoryTag")
 
         if(GitHub.MatchedRepository == None):
@@ -330,27 +450,30 @@ class GitHub:
             GitHub.MasterBranch = GitHub.MatchedRepository.get_branch("master")
             Debug.Log("Master branch found")
         except:
-            Debug.Error("Failed to get master branch of matched repository")
+            GitHub.LatestError = "Failed to get master branch of matched repository"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "Failed to get master branch of matched repository"
+            return GitHub.LatestError
 
         Debug.Log("Getting latest commit of the master branch")
         try:
             GitHub.LatestCommit = GitHub.MasterBranch.commit
             Debug.Log("Latest commit found")
         except:
-            Debug.Error("Failed to get master branch's commits")
+            GitHub.LatestError = "Failed to get master branch's commits"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "Failed to get master branch's commits"
+            return GitHub.LatestError
 
         Debug.Log("Getting the tags of that latest commit")
         try:
             GitHub.CommitTags = GitHub.MatchedRepository.get_tags()
-            Debug.Log("Found tags of matche repository")
+            Debug.Log("Found tags of matching repository")
         except:
-            Debug.Error("Failed to get tags of the matching repository")
+            GitHub.LatestError = "Failed to get tags of the matching repository"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "Failed to get tags of the matching repository"
+            return GitHub.LatestError
         Debug.Log(f"CommitTags = {GitHub.CommitTags}")
 
         Debug.Log("Getting the latest tag of that commit")
@@ -359,22 +482,29 @@ class GitHub:
             GitHub.LatestTag = GitHub.LatestTag.name
             Debug.Log(f"Found latest tag of repository: {GitHub.LatestTag}")
         except:
-            Debug.Error("Failed to sort repositories commit tags")
+            GitHub.LatestError = "Failed to sort repositories commit tags"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
-            return "Failed to sort repositories commit tags"
+            return GitHub.LatestError
 
         Debug.Log("Success")
         Debug.End()
     #------------------------------------------------
     def GetAll(username:str = "LyamBRS") -> int:
         """
-        Initializes GitHub class automatically.
-        it will return `None` if everything went well and a message if an error occured.
+            GetAll:
+            =======
+            Summary:
+            --------
+            Initializes GitHub class automatically.
+            it will return `None` if everything went well and a message if an error occurred.
 
-        Make sure the repository is cloned from GitHub and not initialized.
-        Otherwise, it will be impossible to get the name of the repository.
+            Make sure the local repository is cloned from GitHub and not initialized.
+            Otherwise, it will be impossible to get the name of the repository.
 
-        it will use LyamBRS as the default username.
+            Arguments:
+            ----------
+            - `username:str` = Github username that will initialize this class. Defaults to `"LyamBRS"`
         """
         Debug.Start("GetAll")
         # [Step 1]: Getting local repository's information.
@@ -427,10 +557,12 @@ class GitHub:
             str: Error message
         """
         if(GitHub.userInformation == None):
-            return "GetAll was not called properly"
+            GitHub.LatestError = "user information member not set up properly."
+            return GitHub.LatestError
 
         if(GitHub.LatestTag == None):
-            return "No tags to compare with"
+            GitHub.LatestError = "No latest tags found to compare local tag with"
+            return GitHub.LatestError
 
         if(GitHub.LocalRepository["version"] >= GitHub.LatestTag):
             return False
@@ -439,13 +571,34 @@ class GitHub:
             return True
     #------------------------------------------------
     def UpdateDevice():
-        """When called, this will initiate a Git Pull."""
+        """
+            UpdateDevice:
+            =============
+            Summary:
+            --------
+            Deprecated method which used allow a simple
+            `git pull -- rebase` of the current branch.
+
+            `ATTENTION`
+            -----------
+            This method is no longer used but is kept
+            here for various reasons such as old code
+            needing it. Please abstain from using it
+            in any circumstances. Also note that it
+            does not pull recursively meaning submodules
+            will not get updated. Also note that the
+            pull is executed at run time meaning that
+            programs currently executing may experience
+            errors.
+        """
+
         Debug.Start("UpdateDevice")
         gitStuff = subprocess.run(['git', 'pull', "--rebase"])
         if(gitStuff == 0):
             Debug.Log("Pull successfull")
         else:
-            Debug.Error("Could not pull")
+            GitHub.LatestError = "Failed to execute git pull."
+            Debug.Error(GitHub.LatestError)
 
         Debug.End()
         return gitStuff
@@ -468,7 +621,8 @@ class GitHub:
             Debug.End()
             return requests.core.remaining
         except:
-            Debug.Error("Could not execute: get_rate_limit")
+            GitHub.LatestError = "Could not execute: get_rate_limit"
+            Debug.Error(GitHub.LatestError)
             Debug.End()
             return False
     #endregion
