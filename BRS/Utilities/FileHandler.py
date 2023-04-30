@@ -8,6 +8,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
+from re import T
 from .Enums import Execution, FileIntegrity
 from ..Debug.LoadingLog import LoadingLog
 LoadingLog.Start("FileHandler.py")
@@ -154,7 +155,44 @@ def AppendPath(pathA:str, pathB:str):
 
     Debug.End(ContinueDebug=True)
     return pathA + pathB
+# -------------------------------------------------------------------
+def GetParentPath(path) -> str:
+    """
+        GetParentPath:
+        ================
+        Summary:
+        --------
+        This function returns the path of the parent folder
+        of the specified path.
 
+        Returns:
+        --------
+        - `Execution.Failed` : Could not get the parent folder
+        - `str` : name of the parent folder
+    """
+    Debug.Start("GetParentFolder", DontDebug=True)
+
+    Debug.Log("Checking path validitiy")
+    isValid = IsPathValid(path)
+    if(isValid):
+        parentPath = path.rstrip(os.path.basename(path))
+        Debug.Log(f"Parent path: {parentPath}")
+        Debug.End(ContinueDebug=True)
+        return parentPath
+    else:
+        Debug.Error("PATH IS NOT VALID")
+        Debug.End(ContinueDebug=True)
+        return Execution.Failed
+# -------------------------------------------------------------------
+def GetFolderFromPath(path) -> str:
+    """
+        GetFolderFromPath:
+        ==================
+        Summary:
+        --------
+        Returns the last directory of a given path.
+    """
+    return os.path.basename(os.path.normpath(path))
 # -------------------------------------------------------------------
 def CompareList(expected:list, current:list, exceptions:list=None) -> Execution:
     """
