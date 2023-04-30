@@ -146,14 +146,14 @@ class Information:
         - `"KivyMD"` : The application is running KivyMD
     '''
     # ---------------------------------------------------------------
-    version:str = None
+    deviceVersion:str = None
     '''
-        Version:
+        deviceVersion:
         ========
         Summary:
         --------
         String type member which purpose is to hold the version of
-        your application. The version must not have any letters in
+        your device. The version must not have any letters in
         it to simplify the decryption by other python scripts.
         You need to set this yourself one way or an other.
         The possible values for this are endless although some are
@@ -162,8 +162,32 @@ class Information:
         Values:
         -------
         - `None`: Default value.
-        - `"Dev"` : Developement version.
+        - `"Dev"` : Dev version.
     '''
+    # ---------------------------------------------------------------
+    softwareVersion:str = None
+    """
+        softwareVersion:
+        ================
+        Summary:
+        --------
+        This member holds your software's version.
+        You need to set this manually during your software's boot.
+        Avoid using letters in it to simplify decrypting by other
+        python scripts. This is not the same as device version.
+    """
+    # ---------------------------------------------------------------
+    hardwareVersion:str = None
+    """
+        hardwareVersion:
+        ================
+        Summary:
+        --------
+        This member holds the hardware version that your device is
+        using. This needs to be set manually because this class
+        has no ways of knowing your hardware's version.
+        Defaults to `None`.
+    """
     # ---------------------------------------------------------------
     name:str = None
     '''
