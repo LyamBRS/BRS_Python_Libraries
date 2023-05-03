@@ -436,17 +436,17 @@ class Information:
         """
         Debug.Start("Information -> __init__")
 
-        Information.platform = platform.system()
-        Information.PCName = platform.node()
-        Information.processorType = platform.machine()
-        Information.pythonVersion = platform.python_version
+        self.platform       = platform.system()
+        self.PCName         = platform.node()
+        self.processorType  = platform.machine()
+        self.pythonVersion  = platform.python_version
 
         from kivy.core.window import Window
 
         if(Window.height == 576 and Window.width == 720):
-            Information.usingWrongDisplay = True
+            self.usingWrongDisplay = True
         else:
-            Information.usingWrongDisplay = False
+            self.usingWrongDisplay = False
 
         try:
             Debug.Log("processor: \t"    + str(platform.processor()))
@@ -466,7 +466,7 @@ class Information:
         except:
             Debug.Warn("Not all information could be gathered.")
 
-        initialized = True
+        self.initialized = True
         Debug.End()
     #endregion
     pass
