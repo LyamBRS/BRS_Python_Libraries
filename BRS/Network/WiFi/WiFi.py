@@ -109,12 +109,12 @@ def Netsh_GetWiFiNetworks() -> list:
         ======================
         Summary:
         --------
-        Allows you to get a cleaned list of netsh wlan networks output.
-        This function allows you to see all the networks that are
-        available wirelessly.
+        Allows you to get a cleaned list of `netsh wlan` networks output.
+        This function allows you to see all the WiFis that are
+        available wirelessly in a list format.
 
         This is especially useful if you want to check which WiFi
-        your WINDOWS device can access
+        your WINDOWS device can access and view
 
         `Attention`:
         ------------
@@ -125,6 +125,7 @@ def Netsh_GetWiFiNetworks() -> list:
         ----------
         - `Execution.Incompatibility`: The function cannot be used due to your device's operating system.
         - `Execution.Failed`: Failed to run the command. wlan is not accessible.
+        - `Execution.Crashed` : terminal command failed to execute.
 
         Examples of returned lists:
         -----------------------------
@@ -134,12 +135,56 @@ def Netsh_GetWiFiNetworks() -> list:
     Debug.Start("Netsh_GetWiFiNetworks")
 
     if(Information.initialized):
-        if(Information.OS != "Windows"):
-            Debug.Error(f"Attempting to call a netsh function on a non windows based OS: {Information.OS}")
+        if(Information.platform != "Windows"):
+            Debug.Error(f"Attempting to call a netsh function on a non windows based OS: {Information.platform}")
             Debug.End()
             return Execution.Incompatibility
     else:
         Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
+
+    try:
+        network = subprocess.check_output(["netsh", "interface", "show", "interface"])
+        Debug.Log("Subprocess success")
+    except:
+        Debug.Error("Fatal error while running subprocess")
+        Debug.End()
+        return Execution.Crashed
+    decodedNetwork = network.decode("ascii")
+    lines = decodedNetwork.splitlines()
+
+    for line in decodedNetwork.split("\n"):
+        line = line.strip()
+        if line.startswith("SSID"):
+            current_network = {}
+            current_network["ssid"] = line.split(":")[1].strip()
+            var = current_network["ssid"]
+            Debug.Log(f"SSID = {var}")
+
+        elif line.startswith("Authentication"):
+            current_network["authentication"] = line.split(":")[1].strip()
+            var = current_network["authentication"]
+            Debug.Log(f"authentication = {var}")
+
+        elif line.startswith("Encryption"):
+            current_network["encryption"] = line.split(":")[1].strip()
+            var = current_network["authentication"]
+            Debug.Log(f"encryption = {var}")
+
+        elif line.startswith("Signal"):
+            signal = line.split(":")[1].strip()
+            current_network["signal"] = signal
+            Debug.Log(f"signal = {signal}")
+
+        elif line.startswith("BSSID"):
+            bssid = line.split(":")[1].strip()
+
+            dataList:list = line.split(" ")
+            cleanedList = [x for x in dataList if (x and len(x)>5)]
+            Debug.Log(f"BSSID: {cleanedList}")
+
+        elif line.startswith("Channel"):
+            current_network["channel"] = line.split(":")[1].strip()
+            networks.append(current_network)
 #====================================================================#
 # Classes
 #====================================================================#
