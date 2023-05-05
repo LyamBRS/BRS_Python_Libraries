@@ -184,7 +184,6 @@ def Netsh_GetWiFiNetworks() -> list:
 
         elif line.startswith("Channel"):
             current_network["channel"] = line.split(":")[1].strip()
-            networks.append(current_network)
 #====================================================================#
 # Classes
 #====================================================================#
