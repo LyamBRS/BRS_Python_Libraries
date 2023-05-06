@@ -52,23 +52,25 @@ def GetWifiIcon(strength:int, mode:str) -> str:
 
     strength = int(strength/20)
     if(strength > 4):
+        Debug.Log("strength fucked")
         return Execution.Failed
 
     if (mode == "off"):
         Debug.End()
         return "wifi-strength-off-outline"
 
+    iconOutput = "wifi-strength-"
+    if(strength > 0):
+        iconOutput = iconOutput + str(strength)
+
     if not mode in ["alert", "lock", "lock-open", "off"]:
         Debug.Log("Using regular icon")
     else:
-        iconOutput = "wifi-strength-"
-        if(strength > 0):
-            iconOutput = iconOutput + str(strength) + "-"
+        iconOutput = iconOutput + "-" + mode
 
-        iconOutput = iconOutput + mode
-
-    return iconOutput
+    Debug.Log(iconOutput)
     Debug.End()
+    return iconOutput
 
 
 #====================================================================#
