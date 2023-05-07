@@ -154,27 +154,36 @@ def Windows_GetWiFiNetworks() -> list:
 
     listToReturn = []
     current_network = {}
+    oldSSID:str = ""
+    newSSID:bool = False
 
     for line in decodedNetwork.split("\n"):
         line = line.strip()
         if line.startswith("SSID"):
-            Debug.Warn("Key was not found. Could be fresh.")
-            current_network.clear()
-            current_network["ssid"] = line.split(":")[1].strip()
-            var = current_network["ssid"]
+
+            ssid = line.split(":")[1].strip()
+
+            if(oldSSID != newSSID):
+                oldSSID = ssid
+                newSSID = True
+                current_network.clear()
+                current_network["ssid"] = ssid
+                var = current_network["ssid"]
+            else:
+                newSSID = False
             Debug.Log(f"SSID = {var}")
 
-        elif line.startswith("Authentication"):
+        elif line.startswith("Authentication") and newSSID:
             current_network["authentication"] = line.split(":")[1].strip()
             var = current_network["authentication"]
             Debug.Log(f"authentication = {var}")
 
-        elif line.startswith("Encryption"):
+        elif line.startswith("Encryption") and newSSID:
             current_network["encryption"] = line.split(":")[1].strip()
             var = current_network["authentication"]
             Debug.Log(f"encryption = {var}")
 
-        elif line.startswith("Signal"):
+        elif line.startswith("Signal") and newSSID:
             signal = line.split(":")[1].strip()
             current_network["signal"] = signal
             Debug.Log(f"signal = {signal}")
@@ -186,14 +195,14 @@ def Windows_GetWiFiNetworks() -> list:
             except:
                 Debug.Error("Something went wrong durring WiFi parsing.")
 
-        elif line.startswith("BSSID"):
+        elif line.startswith("BSSID") and newSSID:
             bssid = line.split(":")[1].strip()
 
             dataList:list = line.split(" ")
             cleanedList = [x for x in dataList if (x and len(x)>5)]
             Debug.Log(f"BSSID: {cleanedList}")
 
-        elif line.startswith("Channel"):
+        elif line.startswith("Channel") and newSSID:
             current_network["channel"] = line.split(":")[1].strip()
 
     Debug.Log("Found networks: ")
@@ -319,12 +328,65 @@ def GetWiFiNetworks() -> list:
     """
     Debug.Start("GetWiFiNetworks")
 
+    interfaces = []
     if(Information.initialized):
-        pass
-    else:
-        Debug.Error("THE INFORMATION CLASS IS NOT INITIALIZED")
+        Debug.Log("Information is initialized")
 
+        if(Information.platform == "Windows"):
+            Debug.Log("Getting windows networks")
+            interfaces = Windows_GetWiFiNetworks()
+        if(Information.platform == "Linux"):
+            Debug.Log("Getting Linux networks")
+            interfaces = Linux_GetWiFiNetworks()
+    else:
+        Debug.Error("The information class was not initialized")
+        return Execution.Failed
+
+    Debug.Log("Parsing interfaces into normalized buffer")
+    normalizedInterfaces = []
+
+            #             {
+            #                 "ssid" : "test-0",
+            #                 "strength" : 0,
+            #                 "bssid" : "BSSID",
+            #                 "mode" : "lock",
+            #             },
+
+    for interface in interfaces:
+        Debug.Log(interface)
+
+        try:
+            ssid = interface["ssid"]
+            bssid = interface["bssid"]
+            strength:str = interface["strength"]
+            mode = interface["mode"]
+
+            normalizedInterface = {}
+            normalizedInterface["ssid"] = ssid
+            normalizedInterface["bssid"] = bssid
+            normalizedInterface["mode"] = mode
+
+            if("%" in strength):
+                try:
+                    Debug.Log("Attempting to transform windows wifi strength")
+                    strength = strength.replace("%", "")
+                    normalizedInterface["strength"] = int(strength)
+                except:
+                    Debug.Error("Failed to normalize strength")
+                    normalizedInterface["strength"] = 0
+                    normalizedInterface["mode"] = "alert"
+
+
+            normalizedInterfaces.append(normalizedInterface)
+        except:
+            Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
+
+    Debug.Log("Normalized networks: ")
+    Debug.Log(str(normalizedInterfaces))
+
+    Debug.Log("Success")
     Debug.End()
+    return normalizedInterfaces
 
 def CanDeviceUseWiFi() -> bool:
     """
