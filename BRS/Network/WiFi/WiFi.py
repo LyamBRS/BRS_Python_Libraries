@@ -158,8 +158,11 @@ def Windows_GetWiFiNetworks() -> list:
     for line in decodedNetwork.split("\n"):
         line = line.strip()
         if line.startswith("SSID"):
-            if(current_network["ssid"] != None):
-                listToReturn.append(current_network)
+            try:
+                if(current_network["ssid"] != None):
+                    listToReturn.append(current_network)
+            except:
+                Debug.Warn("Key was not found. Could be fresh.")
             current_network.clear()
             current_network["ssid"] = line.split(":")[1].strip()
             var = current_network["ssid"]
