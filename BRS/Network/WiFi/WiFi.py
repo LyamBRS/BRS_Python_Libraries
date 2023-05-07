@@ -199,6 +199,7 @@ def Windows_GetWiFiNetworks() -> list:
                     newSSID = False
                     Debug.Log(f"[APPENDING : {current_network}]")
                     listToReturn.append(current_network)
+                    Debug.Log(f"NEW LIST >>> {listToReturn}")
             except:
                 Debug.Error("Something went wrong durring WiFi parsing.")
 
