@@ -152,6 +152,8 @@ def Windows_GetWiFiNetworks() -> list:
     decodedNetwork = network.decode("ascii")
     lines = decodedNetwork.splitlines()
 
+    listToReturn = []
+
     for line in decodedNetwork.split("\n"):
         line = line.strip()
         if line.startswith("SSID"):
@@ -184,6 +186,9 @@ def Windows_GetWiFiNetworks() -> list:
 
         elif line.startswith("Channel"):
             current_network["channel"] = line.split(":")[1].strip()
+
+        listToReturn.append(current_network)
+    return listToReturn
 
 def Linux_GetNetworkInterfaces() -> list:
     """
