@@ -357,36 +357,36 @@ def GetWiFiNetworks() -> list:
     for interface in interfaces:
         Debug.Log(interface)
 
-        try:
-            Debug.Log(">>> ssid")
-            ssid = interface["ssid"]
-            Debug.Log(">>> bssid")
-            bssid = interface["bssid"]
-            Debug.Log(">>> strength")
-            strength:str = interface["signal"]
+        # try:
+        Debug.Log(">>> ssid")
+        ssid = interface["ssid"]
+        Debug.Log(">>> bssid")
+        bssid = interface["bssid"]
+        Debug.Log(">>> strength")
+        strength = interface["signal"]
 
-            Debug.Log(">>> creating normalized buffer")
-            normalizedInterface = {}
-            Debug.Log(">>> placing ssid")
-            normalizedInterface["ssid"] = ssid
-            Debug.Log(">>> placing bssid")
-            normalizedInterface["bssid"] = bssid
-            Debug.Log(">>> placing mode")
-            normalizedInterface["mode"] = None
+        Debug.Log(">>> creating normalized buffer")
+        normalizedInterface = {}
+        Debug.Log(">>> placing ssid")
+        normalizedInterface["ssid"] = ssid
+        Debug.Log(">>> placing bssid")
+        normalizedInterface["bssid"] = bssid
+        Debug.Log(">>> placing mode")
+        normalizedInterface["mode"] = None
 
-            if("%" in strength):
-                try:
-                    Debug.Log("Attempting to transform windows wifi strength")
-                    strength = strength.replace("%", "")
-                    normalizedInterface["strength"] = int(strength)
-                except:
-                    Debug.Error("Failed to normalize strength")
-                    normalizedInterface["strength"] = 0
-                    normalizedInterface["mode"] = "alert"
+        if("%" in strength):
+            try:
+                Debug.Log("Attempting to transform windows wifi strength")
+                strength = strength.replace("%", "")
+                normalizedInterface["strength"] = int(strength)
+            except:
+                Debug.Error("Failed to normalize strength")
+                normalizedInterface["strength"] = 0
+                normalizedInterface["mode"] = "alert"
 
-            Debug.Log(">>> appending")
-            normalizedInterfaces.append(normalizedInterface)
-        except:
+        Debug.Log(">>> appending")
+        normalizedInterfaces.append(normalizedInterface)
+        # except:
             Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
 
     Debug.Log("Normalized networks: ")
