@@ -336,6 +336,7 @@ def CanDeviceUseWiFi() -> bool:
         else:
             Debug.Log("WiFi can be used")
             Debug.End()
+            return True
 
     if(Information.platform == "Linux"):
         result = Linux_GetWiFiNetworks()
@@ -346,6 +347,7 @@ def CanDeviceUseWiFi() -> bool:
         else:
             Debug.Log("WiFi can be used")
             Debug.End()
+            return True
 
     Debug.Error("FAILED TO EXECUTE")
     Debug.End()
