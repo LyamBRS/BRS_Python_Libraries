@@ -173,6 +173,8 @@ def Windows_GetWiFiNetworks() -> list:
                 listOfSeenNetworks.append(ssid)
                 newSSID = True
                 current_network.clear()
+                current_network = {}
+                Debug.Log(">>>> [CLEARED CONTENT]")
                 current_network["ssid"] = ssid
                 var = current_network["ssid"]
                 Debug.Log(f">>> SSID = {var}")
@@ -195,7 +197,7 @@ def Windows_GetWiFiNetworks() -> list:
             try:
                 if(current_network["ssid"] != None):
                     newSSID = False
-                    Debug.Log("[WIFI APPENDED]")
+                    Debug.Log(f"[APPENDING : {current_network}]")
                     listToReturn.append(current_network)
             except:
                 Debug.Error("Something went wrong durring WiFi parsing.")
