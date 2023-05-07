@@ -12,10 +12,29 @@
 # Imports
 #====================================================================#
 from ...Debug.LoadingLog import LoadingLog
+from ...Debug.consoleLog import Debug
+from kivymd.app import MDApp
+from kivy.utils import get_color_from_hex
+from kivymd.color_definitions import colors
 LoadingLog.Start("colors.py")
+
 #====================================================================#
 # Functions
 #====================================================================#
+def GetAccentColor() -> None:
+    """
+        GetAccentColor:
+        ===============
+        Summary:
+        --------
+        This function returns the accent color
+        of the application.
+    """
+    Debug.Start("GetAccentColor")
+
+    color = MDApp.get_running_app().theme_cls.accent_palette
+    Debug.End()
+    return get_color_from_hex(colors[color]["500"])
 
 #====================================================================#
 # Classes

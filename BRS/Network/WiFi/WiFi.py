@@ -287,6 +287,29 @@ def GetNetworkInterfaces() -> list:
     Debug.End()
     return normalizedInterfaces
 
+def GetWiFiNetworks() -> list:
+    """
+        GetWiFiNetworks:
+        ================
+        Summary:
+        --------
+        This function normalizes the gathering
+        of available WiFi networks.
+
+        Attention:
+        ----------
+        You need to have initialized the Information
+        class prior to calling this function.
+    """
+    Debug.Start("GetWiFiNetworks")
+
+    if(Information.initialized):
+        pass
+    else:
+        Debug.Error("THE INFORMATION CLASS IS NOT INITIALIZED")
+
+    Debug.End()
+
 def CanDeviceUseWiFi() -> bool:
     """
         CanDeviceUseWiFi:
