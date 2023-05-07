@@ -153,11 +153,14 @@ def Windows_GetWiFiNetworks() -> list:
     lines = decodedNetwork.splitlines()
 
     listToReturn = []
+    current_network = {}
 
     for line in decodedNetwork.split("\n"):
         line = line.strip()
         if line.startswith("SSID"):
-            current_network = {}
+            if(current_network["ssid"] != None):
+                listToReturn.append(current_network)
+            current_network.clear()
             current_network["ssid"] = line.split(":")[1].strip()
             var = current_network["ssid"]
             Debug.Log(f"SSID = {var}")
@@ -187,7 +190,9 @@ def Windows_GetWiFiNetworks() -> list:
         elif line.startswith("Channel"):
             current_network["channel"] = line.split(":")[1].strip()
 
-        listToReturn.append(current_network)
+    Debug.Log("Found networks: ")
+    Debug.Log(str(listToReturn))
+    Debug.End()
     return listToReturn
 
 def Linux_GetNetworkInterfaces() -> list:
