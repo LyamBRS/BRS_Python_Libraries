@@ -171,26 +171,26 @@ def Windows_GetWiFiNetworks() -> list:
                 var = current_network["ssid"]
             else:
                 newSSID = False
-            Debug.Log(f"SSID = {var}")
+            Debug.Log(f">>> SSID = {var}")
 
         elif line.startswith("Authentication") and newSSID:
             current_network["authentication"] = line.split(":")[1].strip()
             var = current_network["authentication"]
-            Debug.Log(f"authentication = {var}")
+            Debug.Log(f">>> authentication = {var}")
 
         elif line.startswith("Encryption") and newSSID:
             current_network["encryption"] = line.split(":")[1].strip()
             var = current_network["authentication"]
-            Debug.Log(f"encryption = {var}")
+            Debug.Log(f">>> encryption = {var}")
 
         elif line.startswith("Signal") and newSSID:
             signal = line.split(":")[1].strip()
             current_network["signal"] = signal
-            Debug.Log(f"signal = {signal}")
+            Debug.Log(f">>> signal = {signal}")
 
             try:
                 if(current_network["ssid"] != None):
-                    Debug.Log("Wifi is probably good...")
+                    Debug.Log("[WIFI APPENDED]")
                     listToReturn.append(current_network)
             except:
                 Debug.Error("Something went wrong durring WiFi parsing.")
@@ -200,7 +200,7 @@ def Windows_GetWiFiNetworks() -> list:
 
             dataList:list = line.split(" ")
             cleanedList = [x for x in dataList if (x and len(x)>5)]
-            Debug.Log(f"BSSID: {cleanedList}")
+            Debug.Log(f">>> BSSID: {cleanedList}")
 
         elif line.startswith("Channel") and newSSID:
             current_network["channel"] = line.split(":")[1].strip()
@@ -359,12 +359,11 @@ def GetWiFiNetworks() -> list:
             ssid = interface["ssid"]
             bssid = interface["bssid"]
             strength:str = interface["strength"]
-            mode = interface["mode"]
 
             normalizedInterface = {}
             normalizedInterface["ssid"] = ssid
             normalizedInterface["bssid"] = bssid
-            normalizedInterface["mode"] = mode
+            normalizedInterface["mode"] = None
 
             if("%" in strength):
                 try:
