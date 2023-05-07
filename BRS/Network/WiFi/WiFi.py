@@ -363,7 +363,7 @@ def GetWiFiNetworks() -> list:
             Debug.Log(">>> bssid")
             bssid = interface["bssid"]
             Debug.Log(">>> strength")
-            strength:str = interface["strength"]
+            strength:str = interface["signal"]
 
             Debug.Log(">>> creating normalized buffer")
             normalizedInterface = {}
