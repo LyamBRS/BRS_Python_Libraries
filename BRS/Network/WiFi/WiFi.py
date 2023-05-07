@@ -155,8 +155,10 @@ def Windows_GetWiFiNetworks() -> list:
     listToReturn = []
     current_network = {}
     listOfSeenNetworks = []
+    listOfSeenBSSID = []
     oldSSID:str = ""
     newSSID:bool = False
+    newBSSID:bool = False
 
     for line in decodedNetwork.split("\n"):
         line = line.strip()
@@ -192,6 +194,7 @@ def Windows_GetWiFiNetworks() -> list:
 
             try:
                 if(current_network["ssid"] != None):
+                    newSSID = False
                     Debug.Log("[WIFI APPENDED]")
                     listToReturn.append(current_network)
             except:
@@ -203,7 +206,10 @@ def Windows_GetWiFiNetworks() -> list:
             dataList:list = line.split(" ")
             cleanedList = [x for x in dataList if (x and len(x)>5)]
             Debug.Log(f">>> BSSID: {cleanedList}")
-            current_network["bssid"] = bssid
+            try:
+                current_network["bssid"] = cleanedList[0]
+            except:
+                current_network["bssid"] = "ERROR"
 
         elif line.startswith("Channel") and newSSID:
             current_network["channel"] = line.split(":")[1].strip()
