@@ -154,6 +154,7 @@ def Windows_GetWiFiNetworks() -> list:
 
     listToReturn = []
     current_network = {}
+    listOfSeenNetworks = []
     oldSSID:str = ""
     newSSID:bool = False
 
@@ -163,15 +164,16 @@ def Windows_GetWiFiNetworks() -> list:
 
             ssid = line.split(":")[1].strip()
 
-            if(oldSSID != newSSID):
-                oldSSID = ssid
+            if ssid in listOfSeenNetworks:
+                newSSID = False
+                Debug.Log("[SKIPPED]")
+            else:
+                listOfSeenNetworks.append(ssid)
                 newSSID = True
                 current_network.clear()
                 current_network["ssid"] = ssid
                 var = current_network["ssid"]
-            else:
-                newSSID = False
-            Debug.Log(f">>> SSID = {var}")
+                Debug.Log(f">>> SSID = {var}")
 
         elif line.startswith("Authentication") and newSSID:
             current_network["authentication"] = line.split(":")[1].strip()
@@ -356,13 +358,20 @@ def GetWiFiNetworks() -> list:
         Debug.Log(interface)
 
         try:
+            Debug.Log(">>> ssid")
             ssid = interface["ssid"]
+            Debug.Log(">>> bssid")
             bssid = interface["bssid"]
+            Debug.Log(">>> strength")
             strength:str = interface["strength"]
 
+            Debug.Log(">>> creating normalized buffer")
             normalizedInterface = {}
+            Debug.Log(">>> placing ssid")
             normalizedInterface["ssid"] = ssid
+            Debug.Log(">>> placing bssid")
             normalizedInterface["bssid"] = bssid
+            Debug.Log(">>> placing mode")
             normalizedInterface["mode"] = None
 
             if("%" in strength):
@@ -375,7 +384,7 @@ def GetWiFiNetworks() -> list:
                     normalizedInterface["strength"] = 0
                     normalizedInterface["mode"] = "alert"
 
-
+            Debug.Log(">>> appending")
             normalizedInterfaces.append(normalizedInterface)
         except:
             Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
