@@ -168,7 +168,7 @@ def Windows_GetWiFiNetworks() -> list:
 
             if ssid in listOfSeenNetworks:
                 newSSID = False
-                Debug.Log("[SKIPPED]")
+                # Debug.Log("[SKIPPED]")
             else:
                 listOfSeenNetworks.append(ssid)
                 newSSID = True
@@ -176,29 +176,29 @@ def Windows_GetWiFiNetworks() -> list:
                 Debug.Log(">>>> [CLEARED CONTENT]")
                 current_network["ssid"] = ssid
                 var = current_network["ssid"]
-                Debug.Log(f">>> SSID = {var}")
+                # Debug.Log(f">>> SSID = {var}")
 
         elif line.startswith("Authentication") and newSSID:
             current_network["authentication"] = line.split(":")[1].strip()
             var = current_network["authentication"]
-            Debug.Log(f">>> authentication = {var}")
+            # Debug.Log(f">>> authentication = {var}")
 
         elif line.startswith("Encryption") and newSSID:
             current_network["encryption"] = line.split(":")[1].strip()
             var = current_network["authentication"]
-            Debug.Log(f">>> encryption = {var}")
+            # Debug.Log(f">>> encryption = {var}")
 
         elif line.startswith("Signal") and newSSID:
             signal = line.split(":")[1].strip()
             current_network["signal"] = signal
-            Debug.Log(f">>> signal = {signal}")
+            # Debug.Log(f">>> signal = {signal}")
 
             try:
                 if(current_network["ssid"] != None):
                     newSSID = False
                     Debug.Log(f"[APPENDING : {current_network}]")
                     listToReturn.append(current_network)
-                    Debug.Log(f"NEW LIST >>> {listToReturn}")
+                    # Debug.Log(f"NEW LIST >>> {listToReturn}")
             except:
                 Debug.Error("Something went wrong durring WiFi parsing.")
 
@@ -207,7 +207,7 @@ def Windows_GetWiFiNetworks() -> list:
 
             dataList:list = line.split(" ")
             cleanedList = [x for x in dataList if (x and len(x)>5)]
-            Debug.Log(f">>> BSSID: {cleanedList}")
+            # Debug.Log(f">>> BSSID: {cleanedList}")
             try:
                 current_network["bssid"] = cleanedList[0]
             except:
@@ -216,8 +216,8 @@ def Windows_GetWiFiNetworks() -> list:
         elif line.startswith("Channel") and newSSID:
             current_network["channel"] = line.split(":")[1].strip()
 
-    Debug.Log("Found networks: ")
-    Debug.Log(str(listToReturn))
+    # Debug.Log("Found networks: ")
+    # Debug.Log(str(listToReturn))
     Debug.End()
     return listToReturn
 
@@ -356,50 +356,44 @@ def GetWiFiNetworks() -> list:
     Debug.Log("Parsing interfaces into normalized buffer")
     normalizedInterfaces = []
 
-            #             {
-            #                 "ssid" : "test-0",
-            #                 "strength" : 0,
-            #                 "bssid" : "BSSID",
-            #                 "mode" : "lock",
-            #             },
 
     for interface in interfaces:
         Debug.Log(interface)
 
         try:
-            Debug.Log(">>> ssid")
+            # Debug.Log(">>> ssid")
             try:
                 ssid = interface["ssid"]
             except:
                 Debug.Error("Failed to parse ssid")
                 ssid = "ERROR"
 
-            Debug.Log(">>> bssid")
+            # Debug.Log(">>> bssid")
             try:
                 bssid = interface["bssid"]
             except:
                 Debug.Error("Failed to parse bssid")
                 bssid = "???"
 
-            Debug.Log(">>> strength")
+            # Debug.Log(">>> strength")
             try:
                 strength = interface["signal"]
             except:
                 Debug.Error("Failed to parse signal")
                 strength = 0
 
-            Debug.Log(">>> creating normalized buffer")
+            # Debug.Log(">>> creating normalized buffer")
             normalizedInterface = {}
-            Debug.Log(">>> placing ssid")
+            # Debug.Log(">>> placing ssid")
             normalizedInterface["ssid"] = ssid
-            Debug.Log(">>> placing bssid")
+            # Debug.Log(">>> placing bssid")
             normalizedInterface["bssid"] = bssid
-            Debug.Log(">>> placing mode")
+            # Debug.Log(">>> placing mode")
             normalizedInterface["mode"] = None
 
             if("%" in strength):
                 try:
-                    Debug.Log("Attempting to transform windows wifi strength")
+                    # Debug.Log("Attempting to transform windows wifi strength")
                     strength = strength.replace("%", "")
                     normalizedInterface["strength"] = int(strength)
                 except:
@@ -407,13 +401,13 @@ def GetWiFiNetworks() -> list:
                     normalizedInterface["strength"] = 0
                     normalizedInterface["mode"] = "alert"
     
-            Debug.Log(">>> appending")
+            # Debug.Log(">>> appending")
             normalizedInterfaces.append(normalizedInterface)
         except:
             Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
 
-    Debug.Log("Normalized networks: ")
-    Debug.Log(str(normalizedInterfaces))
+    # Debug.Log("Normalized networks: ")
+    # Debug.Log(str(normalizedInterfaces))
 
     Debug.Log("Success")
     Debug.End()

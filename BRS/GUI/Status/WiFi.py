@@ -143,6 +143,43 @@ class WiFiSelectionCard(BaseButton, Widget):
             comes to an end.
         """
         pass
+
+    def UpdateValues(self, WiFiNetworkDictionary:list) -> None:
+        """
+            UpdateValues:
+            =============
+            Summary:
+            --------
+            This function updates the widgets
+            stored in this class through an
+            input parameter that is a list
+            of WiFi attributes. The same that
+            is given when you initialize the
+            class.
+        """
+        Debug.Start("UpdateValues")
+
+        try:
+            ssid = WiFiNetworkDictionary["ssid"]
+        except:
+            ssid = "ERROR"
+
+        try:
+            bssid = WiFiNetworkDictionary["bssid"]
+        except:
+            bssid = "???"
+
+        try:
+            icon = GetWifiIcon(WiFiNetworkDictionary["strength"], WiFiNetworkDictionary["mode"])
+            accentColor = GetAccentColor()
+        except:
+            icon = "alert"
+            accentColor = (255,0,0)
+
+        self.Icon.icon = icon
+        self.Name.text = ssid
+        self.BSSID.text = bssid
+        Debug.End()
     #endregion
     #region   -- Private
     # ------------------------------------------------------
