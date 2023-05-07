@@ -61,7 +61,7 @@ def Windows_GetNetworkInterfaces() -> list:
         - `[{"Admin State": "Disabled", "State": "Disconnected", "Type": "Dedicated", "Interface Name": "Hamachi"}]`
         - `[{"Admin State": "Enabled", "State": "Connected", "Type": "Dedicated", "Interface Name": "Ethernet"}]`
     """
-    Debug.Start("Netsh_GetNetworkInterfaces")
+    Debug.Start("Windows_GetNetworkInterfaces")
 
     if(Information.initialized):
         if(Information.platform != "Windows"):
@@ -132,7 +132,7 @@ def Windows_GetWiFiNetworks() -> list:
         - `[{"Admin State": "Disabled", "State": "Disconnected", "Type": "Dedicated", "Interface Name": "Hamachi"}]`
         - `[{"Admin State": "Enabled", "State": "Connected", "Type": "Dedicated", "Interface Name": "Ethernet"}]`
     """
-    Debug.Start("Netsh_GetWiFiNetworks")
+    Debug.Start("Windows_GetWiFiNetworks")
 
     if(Information.initialized):
         if(Information.platform != "Windows"):
@@ -143,7 +143,7 @@ def Windows_GetWiFiNetworks() -> list:
         Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
 
     try:
-        network = subprocess.check_output(["netsh", "interface", "show", "interface"])
+        network = subprocess.check_output(["netsh", "wlan", "show", "networks", "mode=bssid"])
         Debug.Log("Subprocess success")
     except:
         Debug.Error("Fatal error while running subprocess")
