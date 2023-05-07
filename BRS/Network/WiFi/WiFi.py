@@ -203,6 +203,7 @@ def Windows_GetWiFiNetworks() -> list:
             dataList:list = line.split(" ")
             cleanedList = [x for x in dataList if (x and len(x)>5)]
             Debug.Log(f">>> BSSID: {cleanedList}")
+            current_network["bssid"] = bssid
 
         elif line.startswith("Channel") and newSSID:
             current_network["channel"] = line.split(":")[1].strip()
@@ -357,36 +358,50 @@ def GetWiFiNetworks() -> list:
     for interface in interfaces:
         Debug.Log(interface)
 
-        # try:
-        Debug.Log(">>> ssid")
-        ssid = interface["ssid"]
-        Debug.Log(">>> bssid")
-        bssid = interface["bssid"]
-        Debug.Log(">>> strength")
-        strength = interface["signal"]
-
-        Debug.Log(">>> creating normalized buffer")
-        normalizedInterface = {}
-        Debug.Log(">>> placing ssid")
-        normalizedInterface["ssid"] = ssid
-        Debug.Log(">>> placing bssid")
-        normalizedInterface["bssid"] = bssid
-        Debug.Log(">>> placing mode")
-        normalizedInterface["mode"] = None
-
-        if("%" in strength):
+        try:
+            Debug.Log(">>> ssid")
             try:
-                Debug.Log("Attempting to transform windows wifi strength")
-                strength = strength.replace("%", "")
-                normalizedInterface["strength"] = int(strength)
+                ssid = interface["ssid"]
             except:
-                Debug.Error("Failed to normalize strength")
-                normalizedInterface["strength"] = 0
-                normalizedInterface["mode"] = "alert"
+                Debug.Error("Failed to parse ssid")
+                ssid = "ERROR"
 
-        Debug.Log(">>> appending")
-        normalizedInterfaces.append(normalizedInterface)
-        # except:
+            Debug.Log(">>> bssid")
+            try:
+                bssid = interface["bssid"]
+            except:
+                Debug.Error("Failed to parse bssid")
+                bssid = "???"
+
+            Debug.Log(">>> strength")
+            try:
+                strength = interface["signal"]
+            except:
+                Debug.Error("Failed to parse signal")
+                strength = 0
+
+            Debug.Log(">>> creating normalized buffer")
+            normalizedInterface = {}
+            Debug.Log(">>> placing ssid")
+            normalizedInterface["ssid"] = ssid
+            Debug.Log(">>> placing bssid")
+            normalizedInterface["bssid"] = bssid
+            Debug.Log(">>> placing mode")
+            normalizedInterface["mode"] = None
+
+            if("%" in strength):
+                try:
+                    Debug.Log("Attempting to transform windows wifi strength")
+                    strength = strength.replace("%", "")
+                    normalizedInterface["strength"] = int(strength)
+                except:
+                    Debug.Error("Failed to normalize strength")
+                    normalizedInterface["strength"] = 0
+                    normalizedInterface["mode"] = "alert"
+    
+            Debug.Log(">>> appending")
+            normalizedInterfaces.append(normalizedInterface)
+        except:
             Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
 
     Debug.Log("Normalized networks: ")
