@@ -10,6 +10,7 @@
 #====================================================================#
 # Loading Logs
 #====================================================================#
+from ast import expr_context
 from distutils.text_file import TextFile
 from Libraries.BRS_Python_Libraries.BRS.GUI.Utilities.references import Rounding
 from ...Debug.LoadingLog import LoadingLog
@@ -162,6 +163,26 @@ class WiFiSelectionCard(BaseButton, Widget):
         self.spacing = 0
         self.size = (600,100)
 
+        #region ---------------------------- Getting network info
+
+        try:
+            ssid = WiFiNetworkDictionary["ssid"]
+        except:
+            ssid = "ERROR"
+
+        try:
+            bssid = WiFiNetworkDictionary["bssid"]
+        except:
+            bssid = "???"
+
+        try:
+            icon = GetWifiIcon(WiFiNetworkDictionary["strength"], WiFiNetworkDictionary["mode"])
+            accentColor = GetAccentColor()
+        except:
+            icon = "alert"
+            accentColor = (255,0,0)
+        #endregion
+
         self.bind(_finishing_ripple = self._RippleHandling)
 
         self.Card = MDCard(spacing = 10, orientation = "horizontal")
@@ -169,14 +190,10 @@ class WiFiSelectionCard(BaseButton, Widget):
         self.Card.shadow_softness = Shadow.Smoothness.default
         self.Card.radius = Rounding.Cards.default
 
-        ssid = WiFiNetworkDictionary["ssid"]
-        bssid = WiFiNetworkDictionary["bssid"]
         #endregion
 
         #region --------------------------- Widgets
         self.Layout = MDFloatLayout(size_hint = (0.25,1))
-        icon = GetWifiIcon(WiFiNetworkDictionary["strength"], WiFiNetworkDictionary["mode"])
-        accentColor = GetAccentColor()
 
         self.Icon = MDFloatingActionButton(icon = icon, halign = "center", icon_size = 90)
         self.Icon.pos_hint = { 'center_x': 0.5, 'center_y': 0.5 }

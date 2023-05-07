@@ -158,11 +158,7 @@ def Windows_GetWiFiNetworks() -> list:
     for line in decodedNetwork.split("\n"):
         line = line.strip()
         if line.startswith("SSID"):
-            try:
-                if(current_network["ssid"] != None):
-                    listToReturn.append(current_network)
-            except:
-                Debug.Warn("Key was not found. Could be fresh.")
+            Debug.Warn("Key was not found. Could be fresh.")
             current_network.clear()
             current_network["ssid"] = line.split(":")[1].strip()
             var = current_network["ssid"]
@@ -182,6 +178,13 @@ def Windows_GetWiFiNetworks() -> list:
             signal = line.split(":")[1].strip()
             current_network["signal"] = signal
             Debug.Log(f"signal = {signal}")
+
+            try:
+                if(current_network["ssid"] != None):
+                    Debug.Log("Wifi is probably good...")
+                    listToReturn.append(current_network)
+            except:
+                Debug.Error("Something went wrong durring WiFi parsing.")
 
         elif line.startswith("BSSID"):
             bssid = line.split(":")[1].strip()
