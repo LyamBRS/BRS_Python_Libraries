@@ -172,7 +172,6 @@ def Windows_GetWiFiNetworks() -> list:
             else:
                 listOfSeenNetworks.append(ssid)
                 newSSID = True
-                current_network.clear()
                 current_network = {}
                 Debug.Log(">>>> [CLEARED CONTENT]")
                 current_network["ssid"] = ssid
