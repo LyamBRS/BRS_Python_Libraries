@@ -70,10 +70,15 @@ class AppLanguage:
     #region   --------------------------- METHODS
     def LoadLanguage(language:str) -> bool:
         """
+            LoadLanguage:
+            =============
+            Summary:
+            --------
             Function that allows you to change the application's currently loaded language.
             Loads the default when building the class.
 
             Returns:
+            --------#####################################
                 - True: Successfully loaded the language
                 - False: Could not load the language
         """

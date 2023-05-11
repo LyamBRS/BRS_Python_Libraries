@@ -380,10 +380,11 @@ class JSONdata:
                 Debug.Log(">>> SUCCESS")
             except:
                 Debug.Error(f"[BRS]: Could not open {self.fileName} at {self.pathToDirectory}")
-                Debug.Log(">>> Second try")
+                Debug.Log(">>> Second try using read")
                 try:
                     with open(jsonPath, 'r') as file:
                         data = json.load(file)
+
                     Debug.Log(">>> SUCCESS")
                 except:
                     Debug.Error("Failed at the second try. Please create the file before loading it.")
