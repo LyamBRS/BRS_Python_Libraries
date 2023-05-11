@@ -221,6 +221,108 @@ def Windows_GetWiFiNetworks() -> list:
     Debug.End()
     return listToReturn
 
+def Windows_ConnectToNetwork(ssid:str, password:str) -> bool:
+    """
+        Windows_ConnectToNetwork:
+        =========================
+        Summary:
+        --------
+        This function attempts to connect
+        to a given network by using a specific
+        SSID and a specific password.
+
+        Returns:
+        --------
+        - `True`: The connection was successful.
+        - `False` : The connection didn't work.
+    """
+    Debug.Start("Windows_ConnectToNetwork")
+
+    if(Information.initialized):
+        if(Information.platform != "Windows"):
+            Debug.Error(f"Attempting to call a netsh function on a non windows based OS: {Information.platform}")
+            Debug.End()
+            return Execution.Incompatibility
+        Debug.Log("Platform checked successfully.")
+    else:
+        Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
+
+
+    Debug.Log("Trying to execute windows terminal command...")
+
+    try:
+        import os
+        name = ""
+        # function to establish a new connection
+        def createNewConnection(name, SSID, password):
+            config = f"""<?xml version=\"1.0\"?>
+        <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
+            <name>{name}</name>
+            <SSIDConfig>
+                <SSID>
+                    <name>{SSID}</name>
+                </SSID>
+            </SSIDConfig>
+            <connectionType>ESS</connectionType>
+            <connectionMode>auto</connectionMode>
+            <MSM>
+                <security>
+                    <authEncryption>
+                        <authentication>WPA2PSK</authentication>
+                        <encryption>AES</encryption>
+                        <useOneX>false</useOneX>
+                    </authEncryption>
+                    <sharedKey>
+                        <keyType>passPhrase</keyType>
+                        <protected>false</protected>
+                        <keyMaterial>{password}</keyMaterial>
+                    </sharedKey>
+                </security>
+            </MSM>
+        </WLANProfile>"""
+
+            command = f"netsh wlan add profile filename=\""+name+".xml\""+" interface=\"Wi-Fi\""
+            with open(name+".xml", 'w') as file:
+                file.write(config)
+            os.system(command)
+
+        # function to connect to a network
+        def connect(name, SSID):
+            command = "netsh wlan connect name=\""+name+"\" ssid=\""+SSID+"\""
+            os.system(command)
+
+        # function to display avavilabe Wifi networks
+        def displayAvailableNetworks() -> int:
+            """0: worked, anythingElse = failed."""
+            command = "netsh wlan show networks interface=\"Wi-Fi\""
+            returnedValue = os.system(command)
+            return returnedValue
+
+        # display available netwroks
+        returnedValue = displayAvailableNetworks()
+        if(returnedValue != 0):
+            Debug.Error("Failed to display available networks")
+            Debug.End()
+            return False
+
+        # input wifi name and password
+        name = "Batiscan"
+        password = "BATISCAN"
+
+        # establish new connection
+        createNewConnection(name, name, password)
+
+        # connect to the wifi network
+        connect(name, name)
+    except:
+        Debug.Error("Something failed when trying to connect through netsh... good luck!")
+        Debug.End()
+        return False
+
+    Debug.Log("SUCCESS")
+    Debug.End()
+    return True
+
 def Linux_GetNetworkInterfaces() -> list:
     """
         Linux_GetNetworkInterfaces:
@@ -271,6 +373,40 @@ def Linux_GetWiFiNetworks() -> list:
         - `[{"Admin State": "Disabled", "State": "Disconnected", "Type": "Dedicated", "Interface Name": "Hamachi"}]`
         - `[{"Admin State": "Enabled", "State": "Connected", "Type": "Dedicated", "Interface Name": "Ethernet"}]`
     """
+
+def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
+    """
+        Linux_ConnectToNetwork:
+        =======================
+        Summary:
+        --------
+        This function attempts to connect
+        to a given network by using a specific
+        SSID and a specific password.
+
+        Returns:
+        --------
+        - `True`: The connection was successful.
+        - `False` : The connection didn't work.
+    """
+    Debug.Start("Linux_ConnectToNetwork")
+
+    if(Information.initialized):
+        if(Information.platform != "Windows"):
+            Debug.Error(f"Attempting to call a netsh function on a non windows based OS: {Information.platform}")
+            Debug.End()
+            return Execution.Incompatibility
+        Debug.Log("Platform checked successfully.")
+    else:
+        Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
+
+
+    Debug.Log("Trying to execute windows terminal command...")
+
+    Debug.Log("SUCCESS")
+    Debug.End()
+    return True
+
 #====================================================================#
 def GetNetworkInterfaces() -> list:
     """
@@ -450,6 +586,54 @@ def CanDeviceUseWiFi() -> bool:
     Debug.Error("FAILED TO EXECUTE")
     Debug.End()
     return False
+
+def ConnectToAWiFiNetwork(ssidOfTheNetwork:str, passwordOfTheNetwork:str) -> bool:
+    """
+        ConnectToAWiFiNetwork:
+        ======================
+        Summary:
+        --------
+        This function attempts to connect to a given wireless
+        Wi-Fi network through various processes.
+        If you are using a Linux based machine, the function
+        will execute differently than a Windows machine.
+
+        Windows machines will use `netsh`
+        Linux machines will use `TO_DO`
+
+        Return:
+        -------
+        - `True`: The connection is successful. Or at least it didn`t crash.
+        - `False`: Failed to connect using the given parameters.
+
+        `Attention`:
+        ------------
+        This is scuffed as fuck. It might just not work for
+        your uses or your device. This is tested on
+        Ethernet enabled Windows devices, Wi-Fi enabled
+        Windows laptops and Raspberry Pi 4B. Nothing else.
+
+        **PLEASE MAKE SURE THE `Information` class is initialised.**
+    """
+    Debug.Start("ConnectToAWiFiNetwork")
+
+    if(Information.initialized):
+        if(Information.platform == "Windows"):
+            Debug.Log("Using Windows function.")
+            result = Windows_ConnectToNetwork(ssidOfTheNetwork, passwordOfTheNetwork)
+            Debug.Log(f"Function executed -> {result}")
+            Debug.End()
+            return result
+        else:
+            Debug.Log("Using Linux function.")
+            result = Linux_ConnectToNetwork(ssidOfTheNetwork, passwordOfTheNetwork)
+            Debug.Log(f"Function executed -> {result}")
+            Debug.End()
+            return result
+    else:
+        Debug.Error("Information class is not initialized. This function cannot be used.")
+        Debug.End()
+        return False
 #====================================================================#
 # Classes
 #====================================================================#
