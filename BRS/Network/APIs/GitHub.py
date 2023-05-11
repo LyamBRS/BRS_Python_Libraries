@@ -569,7 +569,7 @@ class GitHub:
             Debug.End()
             return GitHub.LatestError
 
-        if(GitHub.LocalRepository["version"] >= GitHub.LatestTag):
+        if(GitHub.LocalRepository["version"] > GitHub.LatestTag):
             Debug.Error("Version of local repository is higher than latest tag. UPDATE IT ANYWAYS BRUH.")
             Debug.End()
             return True
@@ -580,6 +580,7 @@ class GitHub:
             return True
         
         Debug.End()
+        return False
     #------------------------------------------------
     def UpdateDevice():
         """
