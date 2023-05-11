@@ -556,19 +556,30 @@ class GitHub:
             bool: True = Repository is behind and needs updating.
             str: Error message
         """
+        Debug.Start("CheckIfBehind")
         if(GitHub.userInformation == None):
             GitHub.LatestError = "user information member not set up properly."
+            Debug.Error("user information member not set up properly.")
+            Debug.End()
             return GitHub.LatestError
 
         if(GitHub.LatestTag == None):
             GitHub.LatestError = "No latest tags found to compare local tag with"
+            Debug.Error("No latest tags found to compare local tag with")
+            Debug.End()
             return GitHub.LatestError
 
         if(GitHub.LocalRepository["version"] >= GitHub.LatestTag):
-            return False
+            Debug.Error("Version of local repository is higher than latest tag. UPDATE IT ANYWAYS BRUH.")
+            Debug.End()
+            return True
 
         if(GitHub.LocalRepository["version"] < GitHub.LatestTag):
+            Debug.Error("Version is behind and needs to be updated.")
+            Debug.End()
             return True
+        
+        Debug.End()
     #------------------------------------------------
     def UpdateDevice():
         """
