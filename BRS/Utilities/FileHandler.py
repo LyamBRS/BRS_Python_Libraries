@@ -270,6 +270,15 @@ class JSONdata:
     """
         Holds the retrived JSON data. Build the class to have access to this.
     """
+    
+    fullJsonPath:str = None
+    """
+        fullJsonPath:
+        =============
+        Summary:
+        --------
+        Private variable that stores the full path to the JSON file.
+    """
     #endregion
     #region   --------------------------- METHODS
     def SaveFile(self) -> bool:
@@ -291,8 +300,9 @@ class JSONdata:
                     self.pathToDirectory = AppendPath(self.pathToDirectory, "\\")
 
                 with open(self.pathToDirectory + self.fileName, "w") as file:
-                    Debug.Log(f"JSONdata -> saving log at: -> {self.pathToDirectory + self.fileName}")
+                    Debug.Log(f"Saved file at: {self.pathToDirectory + self.fileName}")
                     json.dump(self.jsonData, file)
+                    file.close()
                 Debug.End()
                 return True
             except:
@@ -320,6 +330,7 @@ class JSONdata:
             Debug.Log(f">>> self.fileName = {self.fileName}")
             with open(self.pathToDirectory + self.fileName, "w") as file:
                 json.dump(structure, file)
+                file.close()
             Debug.Log(">>> CreateFile -> SUCCESS")
             Debug.End()
             return True
@@ -327,7 +338,45 @@ class JSONdata:
             Debug.Error(">>> CreateFile -> COULD NOT SAVE JSON DATA")
             Debug.End()
             return False
+    def ReadFile(self) -> bool:
+        """
+            ReadFile:
+            =========
+            Summary:
+            --------
+            Tries to read the file it was
+            initialized with.
 
+            Returns:
+            -------
+            - `True`: The file was read successfully.
+            - `False`: The file failed to be read
+        """
+        Debug.Start("ReadFile")
+        try:
+            with open(self.fullJsonPath, 'r') as file:
+                data = json.load(file)
+                self.jsonData = data
+                file.close()
+            Debug.Log(">>> SUCCESS")
+            Debug.End()
+            return True
+        except:
+            Debug.Error(f"[BRS]: Could not open {self.fullJsonPath}")
+            Debug.Log(">>> Second try using read")
+            try:
+                with open(self.fullJsonPath, 'r') as file:
+                    data = json.load(file)
+                    self.jsonData = data
+                    file.close()
+                Debug.Log(">>> SUCCESS")
+                Debug.End()
+                return True
+            except:
+                Debug.Error("Failed at the second try. Please create the file before loading it.")
+                Debug.Error(f"data -> {data}")
+                Debug.End()
+                return False
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self, fileName:str = "", path:str = None) -> None:
@@ -370,6 +419,7 @@ class JSONdata:
         data = None
 
         Debug.Log(f">>> jsonPath = {jsonPath}")
+        self.fullJsonPath = jsonPath
 
         # Validate that the path can exist.
         if(IsPathValid(jsonPath)):
