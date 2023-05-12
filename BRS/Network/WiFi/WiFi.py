@@ -149,8 +149,14 @@ def Windows_GetWiFiNetworks() -> list:
         Debug.Error("Fatal error while running subprocess")
         Debug.End()
         return Execution.Crashed
-    decodedNetwork = network.decode("ascii")
-    lines = decodedNetwork.splitlines()
+    
+    try:
+        decodedNetwork = network.decode("ascii")
+        lines = decodedNetwork.splitlines()
+    except:
+        Debug.Error("Failed to convert bytes to ascii.")
+        Debug.End()
+        return Execution.Crashed
 
     listToReturn = []
     current_network = {}
