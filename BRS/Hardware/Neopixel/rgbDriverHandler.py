@@ -44,6 +44,23 @@ LoadingLog.Import('KivyMD')
 #====================================================================#
 # Variables
 #====================================================================#
+class RGBModes():
+    """
+        RGBModes:
+        =========
+        Summary:
+        --------
+        class which contains all
+        the possible RGB modes that
+        can be sent to the Neopixel
+        driver.
+    """
+    off:str = "OFF"
+    static:str = "STATIC"
+    cycling:str = "CYCLING"
+    pulse:str = "PULSE"
+    loading:str = "LOADING"
+
 _defaultToDriverJsonStructure = {
     "Version" : 1.0,
     "LedCount": 3,
@@ -494,6 +511,99 @@ class RGB:
             return Execution.Failed
 
         Debug.End()
+    # -----------------------------------
+    def SetAttributes(colors:list = None, 
+            red:int = None, 
+            green:int = None, 
+            blue:int = None,
+            mode:RGBModes = None) -> Execution:
+        """
+            SetAttributes:
+            ==============
+            Summary:
+            --------
+            This method allows you to tell
+            the Neopixel driver to update any
+            of the elements you give it.
+            Note that you need to have started
+            the driver prior to calling this
+            method.
+
+            Arguments:
+            ----------
+            - `colors`: List of ints [Red,Green,Blue] so you dont need to call red, green, blue manually.
+            - `red`: int ranging from 0 to 255 that you want the LEDs to display.
+            - `green`: int ranging from 0 to 255 that you want the LEDs to display.
+            - `blue`: int ranging from 0 to 255 that you want the LEDs to display.
+            - `mode`: The LED mode that is wanted. See `RGBModes` for possible values.
+
+            Returns:
+            --------
+            - `Execution.Passed` = Everything worked out.
+            - `Execution.Failed` = Some values were incorrect.
+            - `Execution.Crashed` = Fatal json handling error
+            - `Execution.Unecessary` = You gave no arguments...
+        """
+        Debug.Start("Set")
+        updateTheJson = False
+
+        if(mode != None):
+            Debug.Log(f"Changing wanted mode to {mode}")
+            RGB.ToDriverJsonObject.jsonData["Mode"] = mode
+            updateTheJson = True
+
+        if(colors != None):
+            Debug.Log(f"Changing wanted color to {str(colors)}")
+
+            try:
+                length = len(colors[0])
+                Debug.Log("Multiple colors specified")
+                RGB.ToDriverJsonObject.jsonData["Colors"]["B"] = colors[0]
+                RGB.ToDriverJsonObject.jsonData["Colors"]["R"] = colors[1]
+                RGB.ToDriverJsonObject.jsonData["Colors"]["S"] = colors[2]
+            except:
+                Debug.Log("Only 1 color specified.")
+                RGB.ToDriverJsonObject.jsonData["Colors"]["B"] = colors
+                RGB.ToDriverJsonObject.jsonData["Colors"]["R"] = colors
+                RGB.ToDriverJsonObject.jsonData["Colors"]["S"] = colors
+            updateTheJson = True
+
+        if(red != None):
+            Debug.Log("Setting red color")
+            RGB.ToDriverJsonObject.jsonData["Colors"]["B"][0] = red
+            RGB.ToDriverJsonObject.jsonData["Colors"]["R"][0] = red
+            RGB.ToDriverJsonObject.jsonData["Colors"]["S"][0] = red
+            updateTheJson = True
+
+        if(green != None):
+            Debug.Log("Setting green color")
+            RGB.ToDriverJsonObject.jsonData["Colors"]["B"][1] = green
+            RGB.ToDriverJsonObject.jsonData["Colors"]["R"][1] = green
+            RGB.ToDriverJsonObject.jsonData["Colors"]["S"][1] = green
+            updateTheJson = True
+
+        if(blue != None):
+            Debug.Log("Setting blue color")
+            RGB.ToDriverJsonObject.jsonData["Colors"]["B"][2] = blue
+            RGB.ToDriverJsonObject.jsonData["Colors"]["R"][2] = blue
+            RGB.ToDriverJsonObject.jsonData["Colors"]["S"][2] = blue
+            updateTheJson = True
+        
+        if(not updateTheJson):
+            Debug.Warn("Function called without any given parameters")
+            Debug.End()
+            return Execution.Unecessary
+        
+        Debug.Log("Updating json.")
+        result = RGB.ToDriverJsonObject.SaveFile()
+        if(result != True):
+            Debug.Error("Failed to save file.")
+            Debug.End()
+            return Execution.Crashed
+        
+        Debug.Log("Values were updated!")
+        Debug.End()
+        return Execution.Passed
     # -----------------------------------
     def _WaitForDriverToIndicateItStarted() -> Execution:
         """
