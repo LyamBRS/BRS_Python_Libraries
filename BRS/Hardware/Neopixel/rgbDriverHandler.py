@@ -762,7 +762,7 @@ class RGB:
             else:
                 Debug.Log("Only 1 color specified.")
                 for ledNumber in range(amountOfLed):
-                    RGB.ToDriverJsonObject.jsonData["Colors"][amountOfLed] = colors
+                    RGB.ToDriverJsonObject.jsonData["Colors"][ledNumber] = colors
             updateTheJson = True
 
         if(brightness != None):
