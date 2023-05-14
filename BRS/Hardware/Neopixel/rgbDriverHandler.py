@@ -547,7 +547,7 @@ class RGB:
         if sys.platform == 'win32':
             subprocess.Popen(['start', '/B', 'python', path], shell=True)
         else:
-            subprocess.Popen(['python', path, '&'])
+            subprocess.Popen(['sudo python', path, '&'])
         #endregion
         Debug.Log("Success. Driver is launched.")
         Debug.End()
