@@ -10,19 +10,20 @@
     of its application.
 
     DO NOT EXECUTE THIS FILE MANUALLY.
+    ----------------------------------
 """
 #====================================================================#
 # Loading Logs
 #====================================================================#
 import os
 import sys
-absolutePathOfThedriver = os.path.abspath(__file__)
-LibraryPath = absolutePathOfThedriver.replace("BRS\\Hardware\\Neopixel\\driver.py", "")
+absolutePathOfTheDriver = os.path.abspath(__file__)
+LibraryPath = absolutePathOfTheDriver.replace("BRS\\Hardware\\Neopixel\\driver.py", "")
 LibraryPath = LibraryPath.replace("BRS/Hardware/Neopixel/driver.py", "")
 sys.path.append(LibraryPath)
 
 print("\n=========================================")
-print("NEOPIXELS: START OF DRIVER")
+print("DRIVER: NEOPIXELS: COMPILING             ")
 print("=========================================")
 
 from BRS.Debug.LoadingLog import LoadingLog
@@ -145,7 +146,7 @@ class RGBModes():
     pulse:str = "PULSE"
     loading:str = "LOADING"
 #====================================================================#
-# Global functions
+# Global RGB functions
 #====================================================================#
 def GetCycledColor(colorToCycle, tick, maxTickCount, RadianOffset) -> float:
     """
@@ -218,9 +219,25 @@ def printFatalDriverError(messageToPrint:str):
         ----------
         - `messageToPrint`: string printed in the terminal.
     """
-    print("\n")
     print(f"[BRS - FATAL ERROR]:\t[NEOPIXEL]:\t{messageToPrint}")
-    print("\n")
+
+def printDriverHeader(messageToPrint:str):
+    """
+        printDriverHeader:
+        ==================
+        Summary:
+        --------
+        prints a globally visible header for the main
+        application to see in its terminal regardless
+        of Debug information settings.
+
+        Arguments:
+        ----------
+        - `messageToPrint` : The string to put in the header.
+    """
+    print("\n=========================================")
+    print(f"DRIVER: NEOPIXELS: {messageToPrint}     ")
+    print("=========================================")
 # --------------------------------------------------------------------
 def HandleDriver() -> Execution:
     """
@@ -229,23 +246,25 @@ def HandleDriver() -> Execution:
         Summary:
         --------
         This function's goal is to handle each ticks
-        of the neopixel driver.
+        of the neopixel driver. It also handles
+        the reading of the ToDriver.json file.
     """
     time.sleep(ANIMATION_NEW_FRAME_DELAY)
     currentAnimationTick = currentAnimationTick + ANIMATION_NEW_FRAME_DELAY
 
     if(currentAnimationTick > ANIMATION_DURATION):
-        # Reached the end of an entire animation.
         currentAnimationTick = 0
         result = DriverHandler.Update()
         if(result != Execution.Passed):
+            printDriverHeader("Closing")
             NeopixelHandler.Close()
             return result
-        
+
         NeopixelHandler.UpdateFromJson()
-    
+
     # Update the LEDs.
     NeopixelHandler.ShowNewPixels()
+    return Execution.Passed
 #====================================================================#
 # Classes
 #====================================================================#
@@ -600,9 +619,11 @@ class DriverHandler:
             DriverHandler.Close()
             Debug.End()
             return Execution.Crashed
-        
+
         if(DriverHandler.InputJsonObject.jsonData["State"] != "ON"):
             Debug.Log("Driver should turn off now.")
+            NeopixelHandler.currentMode = "OFF"
+            DriverHandler.Close()
             Debug.End()
             return Execution.Failed
 
@@ -856,17 +877,17 @@ if(__name__ == "__main__"):
             result = DriverHandler.Close(message="CRASHED")
             if(result != Execution.Passed):
                 printFatalDriverError("482: Failed to properly close the driver.")
-
-        Debug.Log("Closing driver...")
+        printDriverHeader("CRASHED")
     else:
-        Debug.Log("Driver successfully started.")
+        printDriverHeader("STARTED")
 
         result = Execution.Failed
         while result == Execution.Passed:
-            result = HandleDriver
+            result = HandleDriver()
             if(result != Execution.Passed):
                 printFatalDriverError("836: HandleDriver failed to execute.")
                 DriverHandler.Close()
                 break
+    printDriverHeader("STOPPED")
 
 LoadingLog.End("driver.py")
