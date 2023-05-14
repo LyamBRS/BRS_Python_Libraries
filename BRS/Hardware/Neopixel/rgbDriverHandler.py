@@ -751,7 +751,7 @@ class RGB:
         if(colors != None):
             Debug.Log(f"Changing wanted color to {str(colors)}")
             amountOfLed = RGB.ToDriverJsonObject.jsonData["LedCount"]
-            try:
+            if(type(colors[0]) != int):
                 length = len(colors[0])
                 if(length == 3):
                     Debug.Log("Multiple colors specified")
@@ -759,7 +759,7 @@ class RGB:
                         RGB.ToDriverJsonObject.jsonData["Colors"][ledNumber] = colors[ledNumber]
                 else:
                     Debug.Error(f"INVALID COLOR(S) SPECIFIED: {colors}")
-            except:
+            else:
                 Debug.Log("Only 1 color specified.")
                 for ledNumber in range(amountOfLed):
                     RGB.ToDriverJsonObject.jsonData["Colors"][amountOfLed] = colors
