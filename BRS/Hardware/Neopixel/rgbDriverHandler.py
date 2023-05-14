@@ -750,7 +750,7 @@ class RGB:
 
         if(colors != None):
             Debug.Log(f"Changing wanted color to {str(colors)}")
-            amountOfLed = RGB.ToDriverJsonObject["LedCount"]
+            amountOfLed = RGB.ToDriverJsonObject.jsonData["LedCount"]
             try:
                 length = len(colors[0])
                 if(length == 3):
