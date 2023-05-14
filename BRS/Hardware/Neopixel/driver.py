@@ -868,7 +868,7 @@ class NeopixelHandler:
 #====================================================================#
 
 if(__name__ == "__main__"):
-    Debug.enableConsole = False
+    Debug.enableConsole = True
     result = DriverHandler.Start()
     if(result != Execution.Passed):
         printFatalDriverError("477: Driver failed to start")
