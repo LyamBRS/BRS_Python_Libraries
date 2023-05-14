@@ -534,7 +534,7 @@ class DriverHandler:
         DriverHandler.InputJsonObject = JSONdata(jsonFileName, path)
         if(DriverHandler.InputJsonObject.jsonData == None):
             Debug.Error("The Input json file found is empty.")
-            printFatalDriverError("326: FAILED TO GET DATA FROM ToDriver.json")
+            printFatalDriverError("537: FAILED TO GET DATA FROM ToDriver.json")
             Debug.End()
             return Execution.Crashed
         Debug.Log("File's content gathered successfully.")
@@ -545,7 +545,7 @@ class DriverHandler:
         result = CompareKeys(_defaultToDriverJsonStructure, DriverHandler.InputJsonObject.jsonData)
         if(result != FileIntegrity.Good):
             Debug.Error("JSON file's data does not match expected data")
-            printFatalDriverError("337: ToDriver.py has corrupted data in it.")
+            printFatalDriverError("548: ToDriver.py has corrupted data in it.")
         #endregion
         
         #region ------------------------- Reading State of ToDriver
@@ -553,13 +553,13 @@ class DriverHandler:
         try:
             if(DriverHandler.InputJsonObject.jsonData["State"] != "ON"):
                 Debug.Log("Driver should close")
-                printFatalDriverError("Driver started with json set to OFF...")
+                printFatalDriverError("556: Driver started with json set to OFF...")
                 Debug.End()
                 return Execution.Failed
             Debug.Log("State is ON, the application wants to handle LEDs")
         except:
             Debug.Error("FATAL: Crashed when attempting to set STATE to ON")
-            printFatalDriverError("392: Crashed when trying to read if ToDriver's state is ON")
+            printFatalDriverError("562: Crashed when trying to read if ToDriver's state is ON")
             Debug.End()
             return Execution.Crashed
         #endregion
@@ -594,7 +594,7 @@ class DriverHandler:
             - `"CRASHED"` : Means the driver crashed during execution.
         """
         Debug.Start("Close")
-    
+
         if(not DriverHandler.initialized):
             Debug.Error("Trying to properly close an uninitialized driver.")
 
@@ -603,17 +603,15 @@ class DriverHandler:
 
         Debug.Log("Saving OutputJsonObject")
         result = DriverHandler.OutputJsonObject.SaveFile()
-        if(result != Execution.Passed):
-            printFatalDriverError("457: Failed to save ToApplication.json")
+        if(result != True):
+            printFatalDriverError("607: Failed to save ToApplication.json")
             Debug.Error("oh no... err welp, looks like your application will have to figure out itself that the neopixel driver shutted down lmfao! Good luck!")
             Debug.End()
             return Execution.Failed
-        
+
         Debug.Log("Successfully indicated to Application that the driver is no longer operational.")
         Debug.End()
         return Execution.Passed
-
-        Debug.End()
     # -----------------------------------
     def Update() -> Execution:
         """
@@ -633,9 +631,9 @@ class DriverHandler:
         Debug.Start("Update")
 
         result = DriverHandler.InputJsonObject.ReadFile()
-        if(result != Execution.Passed):
+        if(result != True):
             Debug.Error("Failed to read file.")
-            printFatalDriverError("568: Failed to read JSON")
+            printFatalDriverError("638: Failed to read JSON")
             NeopixelHandler.currentMode = "OFF"
             DriverHandler.Close()
             Debug.End()
@@ -845,7 +843,7 @@ class NeopixelHandler:
             - `maxTickCount:int` = The maximum ticks in an animation.
         """
         if(DriverHandler.initialized != True):
-            printFatalDriverError("848: Attempting to Update pixels while driver is not initialized")
+            printFatalDriverError("846: Attempting to Update pixels while driver is not initialized")
             return Execution.Failed
 
         #region ---------------------------------- [OFF]
@@ -909,12 +907,12 @@ if(__name__ == "__main__"):
     Debug.enableConsole = True
     result = DriverHandler.Start()
     if(result != Execution.Passed):
-        printFatalDriverError("477: Driver failed to start")
+        printFatalDriverError("910: Driver failed to start")
         Debug.Log("Checking if driver is initialized.")
         if(DriverHandler.initialized):
             result = DriverHandler.Close(message="CRASHED")
             if(result != Execution.Passed):
-                printFatalDriverError("482: Failed to properly close the driver.")
+                printFatalDriverError("915: Failed to properly close the driver.")
         printDriverHeader("CRASHED")
     else:
         printDriverHeader("STARTED")
@@ -928,7 +926,7 @@ if(__name__ == "__main__"):
         while result == Execution.Passed:
             result = HandleDriver()
             if(result != Execution.Passed):
-                printFatalDriverError("836: HandleDriver failed to execute.")
+                printFatalDriverError("929: HandleDriver failed to execute.")
                 DriverHandler.Close()
                 break
     printDriverHeader("STOPPED")
