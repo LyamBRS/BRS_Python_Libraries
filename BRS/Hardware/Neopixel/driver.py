@@ -57,7 +57,28 @@ LoadingLog.Import('KivyMD')
 #====================================================================#
 ANIMATION_NEW_FRAME_DELAY = 0.01
 ANIMATION_DURATION = 1
-currentAnimationTick = 0
+
+class GlobalVariables():
+    """
+        GlobalVariables:
+        ================
+        Summary:
+        --------
+        Holds variables used throughout the driver
+        in functions that would otherwise not work.
+    """
+    currentAnimationTick:float = 0
+    """
+        currentAnimationTick:
+        =====================
+        Summary:
+        --------
+        The current millisecond that the LED animation is at.
+        The milliseconds are displayed in decimals of seconds.
+        1 millisecond is equal to 0.001 for example.
+
+        Defaults to 0.
+    """
 #====================================================================#
 # Global variables
 #====================================================================#
@@ -250,14 +271,14 @@ def HandleDriver() -> Execution:
         the reading of the ToDriver.json file.
     """
     time.sleep(ANIMATION_NEW_FRAME_DELAY)
-    currentAnimationTick = currentAnimationTick + ANIMATION_NEW_FRAME_DELAY
+    GlobalVariables.currentAnimationTick = GlobalVariables.currentAnimationTick + ANIMATION_NEW_FRAME_DELAY
 
-    if(currentAnimationTick > ANIMATION_DURATION):
-        currentAnimationTick = 0
+    if(GlobalVariables.currentAnimationTick > ANIMATION_DURATION):
+        GlobalVariables.currentAnimationTick = 0
         result = DriverHandler.Update()
         if(result != Execution.Passed):
-            printDriverHeader("Closing")
-            NeopixelHandler.Close()
+            printDriverHeader("STOPPING")
+            # NeopixelHandler.Close()
             return result
 
         NeopixelHandler.UpdateFromJson()

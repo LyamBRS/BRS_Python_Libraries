@@ -606,7 +606,7 @@ class RGB:
         Debug.End()
         return Execution.Passed
     # -----------------------------------
-    def GetStateOfDriver() -> Execution:
+    def GetStateOfDriver(showDebuggingPrints:bool=False) -> Execution:
         """
             GetStateOfDriver:
             =================
@@ -630,29 +630,27 @@ class RGB:
             - `"OFF"` = The Neopixel driver is OFF
             - `"CRASHED"` = The Neopixel driver crashed.
         """
-        Debug.Start("GetStateOfDriver")
+        Debug.Start("GetStateOfDriver", DontDebug = (not showDebuggingPrints))
 
         if(RGB.initialized):
 
             result = RGB.ToApplicationJsonObject.ReadFile()
             if(result != True):
                 Debug.Error("Failed to read the file.")
-                Debug.End()
+                Debug.End(ContinueDebug=True)
                 return Execution.Crashed
-            
+
             Debug.Log("File read successfully.")
-            
+
             state = RGB.ToApplicationJsonObject.jsonData["State"]
             Debug.Log("Successfully returned the driver's current state")
-            Debug.End()
+            Debug.End(ContinueDebug=True)
             return state
 
         else:
             Debug.Error("Tried to get state from uninitialized class")
-            Debug.End()
+            Debug.End(ContinueDebug=True)
             return Execution.Failed
-
-        Debug.End()
     # -----------------------------------
     def SetAttributes(colors:list = None,
             red:int = None,
@@ -836,4 +834,4 @@ class RGB:
     #endregion
     pass
 #====================================================================#
-LoadingLog.End("AppLoading.py")
+LoadingLog.End("rgbDriverHandler.py")
