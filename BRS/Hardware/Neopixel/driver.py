@@ -363,7 +363,7 @@ def HandleDriver() -> Execution:
                     GlobalVariables.blinkCounter = 0
                     GlobalVariables.currentSequencedLed = GlobalVariables.currentSequencedLed + 1
 
-                    if(GlobalVariables.currentSequencedLed > NeopixelHandler.amountOfLEDs):
+                    if(GlobalVariables.currentSequencedLed > NeopixelHandler.amountOfLEDs-1):
                         GlobalVariables.currentSequencedLed = 0
         else:
             GlobalVariables.blinkState = False
