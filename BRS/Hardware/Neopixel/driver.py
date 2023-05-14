@@ -219,6 +219,11 @@ def GetLerpedColors(currentColors:list, wantedColors:list):
     newG = Lerp(currentG, wantedG)
     newB = Lerp(currentB, wantedB)
 
+    print("------------------------------------------------")
+    print(f"current:  R:{currentR}, G:{currentG}, B:{currentB}")
+    print(f"wanted:   R:{currentR}, G:{currentG}, B:{currentB}")
+    print(f"resulted: R:{currentR}, G:{currentG}, B:{currentB}")
+
     return [newR, newG, newB]
 
 #====================================================================#
@@ -278,14 +283,16 @@ def HandleDriver() -> Execution:
         result = DriverHandler.Update()
         if(result != Execution.Passed):
             printDriverHeader("STOPPING")
-            # NeopixelHandler.Close()
+            NeopixelHandler.currentMode = "OFF"
+            NeopixelHandler.AnimateCurrentPixelValues(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
+            NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
             return result
 
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
     NeopixelHandler.AnimateCurrentPixelValues(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
-    NeopixelHandler.UpdatePixelsWithCurrentValues()
+    NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
     return Execution.Passed
 #====================================================================#
 # Classes
