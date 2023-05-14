@@ -14,6 +14,7 @@
 #====================================================================#
 # Loading Logs
 #====================================================================#
+from platform import java_ver
 from ...Debug.LoadingLog import LoadingLog
 LoadingLog.Start("rgbDriverHandler.py")
 #====================================================================#
@@ -749,18 +750,19 @@ class RGB:
 
         if(colors != None):
             Debug.Log(f"Changing wanted color to {str(colors)}")
-
+            amountOfLed = RGB.ToDriverJsonObject["LedCount"]
             try:
                 length = len(colors[0])
-                Debug.Log("Multiple colors specified")
-                RGB.ToDriverJsonObject.jsonData["Colors"]["B"] = colors[0]
-                RGB.ToDriverJsonObject.jsonData["Colors"]["R"] = colors[1]
-                RGB.ToDriverJsonObject.jsonData["Colors"]["S"] = colors[2]
+                if(length == 3):
+                    Debug.Log("Multiple colors specified")
+                    for ledNumber in range(length):
+                        RGB.ToDriverJsonObject.jsonData["Colors"][ledNumber] = colors[ledNumber]
+                else:
+                    Debug.Error(f"INVALID COLOR(S) SPECIFIED: {colors}")
             except:
                 Debug.Log("Only 1 color specified.")
-                RGB.ToDriverJsonObject.jsonData["Colors"]["B"] = colors
-                RGB.ToDriverJsonObject.jsonData["Colors"]["R"] = colors
-                RGB.ToDriverJsonObject.jsonData["Colors"]["S"] = colors
+                for ledNumber in range(amountOfLed):
+                    RGB.ToDriverJsonObject.jsonData["Colors"][amountOfLed] = colors
             updateTheJson = True
 
         if(brightness != None):
