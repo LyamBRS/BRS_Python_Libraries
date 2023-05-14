@@ -378,7 +378,13 @@ def HandleDriver() -> Execution:
             NeopixelHandler.CalculateColorMultipliers(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
             NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
             return result
-        NeopixelHandler.UpdateFromJson()
+        result = NeopixelHandler.UpdateFromJson()
+        if(result != Execution.Passed):
+            printDriverHeader("STOPPING")
+            NeopixelHandler.currentMode = "OFF"
+            NeopixelHandler.CalculateColorMultipliers(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
+            NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
+            return result
 
     if(GlobalVariables.currentAnimationTick > NeopixelHandler.animationDuration):
         GlobalVariables.currentAnimationTick = 0
@@ -1015,8 +1021,45 @@ class NeopixelHandler:
         NeopixelHandler.lerpDelta           = DriverHandler.GetAttribute("Animation", "LerpDelta")
         NeopixelHandler.animationPeriod     = DriverHandler.GetAttribute("Animation", "BlinkPeriod")
         NeopixelHandler.blinkMode           = DriverHandler.GetAttribute("Animation", "BlinkMode")
-        NeopixelHandler.blinkCounts         = DriverHandler.GetAttribute("Animation", "BlinkCounts")
+        NeopixelHandler.blinkCounts         = DriverHandler.GetAttribute("Animation", "BlinkCount")
         NeopixelHandler.ledsToUse           = DriverHandler.GetAttribute("Animation", "LEDToUse")
+
+        errorOccurred = False
+        if(NeopixelHandler.currentMode == Execution.Failed):
+            printFatalDriverError("1022: currentMode GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.amountOfLEDs == Execution.Failed):
+            printFatalDriverError("1024: amountOfLEDs GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.brightness == Execution.Failed):
+            printFatalDriverError("1026: brightness GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.animationDuration == Execution.Failed):
+            printFatalDriverError("1028: animationDuration GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.wantedColors == Execution.Failed):
+            printFatalDriverError("1029: wantedColors GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.lerpDelta == Execution.Failed):
+            printFatalDriverError("1032: lerpDelta GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.animationPeriod == Execution.Failed):
+            printFatalDriverError("1034: animationPeriod GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.blinkMode == Execution.Failed):
+            printFatalDriverError("1036: blinkMode GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.blinkCounts == Execution.Failed):
+            printFatalDriverError("1038: blinkCounts GetAttribute failed")
+            errorOccurred = True
+        if(NeopixelHandler.ledsToUse == Execution.Failed):
+            printFatalDriverError("1040: ledsToUse GetAttribute failed")
+            errorOccurred = True
+
+        if(errorOccurred):
+            Debug.Error("Something went hella wrong")
+            Debug.End()
+            return Execution.Failed
 
         Debug.End()
         return Execution.Passed
@@ -1147,6 +1190,22 @@ class NeopixelHandler:
 
         Debug.End(ContinueDebug=True)
         return Execution.Passed
+    # -------------------------------------------
+    def Close():
+        """
+            Close:
+            ======
+            Summary:
+            --------
+            Closes all the LEDs. This is called when
+            the driver shuts down.
+        """
+        Debug.Start("Close")
+
+        NeopixelHandler.pixelObject.fill([0, 0, 0])
+        NeopixelHandler.pixelObject.show()
+
+        Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -1179,6 +1238,7 @@ if(__name__ == "__main__"):
                 printFatalDriverError("929: HandleDriver failed to execute. Closing.")
                 DriverHandler.Close()
                 break
+        NeopixelHandler.Close()
     printDriverHeader("STOPPED")
 
 LoadingLog.End("driver.py")
