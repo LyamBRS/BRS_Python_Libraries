@@ -219,10 +219,10 @@ def GetLerpedColors(currentColors:list, wantedColors:list):
     newG = Lerp(currentG, wantedG)
     newB = Lerp(currentB, wantedB)
 
-    print("------------------------------------------------")
-    print(f"current:  R:{currentR}, G:{currentG}, B:{currentB}")
-    print(f"wanted:   R:{currentR}, G:{currentG}, B:{currentB}")
-    print(f"resulted: R:{currentR}, G:{currentG}, B:{currentB}")
+    # print("------------------------------------------------")
+    # print(f"current:  R:{currentR}, G:{currentG}, B:{currentB}")
+    # print(f"wanted:   R:{currentR}, G:{currentG}, B:{currentB}")
+    # print(f"resulted: R:{currentR}, G:{currentG}, B:{currentB}")
 
     return [newR, newG, newB]
 
@@ -964,7 +964,7 @@ class NeopixelHandler:
 #====================================================================#
 
 if(__name__ == "__main__"):
-    Debug.enableConsole = True
+    Debug.enableConsole = False
     result = DriverHandler.Start()
     if(result != Execution.Passed):
         printFatalDriverError("910: Driver failed to start")
