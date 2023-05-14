@@ -79,6 +79,19 @@ class GlobalVariables():
 
         Defaults to 0.
     """
+    currentAnimationPeriod:float = 0
+
+    currentSequencedLed:int = 0
+
+    blinkState:bool = False
+    """
+        Oscillates between True and False each time the
+        period count is reached.
+    """
+
+    blinkCounter:int = 0
+
+    halfPeriodCounter:int = 0
 #====================================================================#
 # Global variables
 #====================================================================#
@@ -110,14 +123,23 @@ _defaultToApplicationJsonStructure = {
 """
 
 _defaultToDriverJsonStructure = {
-    "Version" : 1.0,
+    "Version" : 1.1,
     "LedCount": 3,
     "State" : "OFF",
-    "Mode": "STATIC",
-    "Colors": {
-        "B" : [0,0,0],
-        "R" : [0,0,0],
-        "S" : [0,0,0]
+    "Brightness" : 1,
+    "Mode": "CUSTOM",
+    "Colors": [
+        [0,0,0],
+        [0,0,0],
+        [0,0,0]
+    ],
+    "Animation":{
+        "Duration" : 1000,
+        "LerpDelta" : 0.01,
+        "BlinkPeriod": 100,
+        "BlinkMode" : "SEQUENTIAL",
+        "BlinkCount" : [0,0,0],
+        "LEDToUse" : [False, False, False]
     }
 }
 """
@@ -137,18 +159,48 @@ _defaultToDriverJsonStructure = {
 
     Default:
     --------
+    ```
     {
-        "Version" : 1.0,
+        "Version" : 1.1,
         "LedCount": 3,
         "State" : "OFF",
-        "Mode": "Custom",
-        "Custom": {
-            "B" : [0,0,0],
-            "R" : [0,0,0],
-            "S" : [0,0,0]
+        "Brightness" : 1,
+        "Mode": "CUSTOM",
+        "Colors": [
+            [0,0,0],
+            [0,0,0],
+            [0,0,0]
+        ],
+        "Animation":{
+            "Duration" : 1000,
+            "LerpDelta" : 0.01,
+            "BlinkPeriod": 100,
+            "BlinkMode" : "SEQUENTIAL",
+            "BlinkCount" : [0,0,0],
+            "LEDToUse" : [False, False, False]
         }
     }
+    ```
+
+    Values:
+    --------
+    - `Version` : The JSON's version.
+    - `LedCount` : How many LEDs the driver needs to drive. This directly impacts `Colors`
+    - `State` : Wanted driver state. "ON" = The driver needs to run. "OFF" the driver will turn off.
+    - `Brightness` : Value from 0 to 1 that sets how bright the LEDs can be.
+    - `Mode` : See `RGBModes` class.
+    - `Colors` : A list of lists of 3 elements [R,G,B]. each element can only go from 0 to 255.
+    - `Animation`: Dictionary containing animation properties.
+        - `Duration` : How long, in milliseconds, will an animation last.
+        - `LerpDelta` : How much delta to apply to leds. Set to 1 for none.
+        - `BlinkPeriod` : How long should an LED stay on during blinking.
+        - `BlinkCounts`: List of how many times each LEDs should blink.
+        - `BlinkMode` : The blinking mode. "SEQUENTIAL" = LEDs blink one after the other. "NORMAL" = Everything blinks at the same time.
+        - `LEDToUse` : List of boolean indicating which LED should be used in the animation.
 """
+
+listOfKeyA = ["Version", "LedCount","State","Brightness","Mode","Colors","Animation"]
+listOfKeyB = ["Duration", "LerpDelta","BlinkPeriod","BlinkMode","BlinkCount","LEDToUse"]
 
 class RGBModes():
     """
@@ -160,12 +212,22 @@ class RGBModes():
         the possible RGB modes that
         can be sent to the Neopixel
         driver.
+
+        Members:
+        --------
+        - `off` = All LEDs will turn off.
+        - `static` = All LEDs will display a static color.
+        - `cycling` = RGB Gamer mode
+        - `pulse` = LEDs are pulsed one after the other depending on BlinkMode
+        - `loading` = LEDs display a loading animation.
+        - `blink` = LEDs blink according to set Animation properties.
     """
     off:str = "OFF"
     static:str = "STATIC"
     cycling:str = "CYCLING"
     pulse:str = "PULSE"
     loading:str = "LOADING"
+    blink:str = "BLINK"
 #====================================================================#
 # Global RGB functions
 #====================================================================#
@@ -194,7 +256,7 @@ def GetCycledColor(colorToCycle, tick, maxTickCount, RadianOffset) -> float:
 
     return temporary
 # -------------------------------------------------------------------
-def GetLerpedColors(currentColors:list, wantedColors:list):
+def GetLerpedColors(currentColors:list, wantedColors:list, globalDelta:float):
     """
         GetLerpedColor:
         ===============
@@ -202,8 +264,6 @@ def GetLerpedColors(currentColors:list, wantedColors:list):
         --------
         Returns a lerped singular color.
     """
-    globalDelta = 0.01
-
     wantedR = wantedColors[0]
     wantedG = wantedColors[1]
     wantedB = wantedColors[2]
@@ -225,7 +285,16 @@ def GetLerpedColors(currentColors:list, wantedColors:list):
     # print(f"resulted: R:{currentR}, G:{currentG}, B:{currentB}")
 
     return [newR, newG, newB]
-
+# -------------------------------------------------------------------
+def GetBlinkedColor(wantedColor:list, blinkMode:str, ledNumber:int) -> list:
+    pass
+# -------------------------------------------------------------------
+def CalculateMultiplierIfLedIsUsed(currentList:list, ledIsUsed:bool) -> list:
+    if(ledIsUsed):
+        return currentList
+    else:
+        lerped = GetLerpedColors(currentList, [0,0,0], NeopixelHandler.lerpDelta/255)
+        return lerped
 #====================================================================#
 # Global functions
 #====================================================================#
@@ -277,21 +346,49 @@ def HandleDriver() -> Execution:
     """
     time.sleep(ANIMATION_NEW_FRAME_DELAY)
     GlobalVariables.currentAnimationTick = GlobalVariables.currentAnimationTick + ANIMATION_NEW_FRAME_DELAY
+    GlobalVariables.currentAnimationPeriod = GlobalVariables.currentAnimationPeriod + ANIMATION_NEW_FRAME_DELAY
 
-    if(GlobalVariables.currentAnimationTick > ANIMATION_DURATION):
-        GlobalVariables.currentAnimationTick = 0
+    if(GlobalVariables.currentAnimationPeriod >= NeopixelHandler.animationPeriod):
+        GlobalVariables.currentAnimationPeriod = 0
+        GlobalVariables.halfPeriodCounter = GlobalVariables.halfPeriodCounter + 1
+
+        if(GlobalVariables.halfPeriodCounter == 1):
+            GlobalVariables.blinkState = True
+            GlobalVariables.blinkCounter = GlobalVariables.blinkCounter + 1
+            GlobalVariables.halfPeriodCounter = 0
+
+            #Leds blinks one after the other.
+            if(NeopixelHandler.blinkMode == "SEQUENTIAL"):
+                if (GlobalVariables.blinkCounter >= NeopixelHandler.blinkCounts[GlobalVariables.currentSequencedLed]):
+                    GlobalVariables.blinkCounter = 0
+                    GlobalVariables.currentSequencedLed = GlobalVariables.currentSequencedLed + 1
+
+                    if(GlobalVariables.currentSequencedLed > NeopixelHandler.amountOfLEDs):
+                        GlobalVariables.currentSequencedLed = 0
+        else:
+            GlobalVariables.blinkState = False
+
+
+    if(int((GlobalVariables.currentAnimationTick*1000)%500) == 0):
+        # Time to update the JSONs!
         result = DriverHandler.Update()
         if(result != Execution.Passed):
             printDriverHeader("STOPPING")
             NeopixelHandler.currentMode = "OFF"
-            NeopixelHandler.AnimateCurrentPixelValues(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
+            NeopixelHandler.CalculateColorMultipliers(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
             NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
             return result
+        NeopixelHandler.UpdateFromJson()
+
+    if(GlobalVariables.currentAnimationTick > NeopixelHandler.animationDuration):
+        GlobalVariables.currentAnimationTick = 0
+        GlobalVariables.currentSequencedLed = 0
+        GlobalVariables.currentAnimationPeriod = 0
 
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
-    NeopixelHandler.AnimateCurrentPixelValues(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
+    NeopixelHandler.CalculateColorMultipliers(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
     NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
     return Execution.Passed
 #====================================================================#
@@ -621,6 +718,68 @@ class DriverHandler:
         Debug.End()
         return Execution.Passed
     # -----------------------------------
+    def GetAttribute(valueA:str, valueB:str=None) -> Execution:
+        """
+            GetAttribute:
+            =============
+            Summary:
+            --------
+            This method returns an attribute
+            from the ToDriver.json file and
+            allows easy handling of the JSON
+            object responsible for it.
+
+            Arguments:
+            ----------
+            -`valueA:str` = First key in the dictionary
+            -`valueB:str` = Optional second key within the first key.
+
+            Example:
+            --------
+            - How to get the animation duration?
+
+            ```
+                currentDuration = DriverHandler.GetAttribute("Animation", "Duration")
+            ```
+
+            - How to get all the colors?
+
+            ```
+                listOfAllColors = DriverHandler.GetAttribute("Colors")
+            ```
+
+            - How to get the color of the first pixel?
+
+            ```
+                colorOfPixelA = DriverHandler.GetAttribute("Colors", 0)
+            ```
+        """
+        Debug.Start("GetAttribute")
+
+        if (valueA not in listOfKeyA):
+            Debug.Error(f"{valueA} is not a valid first key.")
+            Debug.End()
+            return Execution.Failed
+
+        if(valueB != None):
+            if(valueB not in listOfKeyB):
+                if(valueA == "Colors" and type(valueB) != "int"):
+                    Debug.Error(f"Invalid second key for colors: {valueB}")
+                    Debug.End()
+                    return Execution.Failed
+                elif (valueA != "Colors"):
+                    Debug.Error(f"Invalid second key: {valueB}")
+                    Debug.End()
+                    return Execution.Failed
+
+            Debug.Log(">>> SUCCESS")
+            Debug.End()
+            return DriverHandler.InputJsonObject.jsonData[valueA][valueB]
+        else:
+            Debug.Log(">>> SUCCESS")
+            Debug.End()
+            return DriverHandler.InputJsonObject.jsonData[valueA]
+    # -----------------------------------
     def Update() -> Execution:
         """
             Update:
@@ -747,7 +906,16 @@ class NeopixelHandler:
         --------
         - [[R,G,B], [0,0,0]]
     """
-    
+
+    currentColorMultipliers = []
+    """
+        lists of lists of values between 0 and 1
+        that represents how much each color should
+        be present on each LED. This is used
+        to smooth out transitions between colors.
+    """
+    wantedColorMultipliers = []
+
     currentColors = []
     """
         currentColors:
@@ -766,6 +934,19 @@ class NeopixelHandler:
         --------
         - [[R,G,B], [0,0,0]]
     """
+
+    brightness = 1
+    animationDuration = 1
+    lerpDelta = 0.01
+    animationPeriod = 0.02
+    blinkMode = "NORMAL"
+    blinkCounts = [1,1,1]
+    ledsToUse = [True, True, True]
+    blinkerCounter = []
+    """
+        Keeps count of how many blinks each LEDs made.
+    """
+
     #endregion
     #region   --------------------------- METHODS
     def Initialize() -> Execution:
@@ -792,7 +973,7 @@ class NeopixelHandler:
                                                         pixel_order=ORDER
                                                         )
         Debug.Log("NeopixelObject was initialized.")
-        
+
         Debug.Log("Closing Neopixels")
         NeopixelHandler.pixelObject.fill((0,0,0))
 
@@ -802,10 +983,14 @@ class NeopixelHandler:
         Debug.Log("Initializing wanted and current colors")
         NeopixelHandler.wantedColors = []
         NeopixelHandler.currentColors = []
+        NeopixelHandler.colorMultipliers = []
 
         for i in range(ledCount):
             NeopixelHandler.wantedColors.append([0,0,0])
             NeopixelHandler.currentColors.append([0,0,0])
+            NeopixelHandler.currentColorMultipliers.append([1,1,1])
+            NeopixelHandler.wantedColorMultipliers.append([1,1,1])
+            NeopixelHandler.blinkerCounter.append(0)
 
         Debug.End()
         return Execution.Passed
@@ -822,24 +1007,28 @@ class NeopixelHandler:
         """
         Debug.Start("UpdateFromJson")
 
-        NeopixelHandler.currentMode = DriverHandler.InputJsonObject.jsonData["Mode"]
-
-        Debug.Log("Setting wanted colors")
-        NeopixelHandler.wantedColors[0] = DriverHandler.InputJsonObject.jsonData["Colors"]["B"]
-        NeopixelHandler.wantedColors[1] = DriverHandler.InputJsonObject.jsonData["Colors"]["R"]
-        NeopixelHandler.wantedColors[2] = DriverHandler.InputJsonObject.jsonData["Colors"]["S"]
+        NeopixelHandler.currentMode         = DriverHandler.GetAttribute("Mode")
+        NeopixelHandler.amountOfLEDs        = DriverHandler.GetAttribute("LedCount")
+        NeopixelHandler.brightness          = DriverHandler.GetAttribute("Brightness")
+        NeopixelHandler.animationDuration   = DriverHandler.GetAttribute("Animation", "Duration")
+        NeopixelHandler.wantedColors        = DriverHandler.GetAttribute("Colors")
+        NeopixelHandler.lerpDelta           = DriverHandler.GetAttribute("Animation", "LerpDelta")
+        NeopixelHandler.animationPeriod     = DriverHandler.GetAttribute("Animation", "BlinkPeriod")
+        NeopixelHandler.blinkMode           = DriverHandler.GetAttribute("Animation", "BlinkMode")
+        NeopixelHandler.blinkCounts         = DriverHandler.GetAttribute("Animation", "BlinkCounts")
+        NeopixelHandler.ledsToUse           = DriverHandler.GetAttribute("Animation", "LEDToUse")
 
         Debug.End()
         return Execution.Passed
     # -------------------------------------------
-    def AnimateCurrentPixelValues(tick:int, maxTickCount:int) -> Execution:
+    def CalculateColorMultipliers(tick:int, maxTickCount:int) -> Execution:
         """
-            AnimateCurrentPixelValues:
+            CalculateColorMultipliers:
             ==============
             Summary:
             --------
-            Calculates the current values depending on
-            wanted colors.
+            Calculates the current values of
+            color multipliers depending on modes.
             This needs to be called at a fixed
             interval so that its updating
             RGB LEDs smoothly. Please note that
@@ -855,50 +1044,52 @@ class NeopixelHandler:
             printFatalDriverError("846: Attempting to Update pixels while driver is not initialized")
             return Execution.Failed
 
-        #region ---------------------------------- [OFF]
-        if(NeopixelHandler.currentMode == RGBModes.off):
-            for i in range(NeopixelHandler.amountOfLEDs):
-                NeopixelHandler.currentColors[i] = [0,0,0]
-        #endregion
+        for ledNumber in range(NeopixelHandler.amountOfLEDs):
+            ledIsUsed = NeopixelHandler.ledsToUse[ledNumber]
+            if(ledIsUsed):
+                lerped = CalculateMultiplierIfLedIsUsed(NeopixelHandler.currentColorMultipliers[ledNumber], ledIsUsed)
+                NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+            else:
+                #region ---------------------------------- [OFF]
+                if(NeopixelHandler.currentMode == RGBModes.off):
+                    lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [0,0,0], NeopixelHandler.lerpDelta/255)
+                    NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                #endregion
 
-        #region ---------------------------------- [STATIC]
-        if(NeopixelHandler.currentMode == RGBModes.static):
-            for i in range(NeopixelHandler.amountOfLEDs):
-                lerped = GetLerpedColors(NeopixelHandler.currentColors[i], NeopixelHandler.wantedColors[i])
-                NeopixelHandler.currentColors[i] = lerped
-        #endregion
+                #region ---------------------------------- [STATIC]
+                if(NeopixelHandler.currentMode == RGBModes.static):
+                    lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                             [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
+                                             NeopixelHandler.lerpDelta/255)
+                    NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                #endregion
 
-        #region ---------------------------------- [PULSE]
-        if(NeopixelHandler.currentMode == RGBModes.pulse):
-            for i in range(NeopixelHandler.amountOfLEDs):
+                #region ---------------------------------- [PULSE]
+                if(NeopixelHandler.currentMode == RGBModes.pulse):
+                    multiplierToCycle = NeopixelHandler.wantedColorMultipliers[ledNumber]
+                    wantedR = GetCycledColor(multiplierToCycle[0], tick, maxTickCount, 0)
+                    wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, 0)
+                    wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 0)
 
-                lerped = GetLerpedColors(NeopixelHandler.currentColors[i], NeopixelHandler.wantedColors[i])
+                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], NeopixelHandler.lerpDelta/255)
+                    NeopixelHandler.currentColorMultipliers[ledNumber] = lerpedMultipliers
+                #endregion
 
-                cycledR = GetCycledColor(lerped[0], tick, maxTickCount, 0)
-                cycledG = GetCycledColor(lerped[1], tick, maxTickCount, 0)
-                cycledB = GetCycledColor(lerped[2], tick, maxTickCount, 0)
+                #region ---------------------------------- [CYCLING]
+                if(NeopixelHandler.currentMode == RGBModes.cycling and ledIsUsed):
+                    offset = ledNumber * 0.15
 
-                NeopixelHandler.currentColors[i] = [cycledR, cycledG, cycledB]
-        #endregion
+                    multiplierToCycle = NeopixelHandler.wantedColorMultipliers[ledNumber]
+                    wantedR = GetCycledColor(multiplierToCycle[0], tick, maxTickCount, -2.09 + offset)
+                    wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, offset)
+                    wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 2.09 + offset)
 
-        #region ---------------------------------- [CYCLING]
-        if(NeopixelHandler.currentMode == RGBModes.cycling):
-            for i in range(NeopixelHandler.amountOfLEDs):
+                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], NeopixelHandler.lerpDelta/255)
+                    NeopixelHandler.currentColorMultipliers[ledNumber] = lerpedMultipliers
+                #endregion
 
-                offset = i * 0.15
-
-                cycledR = GetCycledColor(255, tick, maxTickCount, -2.09 + offset)
-                cycledG = GetCycledColor(255, tick, maxTickCount, offset)
-                cycledB = GetCycledColor(255, tick, maxTickCount, 2.09 + offset)
-
-                NeopixelHandler.currentColors[i] = [cycledR, cycledG, cycledB]
-        #endregion
-
-        #region ---------------------------------- [LOADING]
-        if(NeopixelHandler.currentMode == RGBModes.loading):
-            for i in range(NeopixelHandler.amountOfLEDs):
-                NeopixelHandler.wantedColors[i] = [0,0,0]
-        #endregion
+                #region ---------------------------------- [LOADING]
+                #endregion
 
         return Execution.Passed
     # -------------------------------------------
@@ -919,18 +1110,17 @@ class NeopixelHandler:
         Debug.Start("UpdatePixelsWithCurrentValues", DontDebug=dontShowDebugTraceback)
 
         # Updating pixel object with current LEDs
-        for pixelToChange in range(NeopixelHandler.amountOfLEDs):
+        for ledNumber in range(NeopixelHandler.amountOfLEDs):
 
-            rgbListToShow = NeopixelHandler.currentColors[pixelToChange]
+            # lerp current color with wanted color
+            lerpedColors = GetLerpedColors(NeopixelHandler.currentColors[ledNumber], NeopixelHandler.wantedColors[ledNumber], NeopixelHandler.lerpDelta)
+            NeopixelHandler.currentColors[ledNumber] = lerpedColors
 
-            if(len(rgbListToShow) != 3):
-                printFatalDriverError(f"918: Incorrect amount of colors in list: {rgbListToShow}")
-                Debug.End(ContinueDebug=True)
-                return Execution.Failed
+            multipliers = NeopixelHandler.currentColorMultipliers[ledNumber]
 
-            red = rgbListToShow[0]
-            green = rgbListToShow[1]
-            blue = rgbListToShow[2]
+            red   = lerpedColors[0] * multipliers[0]
+            green = lerpedColors[1] * multipliers[1]
+            blue  = lerpedColors[2] * multipliers[2]
 
             if(red > 255 or red < 0):
                 printFatalDriverError(f"Red isn't within allowed range: {red}")
@@ -951,7 +1141,7 @@ class NeopixelHandler:
             intGreen = int(green)
             intBlue = int(blue)
 
-            NeopixelHandler.pixelObject[pixelToChange] = [intRed, intGreen, intBlue]
+            NeopixelHandler.pixelObject[ledNumber] = [intRed, intGreen, intBlue]
 
         NeopixelHandler.pixelObject.show()
 

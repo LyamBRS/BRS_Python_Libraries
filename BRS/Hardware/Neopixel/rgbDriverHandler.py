@@ -53,22 +53,41 @@ class RGBModes():
         the possible RGB modes that
         can be sent to the Neopixel
         driver.
+
+        Members:
+        --------
+        - `off` = All LEDs will turn off.
+        - `static` = All LEDs will display a static color.
+        - `cycling` = RGB Gamer mode
+        - `pulse` = LEDs are pulsed one after the other depending on BlinkMode
+        - `loading` = LEDs display a loading animation.
+        - `blink` = LEDs blink according to set Animation properties.
     """
     off:str = "OFF"
     static:str = "STATIC"
     cycling:str = "CYCLING"
     pulse:str = "PULSE"
     loading:str = "LOADING"
+    blink:str = "BLINK"
 
 _defaultToDriverJsonStructure = {
-    "Version" : 1.0,
+    "Version" : 1.1,
     "LedCount": 3,
     "State" : "OFF",
+    "Brightness" : 1,
     "Mode": "CUSTOM",
-    "Colors": {
-        "B" : [0,0,0],
-        "R" : [0,0,0],
-        "S" : [0,0,0]
+    "Colors": [
+        [0,0,0],
+        [0,0,0],
+        [0,0,0]
+    ],
+    "Animation":{
+        "Duration" : 1000,
+        "LerpDelta" : 0.01,
+        "BlinkPeriod": 100,
+        "BlinkMode" : "SEQUENTIAL",
+        "BlinkCount" : [0,0,0],
+        "LEDToUse" : [False, False, False]
     }
 }
 """
@@ -88,17 +107,44 @@ _defaultToDriverJsonStructure = {
 
     Default:
     --------
+    ```
     {
-        "Version" : 1.0,
+        "Version" : 1.1,
         "LedCount": 3,
         "State" : "OFF",
-        "Mode": "STATIC",
-        "Colors": {
-            "B" : [0,0,0],
-            "R" : [0,0,0],
-            "S" : [0,0,0]
+        "Brightness" : 1,
+        "Mode": "CUSTOM",
+        "Colors": [
+            [0,0,0],
+            [0,0,0],
+            [0,0,0]
+        ],
+        "Animation":{
+            "Duration" : 1000,
+            "LerpDelta" : 0.01,
+            "BlinkPeriod": 100,
+            "BlinkMode" : "SEQUENTIAL",
+            "BlinkCount" : [0,0,0],
+            "LEDToUse" : [False, False, False]
         }
     }
+    ```
+
+    Values:
+    --------
+    - `Version` : The JSON's version.
+    - `LedCount` : How many LEDs the driver needs to drive. This directly impacts `Colors`
+    - `State` : Wanted driver state. "ON" = The driver needs to run. "OFF" the driver will turn off.
+    - `Brightness` : Value from 0 to 1 that sets how bright the LEDs can be.
+    - `Mode` : See `RGBModes` class.
+    - `Colors` : A list of lists of 3 elements [R,G,B]. each element can only go from 0 to 255.
+    - `Animation`: Dictionary containing animation properties.
+        - `Duration` : How long, in milliseconds, will an animation last.
+        - `LerpDelta` : How much delta to apply to leds. Set to 1 for none.
+        - `BlinkPeriod` : How long should an LED stay on during blinking.
+        - `BlinkCounts`: List of how many times each LEDs should blink.
+        - `BlinkMode` : The blinking mode. "SEQUENTIAL" = LEDs blink one after the other. "NORMAL" = Everything blinks at the same time.
+        - `LEDToUse` : List of boolean indicating which LED should be used in the animation.
 """
 
 _defaultToApplicationJsonStructure = {
@@ -652,10 +698,15 @@ class RGB:
             return Execution.Failed
     # -----------------------------------
     def SetAttributes(colors:list = None,
-            red:int = None,
-            green:int = None,
-            blue:int = None,
-            mode:RGBModes = None) -> Execution:
+            rgbMode:RGBModes = None,
+            brightness:float = None,
+            ledCount:int = None,
+            animationDuration:int = None,
+            lerpDelta:float = None,
+            blinkPeriod:int = None,
+            blinkMode:str = None,
+            blinkCount:list = None,
+            ledToUse:list = None) -> Execution:
         """
             SetAttributes:
             ==============
@@ -670,11 +721,16 @@ class RGB:
 
             Arguments:
             ----------
-            - `colors`: List of ints [Red,Green,Blue] so you dont need to call red, green, blue manually.
-            - `red`: int ranging from 0 to 255 that you want the LEDs to display.
-            - `green`: int ranging from 0 to 255 that you want the LEDs to display.
-            - `blue`: int ranging from 0 to 255 that you want the LEDs to display.
-            - `mode`: The LED mode that is wanted. See `RGBModes` for possible values.
+            - `colors`: List of ints ranging from 0 to 255 [Red,Green,Blue]. Or lists of lists: [[Red,Green,Blue]]
+            - `rgbMode`: The LED mode that is wanted. See `RGBModes` for possible values.
+            - `brightness`: float ranging from 0 to 1 indicating how bright the LEDs should be.
+            - `ledCount`: How many LEDs does the driver need to drive.
+            - `animationDuration` : How long is an animation? (seconds 1 = 1 seconds)
+            - `lerpDelta` : Smoothening given to the LEDs when they change colors. Set to 1 for no smoothening. DONT SET TO 0.
+            - `blinkPeriod` : How long do LEDs stay ON or OFF when in blinking mode? (1 = 1 seconds, 0.01 = 10 milliseconds)
+            - `blinkMode` : How does the blinking work? `"SEQUENTIAL"` = LEDs blink one after the other. `"NORMAL"` = Everything blinks at the same time
+            - `blinkCount` : How many blinks per animation? Either an int or a list of ints representing blinks for each LEDs.
+            - `ledToUse` : List of boolean telling the driver which LED to use and which to turn off.
 
             Returns:
             --------
@@ -686,9 +742,9 @@ class RGB:
         Debug.Start("Set")
         updateTheJson = False
 
-        if(mode != None):
-            Debug.Log(f"Changing wanted mode to {mode}")
-            RGB.ToDriverJsonObject.jsonData["Mode"] = mode
+        if(rgbMode != None):
+            Debug.Log(f"Changing wanted mode to {rgbMode}")
+            RGB.ToDriverJsonObject.jsonData["Mode"] = rgbMode
             updateTheJson = True
 
         if(colors != None):
@@ -707,32 +763,101 @@ class RGB:
                 RGB.ToDriverJsonObject.jsonData["Colors"]["S"] = colors
             updateTheJson = True
 
-        if(red != None):
-            Debug.Log("Setting red color")
-            RGB.ToDriverJsonObject.jsonData["Colors"]["B"][0] = red
-            RGB.ToDriverJsonObject.jsonData["Colors"]["R"][0] = red
-            RGB.ToDriverJsonObject.jsonData["Colors"]["S"][0] = red
-            updateTheJson = True
+        if(brightness != None):
+            if(brightness > 1 or brightness < 0):
+                Debug.Error("INVALID BRIGHTNESS")
+                Debug.End()
+                return Execution.Failed
+            else:
+                RGB.ToDriverJsonObject.jsonData["Brightness"] = brightness
+                updateTheJson = True
 
-        if(green != None):
-            Debug.Log("Setting green color")
-            RGB.ToDriverJsonObject.jsonData["Colors"]["B"][1] = green
-            RGB.ToDriverJsonObject.jsonData["Colors"]["R"][1] = green
-            RGB.ToDriverJsonObject.jsonData["Colors"]["S"][1] = green
-            updateTheJson = True
+        if(ledCount != None):
+            if(ledCount < 1 or ledCount > 50):
+                Debug.Error(f"INVALID LED COUNT: {ledCount}")
+                Debug.End()
+                return Execution.Failed
+            else:
+                RGB.ToDriverJsonObject.jsonData["LedCount"] = ledCount
+                updateTheJson = True
 
-        if(blue != None):
-            Debug.Log("Setting blue color")
-            RGB.ToDriverJsonObject.jsonData["Colors"]["B"][2] = blue
-            RGB.ToDriverJsonObject.jsonData["Colors"]["R"][2] = blue
-            RGB.ToDriverJsonObject.jsonData["Colors"]["S"][2] = blue
-            updateTheJson = True
-        
+        if(animationDuration != None):
+            if(animationDuration < 0.6 or animationDuration > 60):
+                Debug.Error(f"INVALID ANIMATION DURATION: {animationDuration}")
+                Debug.End()
+                return Execution.Failed
+            else:
+                RGB.ToDriverJsonObject.jsonData["Animation"]["Duration"] = animationDuration
+                updateTheJson = True
+
+        if(lerpDelta != None):
+            if(lerpDelta < 0 or lerpDelta > 1):
+                Debug.Error(f"INVALID LERP DELTA: {lerpDelta}")
+                Debug.End()
+                return Execution.Failed
+            else:
+                RGB.ToDriverJsonObject.jsonData["Animation"]["LerpDelta"] = lerpDelta
+                updateTheJson = True
+
+        if(blinkPeriod != None):
+            if(blinkPeriod < 0.02 or blinkPeriod > 5):
+                Debug.Error(f"INVALID BLINK PERIOD: {blinkPeriod}")
+                Debug.End()
+                return Execution.Failed
+            else:
+                RGB.ToDriverJsonObject.jsonData["Animation"]["BlinkPeriod"] = blinkPeriod
+                updateTheJson = True
+
+        if(blinkMode != None):
+            if(blinkMode != "SEQUENTIAL" and blinkMode != "NORMAL"):
+                Debug.Error(f"INVALID BLINK MODE: {blinkMode}")
+                Debug.End()
+                return Execution.Failed
+            else:
+                RGB.ToDriverJsonObject.jsonData["Animation"]["BlinkMode"] = blinkMode
+                updateTheJson = True
+
+        if(blinkCount != None):
+            amountToBlink = 0
+            try:
+                amountToBlink = len(blinkCount)
+                if(amountToBlink < RGB.ToDriverJsonObject.jsonData["Animation"]["BlinkCount"]):
+                    Debug.Error("SPECIFIED ARRAY IS SMALLER THAN LEDCOUNT")
+                    Debug.End()
+                    return Execution.Failed
+                RGB.ToDriverJsonObject.jsonData["Animation"]["BlinkCount"] = blinkCount
+                updateTheJson = True
+            except:
+                if(blinkCount < 0 or blinkCount > 100):
+                    Debug.Error(f"INVALID BLINK COUNT: {blinkCount}")
+                    Debug.End()
+                    return Execution.Failed
+                else:
+                    for led in RGB.ToDriverJsonObject.jsonData["Animation"]["BlinkCount"]:
+                        RGB.ToDriverJsonObject.jsonData["Animation"]["BlinkCount"][led] = blinkCount
+                    updateTheJson = True
+
+        if(ledToUse != None):
+            try:
+                amountOfLed = len(ledToUse)
+                amountOfLedToHave = RGB.ToDriverJsonObject.jsonData["LedCount"]
+                if(amountOfLed < amountOfLedToHave):
+                    Debug.Error(f"INVALID LED TO USE: {ledToUse}. List needs to have {amountOfLedToHave} spots")
+                    Debug.End()
+                    return Execution.Failed
+
+                updateTheJson = True
+                RGB.ToDriverJsonObject.jsonData["Animation"]["LEDToUse"] = ledToUse
+            except:
+                Debug.Error("FATAL ERROR WHILE PARSING LED TO USE.")
+                Debug.End()
+                return Execution.Failed
+
         if(not updateTheJson):
             Debug.Warn("Function called without any given parameters")
             Debug.End()
             return Execution.Unecessary
-        
+
         Debug.Log("Updating json.")
         result = RGB.ToDriverJsonObject.SaveFile()
         if(result != True):
