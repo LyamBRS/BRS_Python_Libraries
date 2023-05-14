@@ -385,14 +385,14 @@ class DriverHandler:
             Debug.Error("DRIVER: Failed to initialize the JSON.")
             Debug.End()
             return Execution.Crashed
-        
+
         result = DriverHandler._InitializeInputJson()
         if(result != Execution.Passed):
             Debug.Error("DRIVER: Failed to verify and get data from ToDriver.json")
             Debug.Warn("Setting driver to crashed mode.")
             Debug.End()
             return Execution.Crashed
-        
+
         Debug.Log("Driver's JSON were successfully initialized.")
         DriverHandler.initialized = True
 
@@ -676,6 +676,7 @@ class NeopixelHandler:
     """
     #endregion
     #region   --------------------------- MEMBERS
+
     amountOfLEDs = 0
     """
         amountOfLEDs:
@@ -843,6 +844,9 @@ class NeopixelHandler:
             - `tick:int` = the current tick that the animation is at.
             - `maxTickCount:int` = The maximum ticks in an animation.
         """
+        if(DriverHandler.initialized != True):
+            printFatalDriverError("848: Attempting to Update pixels while driver is not initialized")
+            return Execution.Failed
 
         #region ---------------------------------- [OFF]
         if(NeopixelHandler.currentMode == RGBModes.off):
@@ -914,6 +918,11 @@ if(__name__ == "__main__"):
         printDriverHeader("CRASHED")
     else:
         printDriverHeader("STARTED")
+
+        result = NeopixelHandler.Initialize()
+        if(result != Execution.Passed):
+            printDriverHeader("NEOPIXEL FAIL")
+            DriverHandler.Close(message="CRASHED")
 
         result = Execution.Passed
         while result == Execution.Passed:
