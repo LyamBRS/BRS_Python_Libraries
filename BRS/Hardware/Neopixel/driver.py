@@ -926,7 +926,7 @@ if(__name__ == "__main__"):
         while result == Execution.Passed:
             result = HandleDriver()
             if(result != Execution.Passed):
-                printFatalDriverError("929: HandleDriver failed to execute.")
+                printFatalDriverError("929: HandleDriver failed to execute. Closing.")
                 DriverHandler.Close()
                 break
     printDriverHeader("STOPPED")
