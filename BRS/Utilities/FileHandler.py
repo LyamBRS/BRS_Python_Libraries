@@ -8,12 +8,11 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from re import T
 from .Enums import Execution, FileIntegrity
 from ..Debug.LoadingLog import LoadingLog
 LoadingLog.Start("FileHandler.py")
 
-import errno, os, sys
+import errno, os, sys, time
 import json
 from ..Debug.consoleLog import Debug
 #====================================================================#
@@ -353,6 +352,7 @@ class JSONdata:
             - `False`: The file failed to be read
         """
         Debug.Start("ReadFile")
+        data = {}
         try:
             with open(self.fullJsonPath, 'r') as file:
                 data = json.load(file)
@@ -364,6 +364,7 @@ class JSONdata:
         except:
             Debug.Error(f"[BRS]: Could not open {self.fullJsonPath}")
             Debug.Log(">>> Second try using read")
+            time.sleep(0.01)
             try:
                 with open(self.fullJsonPath, 'r') as file:
                     data = json.load(file)
