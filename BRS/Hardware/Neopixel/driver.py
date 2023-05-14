@@ -204,13 +204,13 @@ def GetLerpedColors(currentColors:list, wantedColors:list):
     """
     globalDelta = 0.01
 
-    wantedR = wantedColors[1]
-    wantedG = wantedColors[2]
-    wantedB = wantedColors[3]
+    wantedR = wantedColors[0]
+    wantedG = wantedColors[1]
+    wantedB = wantedColors[2]
 
-    currentR = currentColors[1]
-    currentG = currentColors[2]
-    currentB = currentColors[3]
+    currentR = currentColors[0]
+    currentG = currentColors[1]
+    currentB = currentColors[2]
 
     def Lerp(current,wanted):
         return ((current - globalDelta) * current + globalDelta * wanted)
