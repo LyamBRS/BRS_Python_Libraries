@@ -1052,7 +1052,7 @@ class NeopixelHandler:
             else:
                 #region ---------------------------------- [OFF]
                 if(NeopixelHandler.currentMode == RGBModes.off):
-                    lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [0,0,0], NeopixelHandler.lerpDelta/255)
+                    lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [0,0,0], NeopixelHandler.lerpDelta)
                     NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
                 #endregion
 
@@ -1060,7 +1060,7 @@ class NeopixelHandler:
                 if(NeopixelHandler.currentMode == RGBModes.static):
                     lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
                                              [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
-                                             NeopixelHandler.lerpDelta/255)
+                                             NeopixelHandler.lerpDelta)
                     NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
                 #endregion
 
@@ -1071,7 +1071,7 @@ class NeopixelHandler:
                     wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, 0)
                     wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 0)
 
-                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], NeopixelHandler.lerpDelta/255)
+                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], NeopixelHandler.lerpDelta)
                     NeopixelHandler.currentColorMultipliers[ledNumber] = lerpedMultipliers
                 #endregion
 
@@ -1084,7 +1084,7 @@ class NeopixelHandler:
                     wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, offset)
                     wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 2.09 + offset)
 
-                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], NeopixelHandler.lerpDelta/255)
+                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], NeopixelHandler.lerpDelta)
                     NeopixelHandler.currentColorMultipliers[ledNumber] = lerpedMultipliers
                 #endregion
 
