@@ -548,7 +548,7 @@ class RGB:
             subprocess.Popen(['start', '/B', 'python', path], shell=True)
         else:
             linuxCommand = f"sudo python {path} &"
-            subprocess.Popen(linuxCommand)
+            subprocess.run(linuxCommand)
         #endregion
         Debug.Log("Success. Driver is launched.")
         Debug.End()
