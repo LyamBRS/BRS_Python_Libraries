@@ -284,7 +284,8 @@ def HandleDriver() -> Execution:
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
-    NeopixelHandler.ShowNewPixels(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
+    NeopixelHandler.AnimateCurrentPixelValues(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
+    NeopixelHandler.UpdatePixelsWithCurrentValues()
     return Execution.Passed
 #====================================================================#
 # Classes
@@ -824,13 +825,14 @@ class NeopixelHandler:
         Debug.End()
         return Execution.Passed
     # -------------------------------------------
-    def ShowNewPixels(tick:int, maxTickCount:int) -> Execution:
+    def AnimateCurrentPixelValues(tick:int, maxTickCount:int) -> Execution:
         """
-            ShowNewPixels:
+            AnimateCurrentPixelValues:
             ==============
             Summary:
             --------
-            Calculates and show new neopixels.
+            Calculates the current values depending on
+            wanted colors.
             This needs to be called at a fixed
             interval so that its updating
             RGB LEDs smoothly. Please note that
@@ -891,11 +893,62 @@ class NeopixelHandler:
                 NeopixelHandler.wantedColors[i] = [0,0,0]
         #endregion
 
+        return Execution.Passed
+    # -------------------------------------------
+    def UpdatePixelsWithCurrentValues(dontShowDebugTraceback:bool = False) -> Execution:
+        """
+            UpdatePixelsWithCurrentValues:
+            ==============================
+            Summary:
+            --------
+            This method will update the hardware
+            circuit python classes with the current
+            values stored in the current list.
+
+            Each list's values is checked manually
+            by this function and prints are given
+            if anything isn't within 0 to 255.
+        """
+        Debug.Start("UpdatePixelsWithCurrentValues", DontDebug=dontShowDebugTraceback)
+
         # Updating pixel object with current LEDs
         for pixelToChange in range(NeopixelHandler.amountOfLEDs):
-            NeopixelHandler.pixelObject[pixelToChange] = NeopixelHandler.currentColors[pixelToChange]
+
+            rgbListToShow = NeopixelHandler.currentColors[pixelToChange]
+
+            if(len(rgbListToShow) != 3):
+                printFatalDriverError(f"918: Incorrect amount of colors in list: {rgbListToShow}")
+                Debug.End(ContinueDebug=True)
+                return Execution.Failed
+
+            red = rgbListToShow[0]
+            green = rgbListToShow[1]
+            blue = rgbListToShow[2]
+
+            if(red > 255 or red < 0):
+                printFatalDriverError(f"Red isn't within allowed range: {red}")
+                Debug.End(ContinueDebug=True)
+                return Execution.Failed
+
+            if(green > 255 or green < 0):
+                printFatalDriverError(f"Green isn't within allowed range: {green}")
+                Debug.End(ContinueDebug=True)
+                return Execution.Failed
+
+            if(blue > 255 or blue < 0):
+                printFatalDriverError(f"Blue isn't within allowed range: {blue}")
+                Debug.End(ContinueDebug=True)
+                return Execution.Failed
+
+            intRed = int(red)
+            intGreen = int(green)
+            intBlue = int(blue)
+
+            NeopixelHandler.pixelObject[pixelToChange] = [intRed, intGreen, intBlue]
 
         NeopixelHandler.pixelObject.show()
+
+        Debug.End(ContinueDebug=True)
         return Execution.Passed
     #endregion
     #region   --------------------------- CONSTRUCTOR
