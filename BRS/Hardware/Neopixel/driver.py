@@ -284,7 +284,7 @@ def HandleDriver() -> Execution:
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
-    NeopixelHandler.ShowNewPixels()
+    NeopixelHandler.ShowNewPixels(GlobalVariables.currentAnimationTick, ANIMATION_DURATION)
     return Execution.Passed
 #====================================================================#
 # Classes
@@ -815,8 +815,8 @@ class NeopixelHandler:
         """
         Debug.Start("UpdateFromJson")
 
-        NeopixelHandler.currentLEDMode = DriverHandler.InputJsonObject.jsonData["Mode"]
-        
+        NeopixelHandler.currentMode = DriverHandler.InputJsonObject.jsonData["Mode"]
+
         Debug.Log("Setting wanted colors")
         NeopixelHandler.wantedColors[0] = DriverHandler.InputJsonObject.jsonData["Colors"]["B"]
         NeopixelHandler.wantedColors[1] = DriverHandler.InputJsonObject.jsonData["Colors"]["R"]
@@ -834,13 +834,20 @@ class NeopixelHandler:
             Calculates and show new neopixels.
             This needs to be called at a fixed
             interval so that its updating
-            RGB LEDs smoothly.
+            RGB LEDs smoothly. Please note that
+            this function does not account for the
+            speed at which ticks are executed.
+
+            Arguments:
+            ----------
+            - `tick:int` = the current tick that the animation is at.
+            - `maxTickCount:int` = The maximum ticks in an animation.
         """
-        
+
         #region ---------------------------------- [OFF]
         if(NeopixelHandler.currentMode == RGBModes.off):
             for i in range(NeopixelHandler.amountOfLEDs):
-                NeopixelHandler.wantedColors[i] = [0,0,0]
+                NeopixelHandler.currentColors[i] = [0,0,0]
         #endregion
 
         #region ---------------------------------- [STATIC]
@@ -882,6 +889,12 @@ class NeopixelHandler:
                 NeopixelHandler.wantedColors[i] = [0,0,0]
         #endregion
 
+        # Updating pixel object with current LEDs
+        for pixelToChange in range(NeopixelHandler.amountOfLEDs):
+            NeopixelHandler.pixelObject[pixelToChange] = NeopixelHandler.currentColors[pixelToChange]
+
+        NeopixelHandler.pixelObject.show()
+        return Execution.Passed
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
