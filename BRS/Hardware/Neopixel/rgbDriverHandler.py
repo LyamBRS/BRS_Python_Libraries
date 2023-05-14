@@ -265,42 +265,132 @@ class RGB:
             Debug.End()
             return Execution.Unecessary
 
-        Debug.Log("Verifying Information class")
+        Debug.Log("Verifying Information class...")
         if(not Information.initialized):
             Debug.Error("BRS Information class was not initialized")
             Debug.End()
             return Execution.ByPassed
-        
-        # if(Information.platform != "Linux"):
-            # Debug.Error(f"Your platform does not support IOT: {Information.platform}")
-            # Debug.End()
-            # return Execution.Incompatibility
+
+        if(Information.platform != "Linux"):
+            Debug.Error(f"Your platform does not support IOT: {Information.platform}")
+            Debug.End()
+            return Execution.Incompatibility
 
         Debug.Log("Setting up JSON")
         result = RGB._InitializeJSON()
         if(result != Execution.Passed):
             Debug.Error(f"The JSON function failed to execute with return code: {result}")
+            RGB.initialized = False
             Debug.End()
             return Execution.Failed
+
+        Debug.Log("Jsons successfully initialized.")
+        RGB.initialized = True
 
         Debug.Log("Launching Neopixel driver")
         result = RGB._StartNeoPixelPythonDriver()
         if(result != Execution.Passed):
-            Debug.Error("Something went wrong when trying to launch neopixel driver")
+            Debug.Error("Something went wrong when trying to launch neopixel driver.")
             Debug.End()
             return Execution.Failed
         Debug.Log("DRIVER IS INITIALIZED AND LAUNCHED")
 
-        Debug.Log("Waiting for driver to indicate its ON.")
+        Debug.Log("Waiting for a reply from the driver...")
         result = RGB._WaitForDriverToIndicateItStarted()
         if(result != Execution.Passed):
-            Debug.Error("Something went wrong durring the driver's launch.")
+            Debug.Error("Something went wrong during the driver's launch.")
+            RGB.driverState = False
             Debug.End()
             return Execution.Crashed
 
-        Debug.Log("NEOPIXEL DRIVER IS UP AND RUNNING.")
+        Debug.Log("Neopixel driver is now ON.")
+        RGB.driverState = True
         Debug.End()
         return Execution.Passed
+    # -----------------------------------
+    def StopDriver() -> Execution:
+        """
+            StopDriver:
+            ===========
+            Summary:
+            --------
+            This methods stops the python
+            driver launched when `StartDriver()`
+            was called and returned `Execution.Passed`.
+            It will return an `Execution` enumeration
+            value that represents what happened when
+            the function ran.
+
+            Attention:
+            ----------
+            This method only tells the driver
+            to stop through their JSON files
+            pipeline. If the driver is not
+            responding, as of now there is no
+            way to shut it down by force.
+
+            Returns:
+            --------
+            - `Execution.Passed` : The driver was stopped successfully.
+            - `Execution.Unecessary` : The driver was not running.
+            - `Execution.Bypassed` : The RGB class was not initialized
+            - `Execution.Failed` : The RGB class failed to stop the Neopixel driver.
+        """
+        Debug.Start("StopDriver")
+
+        #region -------------------- Checking Initialization
+        Debug.Log("Is class initialized?")
+        if (not RGB.initialized):
+            Debug.Error("Class is not initialized. You cannot stop drivers if JSONs were not created successfully.")
+            Debug.End()
+            return Execution.ByPassed
+        #endregion
+
+        #region -------------------- Checking If Running
+        Debug.Log("Is driver supposed to be running?")
+        if (not RGB.driverState):
+            Debug.Warn("Driver is not supposed to be running. Executing anyways.")
+        #endregion
+
+        #region -------------------- Getting state of the driver
+        currentDriverState = RGB.GetStateOfDriver()
+
+        if(currentDriverState == Execution.Crashed):
+            Debug.Error("FATAL READING ERROR DETECTED.")
+            Debug.End()
+            return Execution.Crashed
+
+        if(currentDriverState != "ON"):
+            Debug.Warn("Driver says its not running...")
+
+            if(currentDriverState == "OFF"):
+                Debug.Warn("Driver says its already OFF.")
+
+            if(currentDriverState == "CRASHED"):
+                Debug.Error("Driver says it crashed.")
+        else:
+            Debug.Log("Driver is currently running.")
+        #endregion
+
+        #region -------------------- Closing driver
+        result = RGB._StopNeoPixelPythonDriver()
+        if(result != Execution.Passed):
+            Debug.Error("Something went wrong and the class could not tell the driver to stop.")
+            Debug.End()
+            return Execution.Failed
+        Debug.Log("JSON was updated successfully.")
+        #endregion
+
+        #region -------------------- Waiting for driver to stop
+        result = RGB._WaitForDriverToIndicateItStopped()
+        if(result != Execution.Passed):
+            Debug.Error("The driver did not stop despite us asking it to.")
+            Debug.End()
+            return Execution.Failed
+        #endregion
+
+        Debug.Log("Driver successfully indicated it stopped.")
+        Debug.End()
     # -----------------------------------
     def _InitializeJSON() -> Execution:
         """
@@ -464,6 +554,58 @@ class RGB:
         Debug.End()
         return Execution.Passed
     # -----------------------------------
+    def _StopNeoPixelPythonDriver() -> Execution:
+        """
+            _StopNeoPixelPythonDriver:
+            ==========================
+            Summary:
+            --------
+            This private method tells
+            the Neopixel driver to stop
+            running by setting ToDriver.json's
+            wanted driver state to `OFF`.
+            It does not directly force shutdown
+            the driver.
+
+            Attention:
+            ----------
+            This is a private method, calling
+            this manually WILL cause issues
+            and potential crashes. Use
+            `StopDriver()` instead.
+
+            Returns:
+            --------
+            - `Execution.Passed` : JSON updated successfully.
+            - `Execution.Crashed` : Fatal error occurred during JSON handling
+            - `Execution.Failed` : Something went wrong during the handling of the JSON files.
+        """
+        Debug.Start("_StopNeoPixelPythonDriver")
+
+        #region -------------------- Try to set JSON to OFF
+        Debug.Log("Trying to set ToDriver.json to OFF")
+        try:
+            RGB.ToDriverJsonObject.jsonData["State"] = "OFF"
+            Debug.Log(">>> Success")
+        except:
+            Debug.Error("579: Fatal error occurred when trying to set ToDriver.json's [\"State\"] to \"OFF\"")
+            Debug.End()
+            return Execution.Crashed
+        #endregion
+
+        #region -------------------- Saving the JSON
+        Debug.Log("Trying to save ToDriver.json ...")
+        result = RGB.ToDriverJsonObject.SaveFile()
+        if(result == False):
+            Debug.Error("Failed to save ToDriver.json")
+            Debug.End()
+            return Execution.Crashed
+        Debug.Log(">>> Success")
+        #endregion
+
+        Debug.End()
+        return Execution.Passed
+    # -----------------------------------
     def GetStateOfDriver() -> Execution:
         """
             GetStateOfDriver:
@@ -512,9 +654,9 @@ class RGB:
 
         Debug.End()
     # -----------------------------------
-    def SetAttributes(colors:list = None, 
-            red:int = None, 
-            green:int = None, 
+    def SetAttributes(colors:list = None,
+            red:int = None,
+            green:int = None,
             blue:int = None,
             mode:RGBModes = None) -> Execution:
         """
@@ -646,6 +788,47 @@ class RGB:
                     return Execution.Passed
 
         Debug.Error(f"Driver never turned on after {currentAttempt} attempts over a period of {timeout} milliseconds")
+        Debug.End()
+        return Execution.Failed
+    # -----------------------------------
+    def _WaitForDriverToIndicateItStopped() -> Execution:
+        """
+            _WaitForDriverToIndicateItStopped:
+            ==================================
+            Summary:
+            --------
+            Private method that waits for
+            ToApplication.json to say that the
+            driver is OFF. There is a 1 second
+            timeout.
+
+            Returns:
+            --------
+            - `Execution.Passed` = Driver stopped and its state is now OFF
+            - `Execution.Crashed` = Driver says that it crashed.
+            - `Execution.Failed` = Timeout was reached... Driver is still going
+        """
+        Debug.Start("_WaitForDriverToIndicateItStopped")
+        timeout:float = 1000
+        secondsToWaitBetweenSteps:float = 0.1
+        currentAttempt:int = 0
+
+        Debug.Log("Start of reading attemps...")
+
+        for currentMillisecond in range(timeout):
+            if (currentMillisecond % 100 == 0):
+                time.sleep(secondsToWaitBetweenSteps)
+                currentAttempt = currentAttempt + 1
+
+                currentDriverState = RGB.GetStateOfDriver()
+                if(currentDriverState != "OFF" or currentDriverState != "CRASHED"):
+                    Debug.Error("Driver is still running...")
+                else:
+                    Debug.Log(f"Driver is OFF after {currentAttempt} reading attempts.")
+                    Debug.End()
+                    return Execution.Passed
+
+        Debug.Error(f"Driver is still ON after {currentAttempt} attempts over a period of {timeout} milliseconds!")
         Debug.End()
         return Execution.Failed
     #endregion
