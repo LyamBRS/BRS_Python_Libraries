@@ -881,7 +881,7 @@ if(__name__ == "__main__"):
     else:
         printDriverHeader("STARTED")
 
-        result = Execution.Failed
+        result = Execution.Passed
         while result == Execution.Passed:
             result = HandleDriver()
             if(result != Execution.Passed):
