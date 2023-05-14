@@ -1114,8 +1114,7 @@ class NeopixelHandler:
                     wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, 0)
                     wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 0)
 
-                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], 0.1)
-                    NeopixelHandler.currentColorMultipliers[ledNumber] = lerpedMultipliers
+                    NeopixelHandler.currentColorMultipliers[ledNumber] = [wantedR, wantedG, wantedB]
                 #endregion
 
                 #region ---------------------------------- [CYCLING]
@@ -1127,8 +1126,7 @@ class NeopixelHandler:
                     wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, offset)
                     wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 2.09 + offset)
 
-                    lerpedMultipliers = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber], [wantedR, wantedG, wantedB], 0.1)
-                    NeopixelHandler.currentColorMultipliers[ledNumber] = lerpedMultipliers
+                    NeopixelHandler.currentColorMultipliers[ledNumber] = [wantedR, wantedG, wantedB]
                 #endregion
 
                 #region ---------------------------------- [LOADING]
