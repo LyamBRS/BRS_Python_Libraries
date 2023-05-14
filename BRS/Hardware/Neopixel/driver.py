@@ -92,6 +92,17 @@ class GlobalVariables():
     blinkCounter:int = 0
 
     halfPeriodCounter:int = 0
+
+    aboveHalfAnimationDuration:bool = True
+    """Flips its state each time half an animation is completed."""
+
+    animationFlipFlop:bool = False
+    """ Changes state each time an animation is finished """
+
+    currentLedToDisplay:int = 0
+    """ Incremented each time the current tick divided by time per led returns 0"""
+
+    currentLedToDisplayCounter:float = 0
 #====================================================================#
 # Global variables
 #====================================================================#
@@ -347,6 +358,18 @@ def HandleDriver() -> Execution:
     time.sleep(ANIMATION_NEW_FRAME_DELAY)
     GlobalVariables.currentAnimationTick = GlobalVariables.currentAnimationTick + ANIMATION_NEW_FRAME_DELAY
     GlobalVariables.currentAnimationPeriod = GlobalVariables.currentAnimationPeriod + ANIMATION_NEW_FRAME_DELAY
+    GlobalVariables.currentLedToDisplayCounter = GlobalVariables.currentLedToDisplayCounter + ANIMATION_NEW_FRAME_DELAY
+
+    # counts up to X amount of LED in a single animation.
+    if(GlobalVariables.currentLedToDisplayCounter >= (NeopixelHandler.animationDuration / NeopixelHandler.amountOfLEDs)):
+        GlobalVariables.currentLedToDisplayCounter = 0
+        GlobalVariables.currentLedToDisplay = GlobalVariables.currentLedToDisplay + 1
+
+    # Used to tell when we reached half the animation's duration.
+    if(GlobalVariables.currentAnimationTick > NeopixelHandler.animationDuration/2):
+        GlobalVariables.aboveHalfAnimationDuration = True
+    else:
+        GlobalVariables.aboveHalfAnimationDuration = False
 
     if(GlobalVariables.currentAnimationPeriod >= NeopixelHandler.animationPeriod):
         GlobalVariables.currentAnimationPeriod = 0
@@ -386,11 +409,13 @@ def HandleDriver() -> Execution:
             NeopixelHandler.UpdatePixelsWithCurrentValues(dontShowDebugTraceback=True)
             return result
 
+    # Reached the end of the animation duration. Everything is reset.
     if(GlobalVariables.currentAnimationTick > NeopixelHandler.animationDuration):
         GlobalVariables.currentAnimationTick = 0
         GlobalVariables.currentSequencedLed = 0
         GlobalVariables.currentAnimationPeriod = 0
-
+        GlobalVariables.currentLedToDisplay = 0
+        GlobalVariables.animationFlipFlop = not GlobalVariables.animationFlipFlop
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
@@ -1118,7 +1143,7 @@ class NeopixelHandler:
                 #endregion
 
                 #region ---------------------------------- [CYCLING]
-                if(NeopixelHandler.currentMode == RGBModes.cycling and ledIsUsed):
+                if(NeopixelHandler.currentMode == RGBModes.cycling):
                     offset = ledNumber * 0.15
 
                     multiplierToCycle = NeopixelHandler.wantedColorMultipliers[ledNumber]
@@ -1130,6 +1155,20 @@ class NeopixelHandler:
                 #endregion
 
                 #region ---------------------------------- [LOADING]
+                if(NeopixelHandler.currentMode == RGBModes.loading):
+
+                    if(GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
+                        lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
+                                                NeopixelHandler.lerpDelta)
+                        NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+
+                    elif(not GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
+                        lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                [0, 0, 0],
+                                                NeopixelHandler.lerpDelta)
+                        NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+
                 #endregion
 
         return Execution.Passed
