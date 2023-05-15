@@ -397,7 +397,7 @@ def HandleDriver() -> Execution:
             GlobalVariables.blinkState = False
 
 
-    if(int((GlobalVariables.currentAnimationTick*1000)%250) == 0):
+    if(int((GlobalVariables.currentAnimationTick*100)%10) == 0):
         # Time to update the JSONs!
         result = DriverHandler.Update()
         if(result != Execution.Passed):
