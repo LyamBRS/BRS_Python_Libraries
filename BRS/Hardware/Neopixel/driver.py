@@ -364,6 +364,7 @@ def HandleDriver() -> Execution:
     if(GlobalVariables.currentLedToDisplayCounter >= (NeopixelHandler.animationDuration / NeopixelHandler.amountOfLEDs)):
         GlobalVariables.currentLedToDisplayCounter = 0
         GlobalVariables.currentLedToDisplay = GlobalVariables.currentLedToDisplay + 1
+        print(GlobalVariables.currentLedToDisplay)
 
     # Used to tell when we reached half the animation's duration.
     if(GlobalVariables.currentAnimationTick > NeopixelHandler.animationDuration/2):
@@ -416,6 +417,7 @@ def HandleDriver() -> Execution:
         GlobalVariables.currentAnimationPeriod = 0
         GlobalVariables.currentLedToDisplay = 0
         GlobalVariables.animationFlipFlop = not GlobalVariables.animationFlipFlop
+        print(GlobalVariables.currentLedToDisplay)
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
