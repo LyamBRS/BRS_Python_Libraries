@@ -335,17 +335,27 @@ def Linux_GetNetworkInterfaces() -> list:
         ===========================
         Summary:
         --------
-        This function returns a list
-        of the possible network interfaces
-        that your device can interact with.
-        It also returns if they are connected,
-        enabled, disconnected or disabled.
+        Allows you to get a cleaned list of netsh terminal output.
+        This function allows you to see all the interfaces that
+        networks can use such as Hamachi, Ethernet and so on.
+
+        This is especially useful if you want to check if your
+        WINDOWS device has WiFi capabilities.
 
         `Attention`:
         ------------
-        This commands only works on CERTAIN LINUX. They
-        do not work on Windows but may work on
-        MacOS.
+        Netsh commands only works on WINDOWS DEVICES. They
+        do not work on Linux nor MacOS devices.
+
+        Returns:
+        ----------
+        - `Execution.Incompatibility`: The function cannot be used due to your device's operating system.
+        - `(list)`: Good execution
+
+        Examples of returned lists:
+        -----------------------------
+        - `[{"Admin State": "Disabled", "State": "Disconnected", "Type": "Dedicated", "Interface Name": "Hamachi"}]`
+        - `[{"Admin State": "Enabled", "State": "Connected", "Type": "Dedicated", "Interface Name": "Ethernet"}]`
     """
     Debug.Start("Linux_GetNetworkInterfaces")
     Debug.End()
@@ -356,17 +366,17 @@ def Linux_GetWiFiNetworks() -> list:
         ======================
         Summary:
         --------
-        Allows you to get a cleaned list of `netsh wlan` networks output.
-        This function allows you to see all the WiFis that are
-        available wirelessly in a list format.
+        Allows you to get a cleaned list of `sudo iwlist wlan0 scan`
+        networks output. This function allows you to see all 
+        the WiFis that are available wirelessly in a list format.
 
         This is especially useful if you want to check which WiFi
-        your WINDOWS device can access and view
+        your LINUX device can access and view
 
         `Attention`:
         ------------
-        Netsh commands only works on WINDOWS DEVICES. They
-        do not work on Linux nor MacOS devices.
+        iwlist commands only works on LINUX DEVICES. They
+        do not work on Windows nor MacOS devices.
 
         Returns:
         ----------
@@ -376,9 +386,108 @@ def Linux_GetWiFiNetworks() -> list:
 
         Examples of returned lists:
         -----------------------------
-        - `[{"Admin State": "Disabled", "State": "Disconnected", "Type": "Dedicated", "Interface Name": "Hamachi"}]`
-        - `[{"Admin State": "Enabled", "State": "Connected", "Type": "Dedicated", "Interface Name": "Ethernet"}]`
+        - `[{"ssid": "network_name", "signal": "0/70", "bssid": "AA:BB:CC:DD:EE:FF", "locked":True}]`
     """
+    Debug.Start("Linux_GetWiFiNetworks")
+
+    if(Information.initialized):
+        if(Information.platform != "Linux"):
+            Debug.Error(f"Attempting to call a iwlist function on a non linux based OS: {Information.platform}")
+            Debug.End()
+            return Execution.Incompatibility
+    else:
+        Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
+
+    try:
+        network = subprocess.check_output(["sudo", "iwlist", "wlan0", "scan"])
+        Debug.Log("Subprocess success")
+    except:
+        Debug.Error("Fatal error while running subprocess")
+        Debug.End()
+        return Execution.Crashed
+    
+    try:
+        decodedNetwork = network.decode("ascii")
+        lines = decodedNetwork.splitlines()
+    except:
+        Debug.Error("Failed to convert bytes to ascii.")
+        Debug.End()
+        return Execution.Crashed
+
+    listToReturn = []
+    current_network = {}
+    listOfSeenNetworks = []
+    listOfSeenBSSID = []
+    oldSSID:str = ""
+    newSSID:bool = False
+    newBSSID:bool = False
+
+    for line in decodedNetwork.split("\n"):
+        line = line.strip()
+
+        if line.startswith("ESSID"):
+            ssid = line.split(":")[1].strip()
+            # Debug.Log(f"[SSID]")
+
+            if ssid in listOfSeenNetworks:
+                newSSID = True
+                # Debug.Log(">>> SKIPPED")
+            else:
+                current_network["ssid"] = ssid
+                # Debug.Log(f">>> {ssid}")
+                try:
+                    if(current_network["ssid"] != None and current_network["signal"] != None and current_network["bssid"] != None):
+                        listToReturn.append({
+                            "ssid": current_network["ssid"],
+                            "signal": current_network["signal"],
+                            "bssid": current_network["bssid"],
+                            "locked": current_network["locked"],
+                        })
+                    # Debug.Log(">>> [NETWORK APPENDED]")
+                except:
+                    pass
+                    # Debug.Error("### COULD NOT APPEND")
+                listOfSeenNetworks.append(ssid)
+                newSSID = True
+                current_network.clear()
+                # Debug.Log("[START OF NEW]")
+
+        elif line.startswith("Encryption key"):
+            # Debug.Log(f"[Encryption]")
+            networkLocked = line.split(":")[1].strip()
+
+            if(networkLocked == "off"):
+                current_network["locked"] = False
+            else:
+                current_network["locked"] = True        
+            # Debug.Log(f">>> {networkLocked}")
+
+        elif line.startswith("Quality"):
+            # Debug.Log(f"[Quality]")
+            splitLines = line.split("/")
+            firstDigit = splitLines[0].split("=")[1]
+            
+            try:
+                currentSignal = int(firstDigit)
+            except:
+                currentSignal = 0
+            signal = int((currentSignal/70)*100)
+            # current_network["signal"] = signal
+            # Debug.Log(f">>> {signal}")
+
+        elif "Address" in line:
+            # Debug.Log(f"[Address]")
+            bssid = line.split("Address: ")[1].strip()
+            try:
+                current_network["bssid"] = bssid
+            except:
+                current_network["bssid"] = "ERROR"
+            # Debug.Log(f">>> {bssid}")
+
+    # Debug.Log("Found networks: ")
+    # Debug.Log(str(listToReturn))
+    Debug.End()
+    return listToReturn
 
 def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
     """
@@ -531,7 +640,14 @@ def GetWiFiNetworks() -> list:
             # Debug.Log(">>> placing bssid")
             normalizedInterface["bssid"] = bssid
             # Debug.Log(">>> placing mode")
-            normalizedInterface["mode"] = None
+            try:
+                locked = interface["locked"]
+                if(locked):
+                    normalizedInterface["mode"] = "lock"
+                else:
+                    normalizedInterface["mode"] = "lock-open"
+            except:
+                normalizedInterface["mode"] = None
 
             if("%" in strength):
                 try:
