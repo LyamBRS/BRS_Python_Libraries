@@ -1167,7 +1167,7 @@ class NeopixelHandler:
                         if(ledNumber <= GlobalVariables.currentLedToDisplay):
                             lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
                                                     [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
-                                                    1)
+                                                    NeopixelHandler.lerpDelta)
                             NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
                         else:
                             lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
@@ -1175,16 +1175,10 @@ class NeopixelHandler:
                                                     NeopixelHandler.lerpDelta)
                             NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
                     else:
-                        if(ledNumber <= GlobalVariables.currentLedToDisplay):
-                            lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
-                                                    [0, 0, 0],
-                                                    NeopixelHandler.lerpDelta)
-                            NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
-                        else:
-                            lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
-                                                    [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
-                                                    NeopixelHandler.lerpDelta)
-                            NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                        lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                [0, 0, 0],
+                                                NeopixelHandler.lerpDelta)
+                        NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
 
                 #endregion
 
