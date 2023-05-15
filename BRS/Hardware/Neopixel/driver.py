@@ -849,6 +849,8 @@ class DriverHandler:
             Debug.End()
             return Execution.Failed
 
+        print("JSON UPDATED")
+
         Debug.End()
         return Execution.Passed
     #endregion
@@ -1054,20 +1056,22 @@ class NeopixelHandler:
         NeopixelHandler.blinkCounts         = DriverHandler.GetAttribute("Animation", "BlinkCount")
         NeopixelHandler.ledsToUse           = DriverHandler.GetAttribute("Animation", "LEDToUse")
 
-        print(f"amountOfLEDs:               {NeopixelHandler.amountOfLEDs}")
-        print(f"animationDuration:          {NeopixelHandler.animationDuration}")
-        print(f"animationPeriod:            {NeopixelHandler.animationPeriod}")
-        print(f"blinkCounts:                {NeopixelHandler.blinkCounts}")
-        print(f"blinkerCounter:             {NeopixelHandler.blinkerCounter}")
-        print(f"blinkMode:                  {NeopixelHandler.blinkMode}")
-        print(f"brightness:                 {NeopixelHandler.brightness}")
-        # print(f"currentColorMultipliers:    {NeopixelHandler.currentColorMultipliers}")
+        # print(f"amountOfLEDs:               {NeopixelHandler.amountOfLEDs}")
+        # print(f"animationDuration:          {NeopixelHandler.animationDuration}")
+        # print(f"animationPeriod:            {NeopixelHandler.animationPeriod}")
+        # print(f"blinkCounts:                {NeopixelHandler.blinkCounts}")
+        # print(f"blinkerCounter:             {NeopixelHandler.blinkerCounter}")
+        # print(f"blinkMode:                  {NeopixelHandler.blinkMode}")
+        # print(f"brightness:                 {NeopixelHandler.brightness}")
+        # # print(f"currentColorMultipliers:    {NeopixelHandler.currentColorMultipliers}")
         # print(f"currentColors:              {NeopixelHandler.currentColors}")
-        print(f"currentMode:                {NeopixelHandler.currentMode}")
-        print(f"ledsToUse:                  {NeopixelHandler.ledsToUse}")
-        print(f"lerpDelta:                  {NeopixelHandler.lerpDelta}")
+        # print(f"currentMode:                {NeopixelHandler.currentMode}")
+        # print(f"ledsToUse:                  {NeopixelHandler.ledsToUse}")
+        # print(f"lerpDelta:                  {NeopixelHandler.lerpDelta}")
         # print(f"wantedColorMultipliers:     {NeopixelHandler.wantedColorMultipliers}")
         # print(f"wantedColors:               {NeopixelHandler.wantedColors}")
+
+        print("Neopixels updated")
 
         errorOccurred = False
         if(NeopixelHandler.currentMode == Execution.Failed):
