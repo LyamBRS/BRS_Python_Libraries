@@ -84,7 +84,7 @@ _defaultToDriverJsonStructure = {
     ],
     "Animation":{
         "Duration" : 1,
-        "LerpDelta" : 0.02,
+        "LerpDelta" : 0.04,
         "BlinkPeriod": 0.1,
         "BlinkMode" : "SEQUENTIAL",
         "BlinkCount" : [0,0,0],
