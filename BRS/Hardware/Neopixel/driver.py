@@ -368,7 +368,6 @@ def HandleDriver() -> Execution:
             GlobalVariables.currentLedToDisplay = 0
         else:
             GlobalVariables.currentLedToDisplay = GlobalVariables.currentLedToDisplay + 1
-        print(GlobalVariables.currentLedToDisplay)
 
     # Used to tell when we reached half the animation's duration.
     if(GlobalVariables.currentAnimationTick > NeopixelHandler.animationDuration/2):
@@ -1054,6 +1053,21 @@ class NeopixelHandler:
         NeopixelHandler.blinkMode           = DriverHandler.GetAttribute("Animation", "BlinkMode")
         NeopixelHandler.blinkCounts         = DriverHandler.GetAttribute("Animation", "BlinkCount")
         NeopixelHandler.ledsToUse           = DriverHandler.GetAttribute("Animation", "LEDToUse")
+
+        print(f"amountOfLEDs:               {NeopixelHandler.amountOfLEDs}")
+        print(f"animationDuration:          {NeopixelHandler.animationDuration}")
+        print(f"animationPeriod:            {NeopixelHandler.animationPeriod}")
+        print(f"blinkCounts:                {NeopixelHandler.blinkCounts}")
+        print(f"blinkerCounter:             {NeopixelHandler.blinkerCounter}")
+        print(f"blinkMode:                  {NeopixelHandler.blinkMode}")
+        print(f"brightness:                 {NeopixelHandler.brightness}")
+        # print(f"currentColorMultipliers:    {NeopixelHandler.currentColorMultipliers}")
+        # print(f"currentColors:              {NeopixelHandler.currentColors}")
+        print(f"currentMode:                {NeopixelHandler.currentMode}")
+        print(f"ledsToUse:                  {NeopixelHandler.ledsToUse}")
+        print(f"lerpDelta:                  {NeopixelHandler.lerpDelta}")
+        # print(f"wantedColorMultipliers:     {NeopixelHandler.wantedColorMultipliers}")
+        # print(f"wantedColors:               {NeopixelHandler.wantedColors}")
 
         errorOccurred = False
         if(NeopixelHandler.currentMode == Execution.Failed):
