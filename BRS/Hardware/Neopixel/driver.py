@@ -849,7 +849,7 @@ class DriverHandler:
             Debug.End()
             return Execution.Failed
 
-        print("JSON UPDATED")
+        # print("JSON UPDATED")
 
         Debug.End()
         return Execution.Passed
@@ -1071,7 +1071,7 @@ class NeopixelHandler:
         # print(f"wantedColorMultipliers:     {NeopixelHandler.wantedColorMultipliers}")
         # print(f"wantedColors:               {NeopixelHandler.wantedColors}")
 
-        print("Neopixels updated")
+        # print("Neopixels updated")
 
         errorOccurred = False
         if(NeopixelHandler.currentMode == Execution.Failed):
