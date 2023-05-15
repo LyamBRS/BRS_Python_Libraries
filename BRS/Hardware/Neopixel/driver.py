@@ -419,8 +419,9 @@ def HandleDriver() -> Execution:
         GlobalVariables.currentAnimationTick = 0
         GlobalVariables.currentSequencedLed = 0
         GlobalVariables.currentAnimationPeriod = 0
+        GlobalVariables.currentLedToDisplay = 0
+        GlobalVariables.currentLedToDisplayCounter = 0
         GlobalVariables.animationFlipFlop = not GlobalVariables.animationFlipFlop
-        print(GlobalVariables.currentLedToDisplay)
         NeopixelHandler.UpdateFromJson()
 
     # Update the LEDs.
@@ -1163,7 +1164,7 @@ class NeopixelHandler:
                 if(NeopixelHandler.currentMode == RGBModes.loading):
 
                     if(GlobalVariables.animationFlipFlop):
-                        if(ledNumber >= GlobalVariables.currentLedToDisplay):
+                        if(ledNumber <= GlobalVariables.currentLedToDisplay):
                             lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
                                                     [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
                                                     1)
@@ -1174,7 +1175,7 @@ class NeopixelHandler:
                                                     NeopixelHandler.lerpDelta)
                             NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
                     else:
-                        if(ledNumber >= GlobalVariables.currentLedToDisplay):
+                        if(ledNumber <= GlobalVariables.currentLedToDisplay):
                             lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
                                                     [0, 0, 0],
                                                     NeopixelHandler.lerpDelta)
