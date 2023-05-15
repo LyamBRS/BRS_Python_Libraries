@@ -576,7 +576,7 @@ def GetNetworkInterfaces() -> list:
     Debug.End()
     return normalizedInterfaces
 
-def GetWiFiNetworks() -> list:
+def GetWiFiNetworks(DontDebug:bool = True) -> list:
     """
         GetWiFiNetworks:
         ================
@@ -590,7 +590,7 @@ def GetWiFiNetworks() -> list:
         You need to have initialized the Information
         class prior to calling this function.
     """
-    Debug.Start("GetWiFiNetworks")
+    Debug.Start("GetWiFiNetworks", DontDebug=DontDebug)
 
     interfaces = []
     if(Information.initialized):
@@ -601,9 +601,10 @@ def GetWiFiNetworks() -> list:
             interfaces = Windows_GetWiFiNetworks()
         if(Information.platform == "Linux"):
             Debug.Log("Getting Linux networks")
-            interfaces = Linux_GetWiFiNetworks()
+            interfaces = Linux_GetWiFiNetworks(DontDebug=DontDebug)
     else:
         Debug.Error("The information class was not initialized")
+        Debug.End(ContinueDebug=True)
         return Execution.Failed
 
     Debug.Log("Parsing interfaces into normalized buffer")
@@ -635,13 +636,13 @@ def GetWiFiNetworks() -> list:
                 Debug.Error("Failed to parse signal")
                 strength = 0
 
-            # Debug.Log(">>> creating normalized buffer")
-            normalizedInterface = {}
-            # Debug.Log(">>> placing ssid")
+            Debug.Log(">>> creating normalized buffer")
+            normalizedInterface = {"ssid":"", "bssid":"", "mode":None, "strength":0}
+            Debug.Log(">>> placing ssid")
             normalizedInterface["ssid"] = ssid
-            # Debug.Log(">>> placing bssid")
+            Debug.Log(">>> placing bssid")
             normalizedInterface["bssid"] = bssid
-            # Debug.Log(">>> placing mode")
+            Debug.Log(">>> placing mode")
             try:
                 locked = interface["locked"]
                 if(locked):
@@ -649,6 +650,7 @@ def GetWiFiNetworks() -> list:
                 else:
                     normalizedInterface["mode"] = "lock-open"
             except:
+                Debug.Log("Failed to get mode.")
                 normalizedInterface["mode"] = None
 
             if("%" in strength):
@@ -660,18 +662,18 @@ def GetWiFiNetworks() -> list:
                     Debug.Error("Failed to normalize strength")
                     normalizedInterface["strength"] = 0
                     normalizedInterface["mode"] = "alert"
-    
-            # Debug.Log(">>> appending")
+            else:
+                Debug.Log("Signal has no pourcent in it")
+            Debug.Log(">>> appending")
             normalizedInterfaces.append(normalizedInterface)
         except:
             Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
-            Debug.End()
 
     # Debug.Log("Normalized networks: ")
     # Debug.Log(str(normalizedInterfaces))
 
-    Debug.Log("Success")
-    Debug.End()
+    Debug.Log("End")
+    Debug.End(ContinueDebug=True)
     return normalizedInterfaces
 
 def CanDeviceUseWiFi() -> bool:
