@@ -1162,17 +1162,28 @@ class NeopixelHandler:
                 #region ---------------------------------- [LOADING]
                 if(NeopixelHandler.currentMode == RGBModes.loading):
 
-                    if(GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
-                        lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
-                                                [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
-                                                1)
-                        NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
-
-                    if(not GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
-                        lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
-                                                [0, 0, 0],
-                                                NeopixelHandler.lerpDelta)
-                        NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                    if(GlobalVariables.animationFlipFlop):
+                        if(ledNumber >= GlobalVariables.currentLedToDisplay):
+                            lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                    [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
+                                                    1)
+                            NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                        else:
+                            lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                    [0, 0, 0],
+                                                    NeopixelHandler.lerpDelta)
+                            NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                    else:
+                        if(ledNumber >= GlobalVariables.currentLedToDisplay):
+                            lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                    [0, 0, 0],
+                                                    NeopixelHandler.lerpDelta)
+                            NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
+                        else:
+                            lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
+                                                    [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
+                                                    NeopixelHandler.lerpDelta)
+                            NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
 
                 #endregion
 
