@@ -21,7 +21,7 @@ LoadingLog.Start("colors.py")
 #====================================================================#
 # Functions
 #====================================================================#
-def GetAccentColor() -> None:
+def GetAccentColor(variant:str = "500") -> None:
     """
         GetAccentColor:
         ===============
@@ -38,7 +38,7 @@ def GetAccentColor() -> None:
 
     try:
         color = MDApp.get_running_app().theme_cls.accent_palette
-        color = get_color_from_hex(colors[color]["500"])
+        color = get_color_from_hex(colors[color][variant])
     except:
         Debug.Error("Failed to get accent color.")
         Debug.Log("Returning red")
