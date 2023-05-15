@@ -663,6 +663,7 @@ def GetWiFiNetworks() -> list:
             normalizedInterfaces.append(normalizedInterface)
         except:
             Debug.Error("FAILED TO NORMALIZE GIVEN NETWORK")
+            Debug.End()
 
     # Debug.Log("Normalized networks: ")
     # Debug.Log(str(normalizedInterfaces))
