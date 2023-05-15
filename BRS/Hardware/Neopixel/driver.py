@@ -1287,6 +1287,7 @@ if(__name__ == "__main__"):
                 DriverHandler.Close()
                 break
         NeopixelHandler.Close()
+        DriverHandler.Close()
     printDriverHeader("STOPPED")
 
 LoadingLog.End("driver.py")
