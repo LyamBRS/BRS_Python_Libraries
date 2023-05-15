@@ -784,7 +784,7 @@ class RGB:
                 updateTheJson = True
 
         if(animationDuration != None):
-            if(animationDuration < 0.6 or animationDuration > 60):
+            if(animationDuration < 0.25 or animationDuration > 60):
                 Debug.Error(f"INVALID ANIMATION DURATION: {animationDuration}")
                 Debug.End()
                 return Execution.Failed
