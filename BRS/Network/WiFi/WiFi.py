@@ -429,14 +429,14 @@ def Linux_GetWiFiNetworks(DontDebug:bool = True) -> list:
 
         if line.startswith("ESSID"):
             ssid = line.split(":")[1].strip()
-            # Debug.Log(f"[SSID]")
+            Debug.Log(f"[SSID]")
 
             if ssid in listOfSeenNetworks:
                 newSSID = True
                 # Debug.Log(">>> SKIPPED")
             else:
                 current_network["ssid"] = ssid
-                # Debug.Log(f">>> {ssid}")
+                Debug.Log(f">>> {ssid}")
                 try:
                     if(current_network["ssid"] != None and current_network["signal"] != None and current_network["bssid"] != None):
                         listToReturn.append({
@@ -452,20 +452,20 @@ def Linux_GetWiFiNetworks(DontDebug:bool = True) -> list:
                 listOfSeenNetworks.append(ssid)
                 newSSID = True
                 current_network.clear()
-                # Debug.Log("[START OF NEW]")
+                Debug.Log("[START OF NEW]")
 
         elif line.startswith("Encryption key"):
-            # Debug.Log(f"[Encryption]")
+            Debug.Log(f"[Encryption]")
             networkLocked = line.split(":")[1].strip()
 
             if(networkLocked == "off"):
                 current_network["locked"] = False
             else:
                 current_network["locked"] = True        
-            # Debug.Log(f">>> {networkLocked}")
+            Debug.Log(f">>> {networkLocked}")
 
         elif line.startswith("Quality"):
-            # Debug.Log(f"[Quality]")
+            Debug.Log(f"[Quality]")
             splitLines = line.split("/")
             firstDigit = splitLines[0].split("=")[1]
             
@@ -474,17 +474,17 @@ def Linux_GetWiFiNetworks(DontDebug:bool = True) -> list:
             except:
                 currentSignal = 0
             signal = int((currentSignal/70)*100)
-            # current_network["signal"] = signal
-            # Debug.Log(f">>> {signal}")
+            current_network["signal"] = signal
+            Debug.Log(f">>> {signal}")
 
         elif "Address" in line:
-            # Debug.Log(f"[Address]")
+            Debug.Log(f"[Address]")
             bssid = line.split("Address: ")[1].strip()
             try:
                 current_network["bssid"] = bssid
             except:
                 current_network["bssid"] = "ERROR"
-            # Debug.Log(f">>> {bssid}")
+            Debug.Log(f">>> {bssid}")
 
     Debug.Log("Found networks: ")
     Debug.Log(str(listToReturn))
