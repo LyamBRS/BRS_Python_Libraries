@@ -36,9 +36,15 @@ def GetAccentColor() -> None:
     """
     Debug.Start("GetAccentColor")
 
-    color = MDApp.get_running_app().theme_cls.accent_palette
+    try:
+        color = MDApp.get_running_app().theme_cls.accent_palette
+        color = get_color_from_hex(colors[color]["500"])
+    except:
+        Debug.Error("Failed to get accent color.")
+        Debug.Log("Returning red")
+        color = (1,0,0)
     Debug.End()
-    return get_color_from_hex(colors[color]["500"])
+    return color
 
 #====================================================================#
 # Classes
