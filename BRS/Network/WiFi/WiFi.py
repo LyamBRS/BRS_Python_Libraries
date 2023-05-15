@@ -653,7 +653,7 @@ def GetWiFiNetworks(DontDebug:bool = True) -> list:
             # Debug.Log("Failed to get mode.")
             # normalizedInterface["mode"] = None
 
-        if("%" in strength):
+        if(type(strength) != int):
             try:
                 # Debug.Log("Attempting to transform windows wifi strength")
                 strength = strength.replace("%", "")
