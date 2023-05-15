@@ -29,6 +29,10 @@ def GetAccentColor() -> None:
         --------
         This function returns the accent color
         of the application.
+
+        Returns:
+        --------
+        - (0,0,0) to (1,1,1)
     """
     Debug.Start("GetAccentColor")
 
