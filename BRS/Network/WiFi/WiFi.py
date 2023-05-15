@@ -360,7 +360,7 @@ def Linux_GetNetworkInterfaces() -> list:
     Debug.Start("Linux_GetNetworkInterfaces")
     Debug.End()
 
-def Linux_GetWiFiNetworks() -> list:
+def Linux_GetWiFiNetworks(DontDebug:bool = True) -> list:
     """
         Linux_GetWiFiNetworks:
         ======================
@@ -388,12 +388,12 @@ def Linux_GetWiFiNetworks() -> list:
         -----------------------------
         - `[{"ssid": "network_name", "signal": "0/70", "bssid": "AA:BB:CC:DD:EE:FF", "locked":True}]`
     """
-    Debug.Start("Linux_GetWiFiNetworks")
+    Debug.Start("Linux_GetWiFiNetworks", DontDebug=DontDebug)
 
     if(Information.initialized):
         if(Information.platform != "Linux"):
             Debug.Error(f"Attempting to call a iwlist function on a non linux based OS: {Information.platform}")
-            Debug.End()
+            Debug.End(ContinueDebug=True)
             return Execution.Incompatibility
     else:
         Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
@@ -403,7 +403,7 @@ def Linux_GetWiFiNetworks() -> list:
         Debug.Log("Subprocess success")
     except:
         Debug.Error("Fatal error while running subprocess")
-        Debug.End()
+        Debug.End(ContinueDebug=True)
         return Execution.Crashed
     
     try:
@@ -411,8 +411,10 @@ def Linux_GetWiFiNetworks() -> list:
         lines = decodedNetwork.splitlines()
     except:
         Debug.Error("Failed to convert bytes to ascii.")
-        Debug.End()
+        Debug.End(ContinueDebug=True)
         return Execution.Crashed
+    
+    Debug.Log(f"Networks found: {decodedNetwork}")
 
     listToReturn = []
     current_network = {}
@@ -484,9 +486,9 @@ def Linux_GetWiFiNetworks() -> list:
                 current_network["bssid"] = "ERROR"
             # Debug.Log(f">>> {bssid}")
 
-    # Debug.Log("Found networks: ")
-    # Debug.Log(str(listToReturn))
-    Debug.End()
+    Debug.Log("Found networks: ")
+    Debug.Log(str(listToReturn))
+    Debug.End(ContinueDebug=True)
     return listToReturn
 
 def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
