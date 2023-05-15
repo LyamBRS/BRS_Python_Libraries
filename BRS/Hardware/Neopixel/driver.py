@@ -1160,10 +1160,10 @@ class NeopixelHandler:
                     if(GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
                         lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
                                                 [NeopixelHandler.brightness, NeopixelHandler.brightness, NeopixelHandler.brightness],
-                                                NeopixelHandler.lerpDelta)
+                                                1)
                         NeopixelHandler.currentColorMultipliers[ledNumber] = lerped
 
-                    elif(not GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
+                    if(not GlobalVariables.animationFlipFlop and ledNumber >= GlobalVariables.currentLedToDisplay):
                         lerped = GetLerpedColors(NeopixelHandler.currentColorMultipliers[ledNumber],
                                                 [0, 0, 0],
                                                 NeopixelHandler.lerpDelta)
