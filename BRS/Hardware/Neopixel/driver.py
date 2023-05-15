@@ -242,7 +242,7 @@ class RGBModes():
 #====================================================================#
 # Global RGB functions
 #====================================================================#
-def GetCycledColor(colorToCycle, tick, maxTickCount, RadianOffset) -> float:
+def GetCycledColor(colorToCycle, RadianOffset) -> float:
     """
         GetCycledColor:
         ===============
@@ -259,7 +259,7 @@ def GetCycledColor(colorToCycle, tick, maxTickCount, RadianOffset) -> float:
         - `RadianOffset` = Offset to give to the color. (2.09 for cycled colors to offset green, red and blue)   
     """
     temporary = 0
-    ratio = tick / maxTickCount
+    ratio = GlobalVariables.currentAnimationTick / NeopixelHandler.animationDuration
     ratio = ratio * 6.28
 
     temporary = math.sin(ratio + RadianOffset)
@@ -1135,9 +1135,9 @@ class NeopixelHandler:
                 #region ---------------------------------- [PULSE]
                 if(NeopixelHandler.currentMode == RGBModes.pulse):
                     multiplierToCycle = NeopixelHandler.wantedColorMultipliers[ledNumber]
-                    wantedR = GetCycledColor(multiplierToCycle[0], tick, maxTickCount, 0)
-                    wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, 0)
-                    wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 0)
+                    wantedR = GetCycledColor(multiplierToCycle[0], 0)
+                    wantedG = GetCycledColor(multiplierToCycle[1], 0)
+                    wantedB = GetCycledColor(multiplierToCycle[2], 0)
 
                     NeopixelHandler.currentColorMultipliers[ledNumber] = [wantedR, wantedG, wantedB]
                 #endregion
@@ -1147,9 +1147,9 @@ class NeopixelHandler:
                     offset = ledNumber * 0.15
 
                     multiplierToCycle = NeopixelHandler.wantedColorMultipliers[ledNumber]
-                    wantedR = GetCycledColor(multiplierToCycle[0], tick, maxTickCount, -2.09 + offset)
-                    wantedG = GetCycledColor(multiplierToCycle[1], tick, maxTickCount, offset)
-                    wantedB = GetCycledColor(multiplierToCycle[2], tick, maxTickCount, 2.09 + offset)
+                    wantedR = GetCycledColor(multiplierToCycle[0], -2.09 + offset)
+                    wantedG = GetCycledColor(multiplierToCycle[1], offset)
+                    wantedB = GetCycledColor(multiplierToCycle[2], 2.09 + offset)
 
                     NeopixelHandler.currentColorMultipliers[ledNumber] = [wantedR, wantedG, wantedB]
                 #endregion
