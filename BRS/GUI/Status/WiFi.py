@@ -10,8 +10,6 @@
 #====================================================================#
 # Loading Logs
 #====================================================================#
-from ast import expr_context
-from distutils.text_file import TextFile
 from Libraries.BRS_Python_Libraries.BRS.GUI.Utilities.references import Rounding
 from ...Debug.LoadingLog import LoadingLog
 from ...Debug.consoleLog import Debug
@@ -30,16 +28,14 @@ from ..Utilities.networks import GetWifiIcon
 from Libraries.BRS_Python_Libraries.BRS.GUI.Utilities.colors import GetAccentColor
 #endregion
 #region -------------------------------------------------------- Kivy
-from kivy.animation import Animation
 
 #endregion
 #region ------------------------------------------------------ KivyMD
 from kivymd.uix.card import MDCard
-from kivymd.uix.button import MDFloatingActionButton, MDFillRoundFlatIconButton, MDIconButton, BaseButton
+from kivymd.uix.button import MDFloatingActionButton, MDFillRoundFlatIconButton, BaseButton
 from kivymd.uix.floatlayout import MDFloatLayout
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
-from kivymd.app import MDApp
 from kivy.uix.widget import Widget
 #endregion
 from Libraries.BRS_Python_Libraries.BRS.GUI.Utilities.attributes import Shadow
