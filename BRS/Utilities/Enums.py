@@ -28,6 +28,7 @@ LoadingLog.Start("Enums.py")
 #====================================================================#
 # Enums
 #====================================================================#
+LoadingLog.Class("Dates")
 class Dates(Enum):
     """
         Dates:
@@ -72,6 +73,7 @@ class Dates(Enum):
             return "Updated"
         return "No Match"
 #====================================================================#
+LoadingLog.Class("FileIntegrity")
 class FileIntegrity(Enum):
     """
         Enumeration of possible results of an integrity check on any
@@ -130,6 +132,7 @@ class FileIntegrity(Enum):
             return "Error"
         return "No Match"
 #====================================================================#
+LoadingLog.Class("GitHubFail")
 class GitHubFail(Enum):
     """
         GitHubFail:
@@ -189,6 +192,7 @@ class GitHubFail(Enum):
             return "Error"
         return "No Match"
 #====================================================================#
+LoadingLog.Class("Execution")
 class Execution(Enum):
     """
         Execution:
