@@ -7,29 +7,25 @@ LoadingLog.Start("cards.py")
 # Imports
 #====================================================================#
 from ...Debug.consoleLog import Debug
-from ...Utilities.states import States,StatesColors
+from ...Utilities.states import States
 from ...Utilities.LanguageHandler import _
 from ...Utilities.FileHandler import JSONdata
 from ...Utilities.Enums import FileIntegrity
 from ...GUI.Utilities.colors import GUIColors
-from ...GUI.Utilities.attributes import BRS_ValueWidgetAttributes, BRS_BarGraphWidgetAttributes, BRS_CardLayoutAttributes
+from ...GUI.Utilities.attributes import BRS_CardLayoutAttributes
 from ...GUI.Utilities.references import Shadow,Rounding,Styles
 
 from kivymd.app import MDApp
-from kivymd.uix.card import MDCard,MDCardSwipe,MDCardSwipeFrontBox,MDCardSwipeLayerBox,MDSeparator
+from kivymd.uix.card import MDCard
 from kivymd.uix.progressbar import MDProgressBar
 from kivymd.uix.button import BaseButton, MDIconButton
 from kivymd.icon_definitions import md_icons
 from kivymd.uix.label import MDLabel
-from kivymd.color_definitions import palette,colors
-from kivymd.theming import ThemeManager
+from kivymd.color_definitions import colors
 from kivy.utils import get_color_from_hex
 
-from kivy.uix.button import ButtonBehavior
 from kivy.uix.widget import Widget
-from kivy.uix.boxlayout import BoxLayout
-from kivy.animation import Animation
-from kivymd.uix.label import MDIcon
+from kivymd.uix.boxlayout import MDBoxLayout
 #====================================================================#
 # Functions
 #====================================================================#
@@ -758,6 +754,102 @@ class CreateCard(BaseButton, Widget):
         self._MDCard.hide_elevation(True)
         self._MDCard.add_widget(self._MDCard.Icon)
         self._MDCard.add_widget(self._MDCard.Title)
+        self.add_widget(self._MDCard)
+        #endregion
+        Debug.End()
+    #endregion
+    pass
+# -------------------------------------------------------------------
+class ControlsCard(BaseButton, Widget):
+    #region   --------------------------- DOCSTRING
+    ''' 
+        Displays a control from the Controls class.
+    '''
+    #endregion
+    #region   --------------------------- MEMBERS
+    name:str = "ERROR"
+    dictionary:dict = {"state":False, "bindedTo":"ERROR", "bindedAs":"ERROR", "binded":True}
+    #endregion
+    #region   --------------------------- METHODS
+    #region   -- Public
+    def PressedEnd(self, *args):
+        """
+            Function called by the card once the ripple effect
+            comes to an end.
+        """
+        pass
+    #endregion
+    #region   -- Private
+    # ------------------------------------------------------
+    def _RippleHandling(self, object, finished):
+        if(finished):
+            self.PressedEnd(self)
+    # ------------------------------------------------------
+    #endregion
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    def __init__(self,
+                 name:str = "ERROR",
+                 dictionary:dict = {"state":False, "bindedTo":"ERROR", "bindedAs":"ERROR", "binded":True},
+                 **kwargs):
+        super(ControlsCard, self).__init__(**kwargs)
+        Debug.Start("ControlsCard")
+        #region --------------------------- Initial check ups
+        self.padding = 0
+        self.spacing = 0
+
+        Debug.Log(name)
+        Debug.Log(dictionary)
+        Debug.Log(kwargs)
+        # Debug.Log(*kwargs)
+        # Debug.Log(**kwargs)
+
+        # Handles a function that is called once the ripple animation finishes.
+        self.bind(_finishing_ripple = self._RippleHandling)
+        #endregion
+        #region --------------------------- Create card elements
+        self._MDCard = MDCard(radius = Rounding.default,
+                              orientation = "vertical",
+                              padding = 10)
+        
+        self.boxlayout = MDBoxLayout(orientation = "horizontal")
+
+        self.ControlNameLabel = MDLabel(text = name,
+                                        font_style = "H4",
+                                        halign = "left")
+        
+        if(dictionary["binded"] == False):
+            Debug.Warn("Nothing to show here.")
+
+            self.available = MDLabel(text = "Available",
+                                        font_style = "H5",
+                                        halign = "right")
+            self.boxlayout.add_widget(self.available)
+        else:
+            self.WhoUsesIt = MDLabel(text = dictionary["bindedTo"],
+                                        font_style = "H5",
+                                        halign = "left")
+            
+            self.WhatIsItBindedTo = MDLabel(text = dictionary["bindedAs"],
+                                        font_style = "H5",
+                                        halign = "left")
+            
+            try:
+                value = dictionary["value"]
+                Debug.Log("Is an axis")
+            except:
+                value = dictionary["state"]
+                Debug.Log("is a button")
+
+            self.currentValue = MDLabel(text = str(value),
+                                        font_style = "H5",
+                                        halign = "left")
+            
+            self.boxlayout.add_widget(self.WhoUsesIt)
+            self.boxlayout.add_widget(self.WhatIsItBindedTo)
+            self.boxlayout.add_widget(self.currentValue)
+
+        self._MDCard.add_widget(self.boxlayout)
         self.add_widget(self._MDCard)
         #endregion
         Debug.End()
