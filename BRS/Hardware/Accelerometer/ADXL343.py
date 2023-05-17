@@ -157,5 +157,137 @@ class ADXL343:
             Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
             Debug.End()
             return [0, 0, 0]
+
+    @staticmethod
+    def GetValue_X_Positive() -> float:
+        """
+            GetValue_X_Positive:
+            ====================
+            Summary:
+            --------
+            Hardware backend control
+            that reads the accelerometer
+            and returns a value from
+            0 to 1 based off the value
+            returned from the X axis.
+        """
+        values = ADXL343.GetAccelerometerValues()
+        xAxis = values[0]
+
+        if(xAxis <= 0):
+            return 0
+        
+        normalized = (xAxis / 8)
+        return normalized
+
+    @staticmethod
+    def GetValue_X_Negative() -> float:
+        """
+            GetValue_X_Negative:
+            ====================
+            Summary:
+            --------
+            Hardware backend control
+            that reads the accelerometer
+            and returns a value from
+            0 to 1 based off the value
+            returned from the X axis.
+        """
+        values = ADXL343.GetAccelerometerValues()
+        xAxis = values[0]
+
+        if(xAxis >= 0):
+            return 0
+        
+        normalized = (xAxis / -8)
+        return normalized
+
+    @staticmethod
+    def GetValue_Y_Positive() -> float:
+        """
+            GetValue_Y_Positive:
+            ====================
+            Summary:
+            --------
+            Hardware backend control
+            that reads the accelerometer
+            and returns a value from
+            0 to 1 based off the value
+            returned from the Y axis.
+        """
+        values = ADXL343.GetAccelerometerValues()
+        yAxis = values[1]
+
+        if(yAxis <= 0):
+            return 0
+        
+        normalized = (yAxis / 8)
+        return normalized
+
+    @staticmethod
+    def GetValue_Y_Negative() -> float:
+        """
+            GetValue_Y_Negative:
+            ====================
+            Summary:
+            --------
+            Hardware backend control
+            that reads the accelerometer
+            and returns a value from
+            0 to 1 based off the value
+            returned from the Y axis.
+        """
+        values = ADXL343.GetAccelerometerValues()
+        yAxis = values[1]
+
+        if(yAxis >= 0):
+            return 0
+        
+        normalized = (yAxis / -8)
+        return normalized
+
+    @staticmethod
+    def GetValue_Z_Positive() -> float:
+        """
+            GetValue_Z_Positive:
+            ====================
+            Summary:
+            --------
+            Hardware backend control
+            that reads the accelerometer
+            and returns a value from
+            0 to 1 based off the value
+            returned from the Z axis.
+        """
+        values = ADXL343.GetAccelerometerValues()
+        zAxis = values[2]
+
+        if(zAxis <= 0):
+            return 0
+        
+        normalized = (zAxis / 10)
+        return normalized
+
+    @staticmethod  
+    def GetValue_Z_Negative() -> float:
+        """
+            GetValue_Z_Negative:
+            ====================
+            Summary:
+            --------
+            Hardware backend control
+            that reads the accelerometer
+            and returns a value from
+            0 to 1 based off the value
+            returned from the Z axis.
+        """
+        values = ADXL343.GetAccelerometerValues()
+        zAxis = values[2]
+
+        if(zAxis >= 0):
+            return 0
+        
+        normalized = (zAxis / -10)
+        return normalized
 #====================================================================#
 LoadingLog.End("ADXL343.py")
