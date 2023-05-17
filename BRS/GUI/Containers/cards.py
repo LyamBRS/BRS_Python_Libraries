@@ -760,6 +760,24 @@ class CreateCard(BaseButton, Widget):
     #endregion
     pass
 # -------------------------------------------------------------------
+class ControlsCardData:
+    """
+        ControlsCardData:
+        =================
+        Summary:
+        --------
+        Listen... sometimes in order
+        for a project to finish you
+        need to put patches on your
+        shit cuz otherwise project
+        ain't fucking going nowhere.
+    """
+    dataList:list = []
+    """
+        Fill that up the same way you're filling
+        up the recycle view...
+    """
+
 class ControlsCard(BaseButton, Widget):
     #region   --------------------------- DOCSTRING
     ''' 
@@ -798,9 +816,19 @@ class ControlsCard(BaseButton, Widget):
         self.padding = 0
         self.spacing = 0
 
+        Debug.Warn("FIXME: I HATE RECYCLEVIEW... so this shit is necessary...")
+        if(dictionary["bindedTo"] == "ERROR"):
+            Debug.Warn("Trying to read from that one goofy ass class.")
+            try:
+                data = ControlsCardData.dataList[0]
+                name = data["name"]
+                dictionary = data["dictionary"]
+                ControlsCardData.dataList.pop(0)
+            except:
+                Debug.Error("Seems like that didnt work as well... cool...")
+
         Debug.Log(name)
         Debug.Log(dictionary)
-        Debug.Log(kwargs)
         # Debug.Log(*kwargs)
         # Debug.Log(**kwargs)
 
@@ -811,13 +839,14 @@ class ControlsCard(BaseButton, Widget):
         self._MDCard = MDCard(radius = Rounding.default,
                               orientation = "vertical",
                               padding = 10)
-        
+
         self.boxlayout = MDBoxLayout(orientation = "horizontal")
 
         self.ControlNameLabel = MDLabel(text = name,
                                         font_style = "H4",
                                         halign = "left")
-        
+        self.boxlayout.add_widget(self.ControlNameLabel)
+
         if(dictionary["binded"] == False):
             Debug.Warn("Nothing to show here.")
 
@@ -829,11 +858,11 @@ class ControlsCard(BaseButton, Widget):
             self.WhoUsesIt = MDLabel(text = dictionary["bindedTo"],
                                         font_style = "H5",
                                         halign = "left")
-            
+
             self.WhatIsItBindedTo = MDLabel(text = dictionary["bindedAs"],
                                         font_style = "H5",
                                         halign = "left")
-            
+
             try:
                 value = dictionary["value"]
                 Debug.Log("Is an axis")
@@ -844,7 +873,7 @@ class ControlsCard(BaseButton, Widget):
             self.currentValue = MDLabel(text = str(value),
                                         font_style = "H5",
                                         halign = "left")
-            
+
             self.boxlayout.add_widget(self.WhoUsesIt)
             self.boxlayout.add_widget(self.WhatIsItBindedTo)
             self.boxlayout.add_widget(self.currentValue)
