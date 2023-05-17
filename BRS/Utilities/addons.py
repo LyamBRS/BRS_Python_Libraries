@@ -497,6 +497,19 @@ class Addons:
         Debug.Start("ClearProfile")
         Addons._Execute("ClearProfile", [profileToDelete])
         Debug.End()
+    
+    def ChangeProfile(newProfileName:str, oldProfileName:str):
+        """
+            ChangeProfile:
+            ==============
+            Summary:
+            -------
+            Changes profiles with the name A to be profiles of
+            nameB
+        """
+        Debug.Start("ChangeProfile")
+        Addons._Execute("ChangeProfile", [newProfileName, oldProfileName])
+        Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
