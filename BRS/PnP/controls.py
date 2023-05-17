@@ -222,26 +222,26 @@ class Controls:
     """
 
     _axes = {
-        "left"          : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "right"         : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "up"            : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "down"          : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "forward"       : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "backward"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "pitch-up"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "pitch-down"    : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "roll-left"     : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "roll-right"    : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "yaw-left"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "yaw-right"     : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-1"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-2"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-3"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-4"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-5"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-6"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-7"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
-        "custom-8"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None},
+        "left"          : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "right"         : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "up"            : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "down"          : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "forward"       : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "backward"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "pitch-up"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "pitch-down"    : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "roll-left"     : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "roll-right"    : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "yaw-left"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "yaw-right"     : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-1"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-2"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-3"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-4"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-5"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-6"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-7"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-8"      : {"value":0, "binded":False, "bindedTo":None, "bindedAs": None, "getter":None},
     }
     """
         _axes:
@@ -268,106 +268,106 @@ class Controls:
     # -----------------------------------------------------
     _buttons = {
         # Movements
-        "up"        : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "down"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "left"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "right"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "forward"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "backward"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "up"        : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "down"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "left"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "right"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "forward"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "backward"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
 
         # Weaponery
-        "fire"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "explode"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "fire"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "explode"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
 
         # UI
-        "select"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "cancel"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "confirm"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "select"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "cancel"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "confirm"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
 
         # Audio and Video
-        "mute"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "record"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "mute"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "record"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
 
         # App Actions
-        "save"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "reset"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "refresh"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "quit"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "stop"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "shutdown" : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "edit"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "add"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "remove"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "copy"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "paste"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "cut"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "undo"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "redo"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "print"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "save"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "reset"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "refresh"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "quit"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "stop"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "shutdown" : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "edit"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "add"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "remove"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "copy"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "paste"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "cut"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "undo"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "redo"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "print"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
 
         # Generic actions
-        "close"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "open"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "fill"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "empty"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "like"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "dislike"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "lock"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "unlock"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "on"       : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "off"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "close"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "open"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "fill"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "empty"    : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "like"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "dislike"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "lock"     : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "unlock"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "on"       : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "off"      : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
 
         # Custom actions
-        "custom-1"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-2"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-3"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-4"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-5"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-6"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-7"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-8"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-9"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-10"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-11"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-12"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-13"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-14"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-15"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-16"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-17"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-18"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-19"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-20"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-21"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-22"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-23"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-24"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-25"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-26"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-27"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-28"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-29"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-30"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-31"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-32"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-33"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-34"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-35"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-36"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-37"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-38"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-39"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-40"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-41"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-42"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-43"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-44"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-45"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-46"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-47"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-48"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-49"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
-        "custom-50"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None},
+        "custom-1"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-2"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-3"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-4"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-5"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-6"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-7"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-8"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-9"   : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-10"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-11"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-12"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-13"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-14"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-15"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-16"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-17"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-18"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-19"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-20"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-21"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-22"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-23"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-24"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-25"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-26"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-27"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-28"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-29"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-30"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-31"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-32"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-33"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-34"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-35"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-36"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-37"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-38"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-39"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-40"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-41"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-42"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-43"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-44"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-45"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-46"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-47"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-48"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-49"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
+        "custom-50"  : {"state" : False, "mode" : "held", "binded" : False, "bindedTo":None, "bindedAs": None, "getter":None},
     }
     """
         _buttons:
@@ -379,7 +379,7 @@ class Controls:
     """
     #endregion
     #region   --------------------------- METHODS
-    def BindButton(nameOfTheHardwareBinding:str, nameOfSoftwareButton:str, bindedAs:str) -> Execution:
+    def BindButton(nameOfTheHardwareBinding:str, nameOfSoftwareButton:str, bindedAs:str, GetterFunction) -> Execution:
         """
             bindButton:
             ===========
@@ -428,12 +428,13 @@ class Controls:
         Controls._buttons[nameOfSoftwareButton]["bindedTo"] = nameOfTheHardwareBinding
         Controls._buttons[nameOfSoftwareButton]["bindedAs"] = bindedAs
         Controls._buttons[nameOfSoftwareButton]["binded"] = True
+        Controls._buttons[nameOfSoftwareButton]["getter"] = GetterFunction
 
         Debug.Log(">>> Success")
         Debug.End()
         return Execution.Passed
 
-    def BindAxis(nameOfTheHardwareBinding:str, nameOfSoftwareAxis:str, bindedAs:str) -> Execution:
+    def BindAxis(nameOfTheHardwareBinding:str, nameOfSoftwareAxis:str, bindedAs:str, GetterFunction) -> Execution:
         """
             BindAxis:
             ===========
@@ -481,6 +482,7 @@ class Controls:
         # Welp, looks like we can bind the button!
         Controls._axes[nameOfSoftwareAxis]["bindedTo"] = nameOfTheHardwareBinding
         Controls._axes[nameOfSoftwareAxis]["bindedAs"] = bindedAs
+        Controls._axes[nameOfSoftwareAxis]["getter"] = GetterFunction
         Controls._axes[nameOfSoftwareAxis]["binded"] = True
 
         Debug.Log(">>> Success")
