@@ -405,6 +405,98 @@ class Addons:
         Debug.Log(f"{newAddonsName} is now listed as an Addon.")
         Debug.End()
         return Execution.Passed
+    # -----------------------------------
+    def _Execute(nameOfFunctionToExecute:str, passedArguments:list = None, returnFirstError:bool = False):
+        """
+            _Execute:
+            =========
+            Summary:
+            --------
+            This method allows internal methods of
+            the :ref:`Addons` class to perform
+            universal addon functions on every
+            addons there is.
+        """
+        Debug.Start("_Execute")
+        Debug.Log(f"performing {nameOfFunctionToExecute} on all addons...")
+        for addonName, addonData in Addons._listedAddons:
+            
+            if(passedArguments == None):
+                result = Addons._listedAddons[addonName][addonData]()
+                if(result != Execution.Passed and returnFirstError):
+                    Debug.Error(f"{addonName} did not pass execution of {nameOfFunctionToExecute}")
+                    Debug.End()
+                    return Execution.Failed
+                Debug.Log(f"{addonName} executed {nameOfFunctionToExecute} with return code {result}")
+            else:
+                if(len(passedArguments) == 1):
+                    result = Addons._listedAddons[addonName][addonData](passedArguments[0])
+                if(len(passedArguments) == 2):
+                    result = Addons._listedAddons[addonName][addonData](passedArguments[0], passedArguments[1])
+                if(len(passedArguments) == 3):
+                    result = Addons._listedAddons[addonName][addonData](passedArguments[0], passedArguments[1], passedArguments[2])
+                if(len(passedArguments) == 4):
+                    result = Addons._listedAddons[addonName][addonData](passedArguments[0], passedArguments[1], passedArguments[2], passedArguments[3])
+
+                if(result != Execution.Passed and returnFirstError):
+                    Debug.Error(f"{addonName} did not pass execution of {nameOfFunctionToExecute} with {passedArguments} as parameters")
+                    Debug.End()
+                    return Execution.Failed
+                Debug.Log(f"{addonName} executed {nameOfFunctionToExecute} with return code {result}")
+
+        Debug.End()
+    # -----------------------------------
+    def StopAll():
+        """
+            StopAll:
+            ========
+            Summary:
+            --------
+            Tries to stop all the addons added to this class
+            by calling their stop functions.
+        """
+        Debug.Start("StopAll")
+        Addons._Execute("Stop")
+        Debug.End()
+
+    def LoadProfile(profileToLoad:str):
+        """
+            LoadProfile:
+            ============
+            Summary:
+            --------
+            Tries to load a profile based off its name
+            in all the addons saved in this class.
+        """
+        Debug.Start("LoadProfile")
+        Addons._Execute("LoadProfile", [profileToLoad])
+        Debug.End()
+
+    def SaveProfile(profileToSave:str):
+        """
+            SaveProfile:
+            ============
+            Summary:
+            --------
+            Tries to load a profile based off its name
+            in all the addons saved in this class.
+        """
+        Debug.Start("SaveProfile")
+        Addons._Execute("SaveProfile", [profileToSave])
+        Debug.End()
+
+    def ClearProfile(profileToDelete:str):
+        """
+            profileToDelete:
+            ================
+            Summary:
+            --------
+            Tries to delete a profile from
+            all the addons
+        """
+        Debug.Start("ClearProfile")
+        Addons._Execute("ClearProfile", [profileToDelete])
+        Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
