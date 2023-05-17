@@ -79,7 +79,7 @@ class Addons:
             "Launch"        : <function>, 
             "Stop"          : <function>,
             "Uninstall"     : <function>,
-            "Update"        : <function>
+            "Update"        : <function>,
             "GetState"      : <function>, 
             "ClearProfile"  : <function>, 
             "SaveProfile"   : <function>, 
@@ -95,12 +95,13 @@ class Addons:
             "information" : {
                     "version" : 1,
                     "name" : "ADXL343",
-                    "type" : "addon
+                    "type" : "addon",
                     "repository" : "http://somethingSomething-GitHub.tho"
                     "description" : "Soldered on Kontrol's accelerometer addon."
                     "outputsHardwareControls" : False,
                     "canReadSoftwareControls" : True,
-                    "isCompatible" : True
+                    "isCompatible" : True,
+                    "MDIcon" : "account"
                 }
             }
         ```
@@ -612,6 +613,7 @@ class AddonInfoHandler:
                  repository:str,
                  outputsHardwareControls:bool,
                  canReadSoftwareControls:bool,
+                 MDIcon:str,
 
                  LaunchFunction,
                  StopFunction,
@@ -655,7 +657,8 @@ class AddonInfoHandler:
                 "description" : description,
                 "outputsHardwareControls" : outputsHardwareControls,
                 "canReadSoftwareControls" : canReadSoftwareControls,
-                "isCompatible" : False 
+                "isCompatible" : False ,
+                "MDIcon" : MDIcon
         }
         self.information["information"] = informationsToSave
         Debug.Log(">>> Success")
