@@ -419,10 +419,11 @@ class Addons:
         """
         Debug.Start("_Execute")
         Debug.Log(f"performing {nameOfFunctionToExecute} on all addons...")
-        for addonName, addonData in Addons._listedAddons:
+        for addonName, addonData in Addons._listedAddons.items():
+            Debug.Log(f"Executing {addonName}'s {nameOfFunctionToExecute} : {Addons._listedAddons[addonName][nameOfFunctionToExecute]}")
             
             if(passedArguments == None):
-                result = Addons._listedAddons[addonName][addonData]()
+                result = Addons._listedAddons[addonName][nameOfFunctionToExecute]()
                 if(result != Execution.Passed and returnFirstError):
                     Debug.Error(f"{addonName} did not pass execution of {nameOfFunctionToExecute}")
                     Debug.End()
@@ -430,13 +431,13 @@ class Addons:
                 Debug.Log(f"{addonName} executed {nameOfFunctionToExecute} with return code {result}")
             else:
                 if(len(passedArguments) == 1):
-                    result = Addons._listedAddons[addonName][addonData](passedArguments[0])
+                    result = Addons._listedAddons[addonName][nameOfFunctionToExecute](passedArguments[0])
                 if(len(passedArguments) == 2):
-                    result = Addons._listedAddons[addonName][addonData](passedArguments[0], passedArguments[1])
+                    result = Addons._listedAddons[addonName][nameOfFunctionToExecute](passedArguments[0], passedArguments[1])
                 if(len(passedArguments) == 3):
-                    result = Addons._listedAddons[addonName][addonData](passedArguments[0], passedArguments[1], passedArguments[2])
+                    result = Addons._listedAddons[addonName][nameOfFunctionToExecute](passedArguments[0], passedArguments[1], passedArguments[2])
                 if(len(passedArguments) == 4):
-                    result = Addons._listedAddons[addonName][addonData](passedArguments[0], passedArguments[1], passedArguments[2], passedArguments[3])
+                    result = Addons._listedAddons[addonName][nameOfFunctionToExecute](passedArguments[0], passedArguments[1], passedArguments[2], passedArguments[3])
 
                 if(result != Execution.Passed and returnFirstError):
                     Debug.Error(f"{addonName} did not pass execution of {nameOfFunctionToExecute} with {passedArguments} as parameters")
