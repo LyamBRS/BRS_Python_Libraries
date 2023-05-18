@@ -35,6 +35,50 @@ from .Enums import Execution
 #====================================================================#
 # Enums classes
 #====================================================================#
+class AddonEnum:
+    """
+        AddonEnum:
+        ==========
+        Summary:
+        --------
+        This class's purpose is to list
+        all the possible AddonEnum as members.
+        This way you won't have to remember the
+        content of an addon and you'll be able
+        to just use this class instead.
+    """
+    Launch:str                      = "Launch"
+    Stop:str                        = "Stop"
+    Uninstall:str                   = "Uninstall"
+    Update:str                      = "Update"
+    GetState:str                    = "GetState"
+    ClearProfile:str                = "ClearProfile"
+    SaveProfile:str                 = "SaveProfile"
+    ChangeProfile:str               = "ChangeProfile"
+    LoadProfile:str                 = "LoadProfile"
+    UnloadProfile:str               = "UnloadProfile"
+    GetAllHardwareControls:str      = "GetAllHardwareControls"
+    GetAllSoftwareActions:str       = "GetAllSoftwareActions"
+    ChangeButtonBinding:str         = "ChangeButtonBinding"
+    ChangeAxisBinding:str           = "ChangeAxisBinding"
+    UnbindButtonBinding:str         = "UnbindButtonBinding"
+    UnbindAxisBinding:str           = "UnbindAxisBinding"
+    ChangeButtonActionBinding:str   = "ChangeButtonActionBinding"
+    ChangeAxisActionBinding:str     = "ChangeAxisActionBinding"
+    information = "information"
+
+    class Information:
+        version:str                 = "version"
+        name:str                    = "name"
+        type:str                    = "type"
+        repository:str              = "repository"
+        description:str             = "description"
+        hasHardwareButtons:str      = "hasHardwareButtons"
+        hasHardwareAxes:str         = "hasHardwareAxes"
+        readsSoftwareButtons:str    = "readsSoftwareButtons"
+        readsSoftwareAxes:str       = "readsSoftwareAxes"
+        isCompatible:str            = "isCompatible"
+        MDIcon:str                  = "MDIcon"
 
 #====================================================================#
 # Classes
@@ -76,19 +120,22 @@ class Addons:
         --------
         ```
         "Accelerometer" : {
-            "Launch"        : <function>, 
+            "Launch"        : <function>,
             "Stop"          : <function>,
             "Uninstall"     : <function>,
             "Update"        : <function>,
-            "GetState"      : <function>, 
-            "ClearProfile"  : <function>, 
-            "SaveProfile"   : <function>, 
-            "ChangeProfile" : <function>, 
+            "GetState"      : <function>,
+            "ClearProfile"  : <function>,
+            "SaveProfile"   : <function>,
+            "ChangeProfile" : <function>,
             "LoadProfile"   : <function>,
+            "UnloadProfile" : <function>,
             "GetAllHardwareControls"        : <function>,
             "GetAllSoftwareActions"         : <function>,
             "ChangeButtonBinding"           : <function>,
             "ChangeAxisBinding"             : <function>,
+            "UnbindButtonBinding"           : <function>,
+            "UnbindAxisBinding"             : <function>,
             "ChangeButtonActionBinding"     : <function>,
             "ChangeAxisActionBinding"       : <function>,
 
@@ -98,8 +145,10 @@ class Addons:
                     "type" : "addon",
                     "repository" : "http://somethingSomething-GitHub.tho"
                     "description" : "Soldered on Kontrol's accelerometer addon."
-                    "outputsHardwareControls" : False,
-                    "canReadSoftwareControls" : True,
+                    "hasHardwareButtons" : False,
+                    "hasHardwareAxes" : False,
+                    "readsSoftwareButtons" : False,
+                    "readsSoftwareAxes" : False,
                     "isCompatible" : True,
                     "MDIcon" : "account"
                 }
@@ -174,7 +223,7 @@ class Addons:
         -----------
             * [Summary]:
                 - A function that returns the current state of the
-                addon. 
+                addon.
 
             * [Arguments]:
                 - None
@@ -245,6 +294,21 @@ class Addons:
                 - `Execution.Failed` = Couldn't load that profile and couldn't create a new one.
                 - `Execution.Incompatibility` = The addon does not support profiles.
 
+        "UnloadProfile":
+        --------------
+            * [Summary]:
+                - This function unloads a specified profile from
+                its cached JSONs. if the profile does not exist,
+                it should just unload the currently saved profile.
+
+            * [Arguments]:
+                - `profileToUnload:str` = string representing the profile to unload.
+
+            * [Returns]:
+                - `Execution.Passed` = Profile is unloaded
+                - `Execution.Failed` = Couldn't unload that profile.
+                - `Execution.Incompatibility` = The addon does not support profiles.
+
         "GetAllHardwareControls":
         -------------------------
             * [Summary]:
@@ -259,17 +323,17 @@ class Addons:
                 - {
                     "buttons" : {
                         "hardware-name" : {
-                            "binded" : False, 
+                            "binded" : False,
                             "bindedTo" : "software_name",
                             "getter" : <function>
-                        }                 
-                    }, 
+                        }
+                    },
                     "axes" : {
                         "hardware-name" : {
-                            "binded" : False, 
+                            "binded" : False,
                             "bindedTo" : "software_name",
                             "getter" : <function>
-                        }                 
+                        }
                     }
                    }
                 - `Execution.Failed` = Couldn't get the hardware controls of the addon
@@ -279,7 +343,7 @@ class Addons:
         ------------------------
             * [Summary]:
                 - Function that returns a dictionary of software
-                specific actions that your application can make 
+                specific actions that your application can make
                 the addon perform. Such as: turn on the lights,
                 surface, dive, cruise control and much more.
 
@@ -290,17 +354,17 @@ class Addons:
                 - {
                     "buttons" : {
                         "action-name" : {
-                            "binded" : False, 
+                            "binded" : False,
                             "bindedTo" : "software_name",
                             "executer" : <function>
-                        }                 
-                    }, 
+                        }
+                    },
                     "axes" : {
                         "action-name" : {
-                            "binded" : False, 
+                            "binded" : False,
                             "bindedTo" : "software_name",
                             "executer" : <function>
-                        }                 
+                        }
                     }
                    }
                 - `Execution.Failed` = Couldn't get the actions of the addon
@@ -336,12 +400,42 @@ class Addons:
                 - `Execution.Failed` = Failed to bind the specified axis.
                 - `Execution.Incompatibility` = The addon does not support hardware axis.
 
+        "UnbindButtonBinding":
+        ----------------------
+            * [Summary]:
+                - Function that attempts to unbind a software
+                button from saved binds
+
+            * [Arguments]:
+                - `nameOfSoftwareButton:str` = Name from `SoftwareButtons` class
+
+            * [Returns]:
+                - `Execution.Passed` = Button is no longer binded.
+                - `Execution.Failed` = Failed to unbind the button.
+                - `Execution.Unecessary` = Button wasn't binded.
+                - `Execution.Incompatibility` = The addon does not support hardware buttons.
+
+        "UnbindAxisBinding":
+        ----------------------
+            * [Summary]:
+                - Function that attempts to unbind a software
+                axis from saved binds
+
+            * [Arguments]:
+                - `nameOfSoftwareButton:str` = Name from `SoftwareButtons` class
+
+            * [Returns]:
+                - `Execution.Passed` = Axis is no longer binded.
+                - `Execution.Failed` = Failed to unbind the Axis.
+                - `Execution.Unecessary` = Axis wasn't binded.
+                - `Execution.Incompatibility` = The addon does not support hardware axis.
+
         "ChangeButtonActionBinding":
         ----------------------------
             * [Summary]:
                 - Function that binds a software button with an
                 addon's button like action. Like binding "on" to
-                a submarine's "light-on" 
+                a submarine's "light-on"
 
             * [Arguments]:
                 - `nameOfSoftwareButton:str` = Name from `SoftwareAxis` class
@@ -457,8 +551,8 @@ class Addons:
             Tries to stop all the addons added to this class
             by calling their stop functions.
         """
-        Debug.Start("StopAll")
-        Addons._Execute("Stop")
+        Debug.Start(AddonEnum.Stop)
+        Addons._Execute(AddonEnum.Stop)
         Debug.End()
 
     def LoadProfile(profileToLoad:str):
@@ -470,8 +564,21 @@ class Addons:
             Tries to load a profile based off its name
             in all the addons saved in this class.
         """
-        Debug.Start("LoadProfile")
-        Addons._Execute("LoadProfile", [profileToLoad])
+        Debug.Start(AddonEnum.LoadProfile)
+        Addons._Execute(AddonEnum.LoadProfile, [profileToLoad])
+        Debug.End()
+
+    def UnloadProfile(profileToUnload:str):
+        """
+            UnloadProfile:
+            ============
+            Summary:
+            --------
+            Tries to unload a profile based off its name
+            from all the addons saved in this class.
+        """
+        Debug.Start(AddonEnum.UnloadProfile)
+        Addons._Execute(AddonEnum.UnloadProfile, [profileToUnload])
         Debug.End()
 
     def SaveProfile(profileToSave:str):
@@ -483,8 +590,8 @@ class Addons:
             Tries to load a profile based off its name
             in all the addons saved in this class.
         """
-        Debug.Start("SaveProfile")
-        Addons._Execute("SaveProfile", [profileToSave])
+        Debug.Start(AddonEnum.SaveProfile)
+        Addons._Execute(AddonEnum.SaveProfile, [profileToSave])
         Debug.End()
 
     def ClearProfile(profileToDelete:str):
@@ -496,10 +603,10 @@ class Addons:
             Tries to delete a profile from
             all the addons
         """
-        Debug.Start("ClearProfile")
-        Addons._Execute("ClearProfile", [profileToDelete])
+        Debug.Start(AddonEnum.ClearProfile)
+        Addons._Execute(AddonEnum.ClearProfile, [profileToDelete])
         Debug.End()
-    
+
     def ChangeProfile(newProfileName:str, oldProfileName:str):
         """
             ChangeProfile:
@@ -509,8 +616,94 @@ class Addons:
             Changes profiles with the name A to be profiles of
             nameB
         """
-        Debug.Start("ChangeProfile")
-        Addons._Execute("ChangeProfile", [newProfileName, oldProfileName])
+        Debug.Start(AddonEnum.ChangeProfile)
+        Addons._Execute(AddonEnum.ChangeProfile, [newProfileName, oldProfileName])
+        Debug.End()
+
+    def BindHardwareButton(whichAddonToBindItTo:str, nameOfTheSoftwareButton:str, nameOfTheHardwareButton:str):
+        """
+            BindHardwareButton:
+            ==============
+            Summary:
+            -------
+            Binds an hardware button of
+            a specified addon to a
+            software representation.
+        """
+        Debug.Start(AddonEnum.ChangeButtonBinding)
+        try:
+            result = Addons._listedAddons[whichAddonToBindItTo][AddonEnum.ChangeButtonBinding](nameOfTheSoftwareButton, nameOfTheHardwareButton)
+            if(result != Execution.Passed):
+                if(result == Execution.Unecessary):
+                    Debug.Warn(f"{whichAddonToBindItTo} may already have {nameOfTheHardwareButton} binded to {nameOfTheSoftwareButton}")
+                    Debug.End()
+                    return Execution.Unecessary
+                Debug.Error("Something went wrong.")
+            else:
+                Debug.Log(f"Success returned when binding {nameOfTheHardwareButton} to {nameOfTheSoftwareButton}")
+                Debug.End()
+                return Execution.Passed
+        except:
+            Debug.Error(f"Crash occured when trying to bind {whichAddonToBindItTo}'s {nameOfTheHardwareButton} to {nameOfTheSoftwareButton}.")
+            Debug.Error(f"{whichAddonToBindItTo} may not exist.")
+        Debug.End()
+        return Execution.Failed
+
+    def BindHardwareAxis(whichAddonToBindItTo:str, nameOfTheSoftwareAxis:str, nameOfTheHardwareAxis:str):
+        """
+            BindHardwareAxis:
+            ==============
+            Summary:
+            -------
+            Binds an hardware axis of
+            a specified addon to a
+            software representation.
+        """
+        Debug.Start(AddonEnum.ChangeAxisBinding)
+        try:
+            result = Addons._listedAddons[whichAddonToBindItTo][AddonEnum.ChangeAxisBinding](nameOfTheSoftwareAxis, nameOfTheHardwareAxis)
+            if(result != Execution.Passed):
+                if(result == Execution.Unecessary):
+                    Debug.Warn(f"{whichAddonToBindItTo} may already have {nameOfTheHardwareAxis} binded to {nameOfTheSoftwareAxis}")
+                    Debug.End()
+                    return Execution.Unecessary
+                Debug.Error("Something went wrong.")
+            else:
+                Debug.Log(f"Success returned when binding {nameOfTheHardwareAxis} to {nameOfTheSoftwareAxis}")
+                Debug.End()
+                return Execution.Passed
+        except:
+            Debug.Error(f"Crash occured when trying to bind {whichAddonToBindItTo}'s {nameOfTheHardwareAxis} to {nameOfTheSoftwareAxis}.")
+            Debug.Error(f"{whichAddonToBindItTo} may not exist.")
+        Debug.End()
+        return Execution.Failed
+
+    def UnbindHardwareButtonFromEveryone(nameOfTheSoftwareButton:str):
+        """
+            UnbindHardwareButtonFromEveryone:
+            =================================
+            Summary:
+            --------
+            Attempts to unbind a given
+            software button from all the
+            addons currently listed.
+        """
+        Debug.Start(AddonEnum.UnbindButtonBinding)
+        Addons._Execute(AddonEnum.UnbindButtonBinding, [nameOfTheSoftwareButton])
+        Debug.End()
+
+    def UnbindHardwareAxisFromEveryone(nameOfTheSoftwareAxis:str):
+        """
+            UnbindHardwareAxisFromEveryone:
+            ===============================
+            Summary:
+            --------
+            Attempts to unbind a given
+            software axis from all the
+            addons currently listed.
+        """
+        Debug.Start(AddonEnum.UnbindAxisBinding)
+        Addons._Execute(AddonEnum.UnbindAxisBinding, [nameOfTheSoftwareAxis])
         Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
@@ -532,14 +725,14 @@ class AddonInfoHandler:
     #endregion
     #region   --------------------------- MEMBERS
     information:dict = {
-            "Launch"        : None, 
+            "Launch"        : None,
             "Stop"          : None,
             "Uninstall"     : None,
             "Update"        : None,
-            "GetState"      : None, 
-            "ClearProfile"  : None, 
-            "SaveProfile"   : None, 
-            "ChangeProfile" : None, 
+            "GetState"      : None,
+            "ClearProfile"  : None,
+            "SaveProfile"   : None,
+            "ChangeProfile" : None,
             "LoadProfile"   : None,
             "GetAllHardwareControls"        : None,
             "GetAllSoftwareActions"         : None,
@@ -554,8 +747,10 @@ class AddonInfoHandler:
                 "type" : None,
                 "repository" : None,
                 "description" : None,
-                "outputsHardwareControls" : False,
-                "canReadSoftwareControls" : False,
+                "hasHardwareButtons" : False,
+                "hasHardwareAxes" : False,
+                "readsSoftwareButtons" : False,
+                "readsSoftwareAxes" : False,
                 "isCompatible" : False
             }
         }
@@ -611,8 +806,10 @@ class AddonInfoHandler:
                  version:str,
                  type:str,
                  repository:str,
-                 outputsHardwareControls:bool,
-                 canReadSoftwareControls:bool,
+                 hasHardwareButtons:bool,
+                 hasHardwareAxes:bool,
+                 readsSoftwareButtons:bool,
+                 readsSoftwareAxes:bool,
                  MDIcon:str,
 
                  LaunchFunction,
@@ -624,10 +821,13 @@ class AddonInfoHandler:
                  SaveProfile,
                  ChangeProfile,
                  LoadProfile,
+                 UnloadProfile,
                  GetAllHardwareControls,
                  GetAllSoftwareActions,
                  ChangeButtonBinding,
                  ChangeAxisBinding,
+                 UnbindButtonBinding,
+                 UnbindAxisBinding,
                  ChangeButtonActionBinding,
                  ChangeAxisActionBinding
                  ):
@@ -655,33 +855,37 @@ class AddonInfoHandler:
                 "type" : type,
                 "repository" : repository,
                 "description" : description,
-                "outputsHardwareControls" : outputsHardwareControls,
-                "canReadSoftwareControls" : canReadSoftwareControls,
+                "hasHardwareButtons" : hasHardwareButtons,
+                "hasHardwareAxes" : hasHardwareAxes,
+                "readsSoftwareButtons" : readsSoftwareButtons,
+                "readsSoftwareAxes" : readsSoftwareAxes,
                 "isCompatible" : False ,
                 "MDIcon" : MDIcon
         }
-        self.information["information"] = informationsToSave
+        self.information[AddonEnum.information] = informationsToSave
         Debug.Log(">>> Success")
 
         Debug.Log("Saving functions...")
         Debug.Warn("TODO: Addon's functions are not tested.")
 
-        self.information["Launch"] = LaunchFunction
-        self.information["Stop"] = StopFunction
-        self.information["Uninstall"] = UninstallFunction
-        self.information["Update"] = UpdateFunction
-        self.information["GetState"] = GetStateFunction
-        self.information["ClearProfile"] = ClearProfileFunction
-        self.information["SaveProfile"] = SaveProfile
-        self.information["ChangeProfile"] = ChangeProfile
-        self.information["LoadProfile"] = LoadProfile
-        self.information["GetAllHardwareControls"] = GetAllHardwareControls
-        self.information["GetAllHardwareControls"] = GetAllHardwareControls
-        self.information["GetAllSoftwareActions"] = GetAllSoftwareActions
-        self.information["ChangeButtonBinding"] = ChangeButtonBinding
-        self.information["ChangeAxisBinding"] = ChangeAxisBinding
-        self.information["ChangeButtonActionBinding"] = ChangeButtonActionBinding
-        self.information["ChangeAxisActionBinding"] = ChangeAxisActionBinding
+        self.information[AddonEnum.Launch] = LaunchFunction
+        self.information[AddonEnum.Stop] = StopFunction
+        self.information[AddonEnum.Uninstall] = UninstallFunction
+        self.information[AddonEnum.Update] = UpdateFunction
+        self.information[AddonEnum.GetState] = GetStateFunction
+        self.information[AddonEnum.ClearProfile] = ClearProfileFunction
+        self.information[AddonEnum.SaveProfile] = SaveProfile
+        self.information[AddonEnum.ChangeProfile] = ChangeProfile
+        self.information[AddonEnum.LoadProfile] = LoadProfile
+        self.information[AddonEnum.UnloadProfile] = UnloadProfile
+        self.information[AddonEnum.GetAllHardwareControls] = GetAllHardwareControls
+        self.information[AddonEnum.GetAllSoftwareActions] = GetAllSoftwareActions
+        self.information[AddonEnum.ChangeButtonBinding] = ChangeButtonBinding
+        self.information[AddonEnum.ChangeAxisBinding] = ChangeAxisBinding
+        self.information[AddonEnum.ChangeButtonActionBinding] = ChangeButtonActionBinding
+        self.information[AddonEnum.ChangeAxisActionBinding] = ChangeAxisActionBinding
+        self.information[AddonEnum.UnbindAxisBinding] = UnbindAxisBinding
+        self.information[AddonEnum.UnbindButtonBinding] = UnbindButtonBinding
         Debug.Log(">>> Success")
         Debug.End()
     #endregion
@@ -854,6 +1058,22 @@ class AddonFoundations:
         Debug.End()
         return Execution.Incompatibility
     # -------------------------------------------
+    def UnloadProfile(profileToLoad:str) -> Execution:
+        """
+            `UnloadProfile`:
+            ==========
+            This function is not yet defined in
+            this addon. It will return
+            `Execution.Incompatibility` until
+            its defined in your class. This means
+            that the application will think that
+            it isn't a supported function.
+        """
+        Debug.Start("UnloadProfile")
+        Debug.Warn("NOT SUPPORTED")
+        Debug.End()
+        return Execution.Incompatibility
+    # -------------------------------------------
     def GetAllHardwareControls() -> Execution:
         """
             `Attention`:
@@ -949,85 +1169,117 @@ class AddonFoundations:
         Debug.Warn("NOT SUPPORTED")
         Debug.End()
         return Execution.Incompatibility
+    # -------------------------------------------
+    def UnbindAxisBinding(nameOfSoftwareAxis:str) -> Execution:
+        """
+            `Attention`:
+            ==========
+            This function is not yet defined in
+            this addon. It will return
+            `Execution.Incompatibility` until
+            its defined in your class. This means
+            that the application will think that
+            it isn't a supported function.
+        """
+        Debug.Start("UnbindAxisBinding")
+        Debug.Warn("NOT SUPPORTED")
+        Debug.End()
+        return Execution.Incompatibility
+    # -------------------------------------------
+    def UnbindButtonBinding(nameOfSoftwareButton:str) -> Execution:
+        """
+            `Attention`:
+            ==========
+            This function is not yet defined in
+            this addon. It will return
+            `Execution.Incompatibility` until
+            its defined in your class. This means
+            that the application will think that
+            it isn't a supported function.
+        """
+        Debug.Start("UnbindButtonBinding")
+        Debug.Warn("NOT SUPPORTED")
+        Debug.End()
+        return Execution.Incompatibility
     #endregion
     #region   --------------------------- CONSTRUCTOR
-    def __init__(self,
-                 name:str,
-                 description:str,
-                 version:str,
-                 type:str,
-                 repository:str,
-                 outputsHardwareControls:bool,
-                 canReadSoftwareControls:bool,
+    # def __init__(self,
+    #              name:str,
+    #              description:str,
+    #              version:str,
+    #              type:str,
+    #              repository:str,
+    #              outputsHardwareControls:bool,
+    #              canReadSoftwareControls:bool,
 
-                 LaunchFunction,
-                 StopFunction,
-                 UninstallFunction,
-                 UpdateFunction,
-                 GetStateFunction,
-                 ClearProfileFunction,
-                 SaveProfile,
-                 ChangeProfile,
-                 LoadProfile,
-                 GetAllHardwareControls,
-                 GetAllSoftwareActions,
-                 ChangeButtonBinding,
-                 ChangeAxisBinding,
-                 ChangeButtonActionBinding,
-                 ChangeAxisActionBinding
-                 ):
-        """
-            AddonInfoHandler:
-            =================
-            Summary:
-            --------
-            Class built in your drivers that allows
-            them to easily create their dictionaries
-            to add to the regular Addons class
+    #              LaunchFunction,
+    #              StopFunction,
+    #              UninstallFunction,
+    #              UpdateFunction,
+    #              GetStateFunction,
+    #              ClearProfileFunction,
+    #              SaveProfile,
+    #              ChangeProfile,
+    #              LoadProfile,
+    #              GetAllHardwareControls,
+    #              GetAllSoftwareActions,
+    #              ChangeButtonBinding,
+    #              ChangeAxisBinding,
+    #              ChangeButtonActionBinding,
+    #              ChangeAxisActionBinding
+    #              ):
+    #     """
+    #         AddonInfoHandler:
+    #         =================
+    #         Summary:
+    #         --------
+    #         Class built in your drivers that allows
+    #         them to easily create their dictionaries
+    #         to add to the regular Addons class
 
-            Arguments:
-            ----------
-            Please refer to :ref:`Addons` class's _list private member.
-            it will explain in great details each one of these as well
-            as their expected returned values and input parameters.
-        """
-        Debug.Start("AddonInfoHandler -> __init__")
+    #         Arguments:
+    #         ----------
+    #         Please refer to :ref:`Addons` class's _list private member.
+    #         it will explain in great details each one of these as well
+    #         as their expected returned values and input parameters.
+    #     """
+    #     Debug.Start("AddonInfoHandler -> __init__")
 
-        Debug.Log("Saving regular informations...")
-        informationsToSave:dict = {
-                "version" : version,
-                "name" : name,
-                "type" : type,
-                "repository" : repository,
-                "description" : description,
-                "outputsHardwareControls" : outputsHardwareControls,
-                "canReadSoftwareControls" : canReadSoftwareControls,
-                "isCompatible" : False 
-        }
-        self.information["information"] = informationsToSave
-        Debug.Log(">>> Success")
+    #     Debug.Log("Saving regular informations...")
+    #     informationsToSave:dict = {
+    #             "version" : version,
+    #             "name" : name,
+    #             "type" : type,
+    #             "repository" : repository,
+    #             "description" : description,
+    #             "outputsHardwareControls" : outputsHardwareControls,
+    #             "canReadSoftwareControls" : canReadSoftwareControls,
+    #             "isCompatible" : False 
+    #     }
+    #     self.information["information"] = informationsToSave
+    #     Debug.Log(">>> Success")
 
-        Debug.Log("Saving functions...")
-        Debug.Warn("TODO: Addon's functions are not tested.")
+    #     Debug.Log("Saving functions...")
+    #     Debug.Warn("TODO: Addon's functions are not tested.")
 
-        self.information["Launch"] = LaunchFunction
-        self.information["Stop"] = StopFunction
-        self.information["Uninstall"] = UninstallFunction
-        self.information["Update"] = UpdateFunction
-        self.information["GetState"] = GetStateFunction
-        self.information["ClearProfile"] = ClearProfileFunction
-        self.information["SaveProfile"] = SaveProfile
-        self.information["ChangeProfile"] = ChangeProfile
-        self.information["LoadProfile"] = LoadProfile
-        self.information["GetAllHardwareControls"] = GetAllHardwareControls
-        self.information["GetAllHardwareControls"] = GetAllHardwareControls
-        self.information["GetAllSoftwareActions"] = GetAllSoftwareActions
-        self.information["ChangeButtonBinding"] = ChangeButtonBinding
-        self.information["ChangeAxisBinding"] = ChangeAxisBinding
-        self.information["ChangeButtonActionBinding"] = ChangeButtonActionBinding
-        self.information["ChangeAxisActionBinding"] = ChangeAxisActionBinding
-        Debug.Log(">>> Success")
-        Debug.End()
+    #     self.information["Launch"] = LaunchFunction
+    #     self.information["Stop"] = StopFunction
+    #     self.information["Uninstall"] = UninstallFunction
+    #     self.information["Update"] = UpdateFunction
+    #     self.information["GetState"] = GetStateFunction
+    #     self.information["ClearProfile"] = ClearProfileFunction
+    #     self.information["SaveProfile"] = SaveProfile
+    #     self.information["ChangeProfile"] = ChangeProfile
+    #     self.information["LoadProfile"] = LoadProfile
+    #     self.information["GetAllHardwareControls"] = GetAllHardwareControls
+    #     self.information["GetAllHardwareControls"] = GetAllHardwareControls
+    #     self.information["GetAllSoftwareActions"] = GetAllSoftwareActions
+    #     self.information["ChangeButtonBinding"] = ChangeButtonBinding
+    #     self.information["ChangeAxisBinding"] = ChangeAxisBinding
+    #     self.information["ChangeButtonActionBinding"] = ChangeButtonActionBinding
+    #     self.information["ChangeAxisActionBinding"] = ChangeAxisActionBinding
+    #     Debug.Log(">>> Success")
+    #     Debug.End()
     #endregion
     pass
 

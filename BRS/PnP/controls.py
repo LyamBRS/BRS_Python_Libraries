@@ -406,7 +406,6 @@ class Controls:
             - `Execution.Incompatibility`: Button is already binded.    
         """
         Debug.Start("bindButton")
-
         Debug.Log(f"Attempting to bind {nameOfTheHardwareBinding}'s {bindedAs} to {nameOfSoftwareButton}...")
 
         # Does the button exist?
@@ -414,7 +413,7 @@ class Controls:
             Debug.Error(f"{nameOfSoftwareButton} isn't a valid button that can be binded.")
             Debug.End()
             return Execution.Failed
-        
+
         # Is the button binded already?
         buttonAlreadybinded = Controls._buttons[nameOfSoftwareButton]["binded"]
         whoeverBindedIt = Controls._buttons[nameOfSoftwareButton]["bindedTo"]
@@ -423,7 +422,7 @@ class Controls:
             Debug.Error(f"{nameOfSoftwareButton} is already binded to {whoeverBindedIt}")
             Debug.End()
             return Execution.Incompatibility
-        
+
         # Welp, looks like we can bind the button!
         Controls._buttons[nameOfSoftwareButton]["bindedTo"] = nameOfTheHardwareBinding
         Controls._buttons[nameOfSoftwareButton]["bindedAs"] = bindedAs
@@ -488,7 +487,111 @@ class Controls:
         Debug.Log(">>> Success")
         Debug.End()
         return Execution.Passed
-    
+
+    def UnbindButton(nameOfTheHardwareBinding:str, nameOfSoftwareButton:str):
+        """
+            UnbindButton:
+            ============
+            Summary:
+            --------
+            Function that unbinds a given
+            software buttons from the class.
+
+            Arguments:
+            ----------
+            - `nameOfTheHardwareBinding:str` : Who wants to unbind?
+            - `nameOfSoftwareButton:str` : Name of the button that will be unbinded.
+
+            Attention:
+            ----------
+            The button is only un-binded
+            if the :ref:`nameOfTheHardwareBinding`
+            passed matches the one currently
+            saved under that software button.
+        """
+        Debug.Start("UnbindButton")
+
+        # Does the button exist?
+        if(nameOfSoftwareButton not in Controls._buttons):
+            Debug.Error(f"{nameOfSoftwareButton} isn't a valid button that can be un-binded.")
+            Debug.End()
+            return Execution.Failed
+
+        # Is the button binded?
+        binded = Controls._buttons[nameOfSoftwareButton]["binded"]
+        whoeverBindedIt = Controls._buttons[nameOfSoftwareButton]["bindedTo"]
+
+        if(not binded):
+            Debug.Error(f"{nameOfSoftwareButton} is not binded.")
+            Debug.End()
+            return Execution.Unecessary
+
+        if(whoeverBindedIt != nameOfTheHardwareBinding):
+            Debug.Error(f"{nameOfTheHardwareBinding} cannot un-bind buttons binded to {whoeverBindedIt}")
+            Debug.End()
+            return Execution.Failed
+
+        Controls._buttons[nameOfSoftwareButton]["bindedTo"] = None
+        Controls._buttons[nameOfSoftwareButton]["bindedAs"] = None
+        Controls._buttons[nameOfSoftwareButton]["getter"] = None
+        Controls._buttons[nameOfSoftwareButton]["state"] = False
+        Controls._buttons[nameOfSoftwareButton]["binded"] = False
+        Debug.Log(f"{nameOfSoftwareButton} is no longer binded.")
+        Debug.End()
+        return Execution.Passed
+
+    def UnbindAxis(nameOfTheHardwareBinding:str, nameOfSoftwareAxis:str):
+        """
+            UnbindAxis:
+            ============
+            Summary:
+            --------
+            Function that unbinds a given
+            software axis from the class.
+
+            Arguments:
+            ----------
+            - `nameOfTheHardwareBinding:str` : Who wants to unbind?
+            - `nameOfSoftwareAxis:str` : Name of the axis that will be un-binded.
+
+            Attention:
+            ----------
+            The axis is only un-binded
+            if the :ref:`nameOfTheHardwareBinding`
+            passed matches the one currently
+            saved under that software axis.
+        """
+        Debug.Start("UnbindAxis")
+
+        # Does the button exist?
+        if(nameOfSoftwareAxis not in Controls._axes):
+            Debug.Error(f"{nameOfSoftwareAxis} isn't a valid axis that can be un-binded.")
+            Debug.End()
+            return Execution.Failed
+
+        # Is the button binded?
+        binded = Controls._axes[nameOfSoftwareAxis]["binded"]
+        whoeverBindedIt = Controls._axes[nameOfSoftwareAxis]["bindedTo"]
+
+        if(not binded):
+            Debug.Error(f"{nameOfSoftwareAxis} is not binded.")
+            Debug.End()
+            return Execution.Unecessary
+
+        if(whoeverBindedIt != nameOfTheHardwareBinding):
+            Debug.Error(f"{nameOfTheHardwareBinding} cannot un-bind axis binded to {whoeverBindedIt}")
+            Debug.End()
+            return Execution.Failed
+
+        Controls._axes[nameOfSoftwareAxis]["bindedTo"] = None
+        Controls._axes[nameOfSoftwareAxis]["bindedAs"] = None
+        Controls._axes[nameOfSoftwareAxis]["getter"] = None
+        Controls._axes[nameOfSoftwareAxis]["state"] = False
+        Controls._axes[nameOfSoftwareAxis]["binded"] = False
+        Debug.Log(f"{nameOfSoftwareAxis} is no longer binded.")
+        Debug.End()
+        return Execution.Passed
+
     def UnbindHardware(nameOfTheHardwareToUnbind) -> Execution:
         """
             UnbindHardware:
@@ -511,9 +614,11 @@ class Controls:
         Debug.Log(f"Unbinding {nameOfTheHardwareToUnbind} from axes...")
         for axis in Controls._axes:
             if(Controls._axes[axis]["bindedTo"] == nameOfTheHardwareToUnbind):
-                Controls._buttons[button]["bindedTo"] = None
-                Controls._buttons[button]["bindedAs"] = None
-                Controls._buttons[button]["value"] = 0
+                Controls._axes[axis]["bindedTo"] = None
+                Controls._axes[axis]["bindedAs"] = None
+                Controls._axes[axis]["getter"] = None
+                Controls._axes[axis]["binded"] = False
+                Controls._axes[axis]["value"] = 0
                 Debug.Log(f"{axis} unbinded from {nameOfTheHardwareToUnbind}")
 
         Debug.Log(f"Unbinding {nameOfTheHardwareToUnbind} from buttons...")
@@ -521,12 +626,13 @@ class Controls:
             if(Controls._buttons[button]["bindedTo"] == nameOfTheHardwareToUnbind):
                 Controls._buttons[button]["bindedTo"] = None
                 Controls._buttons[button]["bindedAs"] = None
+                Controls._buttons[button]["getter"] = None
                 Controls._buttons[button]["state"] = False
+                Controls._buttons[button]["binded"] = False
                 Debug.Log(f"{button} unbinded from {nameOfTheHardwareToUnbind}")
 
         Debug.End()
         return Execution.Passed
-    
     def GetAxisValue(nameOfTheAxis:str) -> float:
         """
             GetAxisValue:
@@ -559,7 +665,7 @@ class Controls:
         Debug.Log(f"{nameOfTheAxis} binded by {thatHardware} is currently {thisValue}")
         Debug.End()
         return thisValue
-    
+
     def GetButtonState(nameOfTheButton:str) -> bool:
         """
             GetButtonState:
