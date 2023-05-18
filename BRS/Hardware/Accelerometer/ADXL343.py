@@ -66,7 +66,7 @@ class ADXL343:
     @staticmethod
     def _reading_thread(ADXLclass):
         counter = 0
-        while counter <= 25:
+        while True:
             if ADXLclass.stop_event.is_set():
                 break
             print("Counter:", counter)
@@ -74,10 +74,10 @@ class ADXL343:
 
             with ADXLclass.lock:
                 ADXLclass.realX = counter
-                ADXLclass.realY = counter
-                ADXLclass.realZ = counter
+                ADXLclass.realY = counter+1
+                ADXLclass.realZ = counter+2
 
-            time.sleep(0.5)
+            time.sleep(1)
         ADXLclass.isStarted = False
 
     @staticmethod
