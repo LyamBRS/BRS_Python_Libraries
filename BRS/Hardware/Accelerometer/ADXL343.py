@@ -86,7 +86,7 @@ class ADXL343:
                 ADXLclass.realY = xyz[1]
                 ADXLclass.realZ = xyz[2]
 
-            time.sleep(1)
+            # time.sleep(1)
         ADXLclass.isStarted = False
 
     @staticmethod
