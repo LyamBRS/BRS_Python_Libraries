@@ -66,16 +66,25 @@ class ADXL343:
     @staticmethod
     def _reading_thread(ADXLclass):
         counter = 0
+
+        import time
+        import board
+        import busio
+        import adafruit_adxl34x
+
+        i2c = busio.I2C(board.SCL, board.SDA)
+        accelerometer = adafruit_adxl34x.ADXL345(i2c)
+
         while True:
             if ADXLclass.stop_event.is_set():
                 break
-            print("Counter:", counter)
-            counter += 1
+
+            xyz = accelerometer.acceleration
 
             with ADXLclass.lock:
-                ADXLclass.realX = counter
-                ADXLclass.realY = counter+1
-                ADXLclass.realZ = counter+2
+                ADXLclass.realX = xyz[0]
+                ADXLclass.realY = xyz[1]
+                ADXLclass.realZ = xyz[2]
 
             time.sleep(1)
         ADXLclass.isStarted = False
@@ -109,7 +118,7 @@ class ADXL343:
         Debug.Log("ADXL343 is now started")
         Debug.End()
         return Execution.Passed
-# 
+
     @staticmethod
     def StopDriver():
         """
