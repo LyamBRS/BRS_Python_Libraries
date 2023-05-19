@@ -85,6 +85,7 @@ class ADXL343:
                 ADXLclass.realX = xyz[0]
                 ADXLclass.realY = xyz[1]
                 ADXLclass.realZ = xyz[2]
+            time.sleep(0.01)
 
             # time.sleep(1)
         ADXLclass.isStarted = False
