@@ -193,7 +193,7 @@ def GetFolderFromPath(path) -> str:
     """
     return os.path.basename(os.path.normpath(path))
 # -------------------------------------------------------------------
-def CompareList(expected:list, current:list, exceptions:list=None) -> Execution:
+def CompareList(expected:list, current:list, exceptions:list=None, DontDebug:bool=True) -> Execution:
     """
         CompareList:
         ============
@@ -209,11 +209,11 @@ def CompareList(expected:list, current:list, exceptions:list=None) -> Execution:
         account during comparaison if they are found in the 2 other
         lists.
     """
-    Debug.Start("CompareList", DontDebug=True)
+    Debug.Start("CompareList", DontDebug=DontDebug)
     ContinueDebug = True
 
     if exceptions != None:
-        Debug.Log(">>> Removing exceptions from given lists")
+        Debug.Log(f">>> Removing exceptions from given lists: {exceptions}")
         current = [item for item in current if item not in exceptions]
         expected = [item for item in expected if item not in exceptions]
 
