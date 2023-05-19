@@ -229,4 +229,33 @@ class Execution(Enum):
 
     Unecessary:int = 6
     """ The execution was bypassed because there was no point in executing it."""
+#====================================================================#
+class VarTypes:
+    """
+        VarTypes:
+        =========
+        Summary:
+        --------
+        Holds definition of c variable
+        types as struct compatible strings.
+    """
+    class Unsigned:
+        Char:str = "B"
+        Short:str = "H"
+        Int:str = "I"
+        Long:str = "L"
+        LongLong:str = "Q"
+    
+    class Signed:
+        Char:str = "b"
+
+    Bool:str = "?"
+    Char:str = "c"
+    Short:str = "h"
+    Int:str = "i"
+    Long:str = "l"
+    Longlong:str = "q"
+    Float:str = "f"
+    Double:str = "d"
+
 LoadingLog.End("Enums.py")
