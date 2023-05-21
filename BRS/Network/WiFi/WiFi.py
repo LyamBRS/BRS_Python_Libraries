@@ -755,9 +755,10 @@ class Linux_VerifyInternetConnection:
             if(continueToTry):
                 isConnected = False
                 try:
-                    ping = subprocess.run(["ping", "www.google.com"])
-                    continueToTry = False
-                    isConnected = True
+                    ping = subprocess.run(["ping", "www.google.com", "-c", "1"])
+                    if(ping.returncode == 0):
+                        continueToTry = False
+                        isConnected = True
                 except:
                     pass
                 timeTakenToConnect = timeTakenToConnect + 0.5
