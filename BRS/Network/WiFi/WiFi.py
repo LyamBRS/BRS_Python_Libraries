@@ -611,6 +611,7 @@ class Linux_ConnectWiFi:
         continueToTry:bool = True
         currentSSID:str = ""
         currentAttempt:int = 0
+        connected:bool = False
 
         while True:
             time.sleep(0.5)
@@ -619,15 +620,17 @@ class Linux_ConnectWiFi:
 
             if(currentSSID == connectWiFiClass.currentSSID):
                 continueToTry = False
+                connected = True
 
             if(continueToTry):
+                connected = False
                 currentSSID = Linux_GetCurrentSSID()
                 timeTakenToConnect = timeTakenToConnect + 0.5
                 currentAttempt = currentAttempt + 1
 
             with connectWiFiClass.lock:
                 connectWiFiClass.currentSSID = currentSSID
-                connectWiFiClass.connected = not continueToTry
+                connectWiFiClass.connected = connected
                 connectWiFiClass.currentAttempt = currentAttempt
                 connectWiFiClass.timeTaken = timeTakenToConnect
 
