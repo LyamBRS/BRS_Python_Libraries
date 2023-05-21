@@ -614,6 +614,8 @@ class Linux_ConnectWiFi:
 
         while True:
             time.sleep(0.5)
+            if Linux_ConnectWiFi.stop_event.is_set():
+                break
 
             if(currentSSID == connectWiFiClass.currentSSID):
                 continueToTry = False
