@@ -531,7 +531,7 @@ def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
     config = '\n'.join(config_lines)
 
     Debug.Log("Trying to change permissions of wpa_supplicant.conf")
-    os.popen("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
+    subprocess.check_output("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
 
     os.popen("sudo ifconfig wlan0 down")
 
@@ -698,15 +698,15 @@ class Linux_ConnectWiFi:
             --------
             - [isConnected:bool, currentAttempt:int, timeTakenToConnect:float, currentNetworkSSID:str]
         """
-        Debug.Start("GetConnectionStatus")
+        Debug.Start("GetConnectionStatus", DontDebug=True)
         if Linux_ConnectWiFi.isStarted:
             with Linux_ConnectWiFi.lock:
                 Debug.Log("Returning values from the thread")
-                Debug.End()
+                Debug.End(ContinueDebug=True)
                 return [Linux_ConnectWiFi.connected, Linux_ConnectWiFi.currentAttempt, Linux_ConnectWiFi.timeTaken, Linux_ConnectWiFi.currentSSID]
         else:
             Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
-            Debug.End()
+            Debug.End(ContinueDebug=True)
             return [False, 0, 0, "ERROR"]
 
 #endregion
