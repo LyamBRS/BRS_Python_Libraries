@@ -784,11 +784,8 @@ class Linux_VerifyInternetConnection:
         """
         Debug.Start("StartConnecting")
         if Linux_VerifyInternetConnection.isStarted == False:
-            Linux_VerifyInternetConnection._ssid = ssid
-            Linux_VerifyInternetConnection._password = password
             Linux_VerifyInternetConnection.currentAttempt = 0
-            Linux_VerifyInternetConnection.connected = False
-            Linux_VerifyInternetConnection.currentSSID = None
+            Linux_VerifyInternetConnection.hasInternet = False
             Linux_VerifyInternetConnection.timeTaken = 0
 
             if not Linux_VerifyInternetConnection.thread or not Linux_VerifyInternetConnection.thread.is_alive():
