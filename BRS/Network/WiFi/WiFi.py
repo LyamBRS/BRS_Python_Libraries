@@ -615,7 +615,7 @@ class Linux_ConnectWiFi:
 
         while True:
             time.sleep(0.5)
-            if Linux_ConnectWiFi.stop_event.is_set():
+            if connectWiFiClass.stop_event.is_set():
                 break
 
             if(continueToTry):
@@ -708,6 +708,144 @@ class Linux_ConnectWiFi:
                 Debug.Log("Returning values from the thread")
                 Debug.End(ContinueDebug=True)
                 return [Linux_ConnectWiFi.connected, Linux_ConnectWiFi.currentAttempt, Linux_ConnectWiFi.timeTaken, Linux_ConnectWiFi.currentSSID]
+        else:
+            Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
+            Debug.End(ContinueDebug=True)
+            return [False, 0, 0, "ERROR"]
+
+class Linux_VerifyInternetConnection:
+    """
+        Linux_VerifyInternetConnection:
+        ===============================
+        Summary:
+        --------
+        This class manages a thread that
+        pings google.com until a correct
+        answer is received. Use StartPinging
+        and StopPinging to start and stop
+        the pinging process. Pings are done
+        each 0.5 seconds until a successful
+        one is received. Its important to
+        stop the thread.
+    """
+
+    thread = None
+    stop_event = threading.Event()
+    isStarted: bool = False
+
+    currentAttempt:int = 0
+    hasInternet:bool = False
+    timeTaken:float = 0
+
+    lock = threading.Lock()
+
+    @staticmethod
+    def _internetCheck_thread(connectWiFiClass):
+        import time
+        Linux_ConnectToNetwork(connectWiFiClass._ssid, connectWiFiClass._password)
+        timeTakenToConnect = 0
+        continueToTry:bool = True
+        readSSID:str = ""
+        currentConnectionAttempt:int = 0
+        isConnected:bool = False
+
+        while True:
+            time.sleep(0.5)
+            if connectWiFiClass.stop_event.is_set():
+                break
+
+            if(continueToTry):
+                isConnected = False
+                try:
+                    ping = subprocess.run(["ping", "www.google.com"])
+                    continueToTry = False
+                    isConnected = True
+                except:
+                    pass
+                timeTakenToConnect = timeTakenToConnect + 0.5
+                currentConnectionAttempt = currentConnectionAttempt + 1
+
+            with connectWiFiClass.lock:
+                connectWiFiClass.hasInternet = isConnected
+                connectWiFiClass.currentConnectionAttempt = currentConnectionAttempt
+                connectWiFiClass.timeTaken = timeTakenToConnect
+
+    @staticmethod
+    def StartPinging(ssid:str, password:str):
+        """
+            StartConnecting:
+            ================
+            Summary:
+            --------
+            Starts a thread that pings
+            www.google.com until a successful
+            ping is received or its told to
+            stop through :ref:`StopConnecting`
+        """
+        Debug.Start("StartConnecting")
+        if Linux_VerifyInternetConnection.isStarted == False:
+            Linux_VerifyInternetConnection._ssid = ssid
+            Linux_VerifyInternetConnection._password = password
+            Linux_VerifyInternetConnection.currentAttempt = 0
+            Linux_VerifyInternetConnection.connected = False
+            Linux_VerifyInternetConnection.currentSSID = None
+            Linux_VerifyInternetConnection.timeTaken = 0
+
+            if not Linux_VerifyInternetConnection.thread or not Linux_VerifyInternetConnection.thread.is_alive():
+                Linux_VerifyInternetConnection.stop_event.clear()
+                Linux_VerifyInternetConnection.thread = threading.Thread(target=Linux_VerifyInternetConnection._internetCheck_thread, args=(Linux_VerifyInternetConnection,))
+                Linux_VerifyInternetConnection.thread.start()
+                Linux_VerifyInternetConnection.isStarted = True
+                Debug.End()
+                return Execution.Passed
+        else:
+            Debug.Error("Thread is already started. You cannot start more than one.")
+            Debug.End()
+            return Execution.Failed
+        Debug.Log("Linux_VerifyInternetConnection is now started")
+        Debug.End()
+        return Execution.Passed
+
+    @staticmethod
+    def StopPinging():
+        """
+            StopConnecting:
+            ===============
+            Summary:
+            --------
+            Only stops the thread in which
+            we constantly read the current SSID
+            hoping its the wanted one.
+        """
+        Debug.Start("StopDriver")
+        Linux_VerifyInternetConnection.stop_event.set()
+        if Linux_VerifyInternetConnection.thread and Linux_VerifyInternetConnection.thread.is_alive():
+            Linux_VerifyInternetConnection.thread.join()
+        Debug.Log("Thread is stopped.")
+        Linux_VerifyInternetConnection.isStarted = False
+        Debug.End()
+        return Execution.Passed
+
+    @staticmethod
+    def GetConnectionStatus() -> list:
+        """
+            GetConnectionStatus:
+            =======================
+            Summary:
+            --------
+            Returns the current connection
+            status.
+
+            Returns:
+            --------
+            - [hasInternet:bool, currentAttempt:int, timeTakenToConnect:float]
+        """
+        Debug.Start("GetConnectionStatus", DontDebug=True)
+        if Linux_VerifyInternetConnection.isStarted:
+            with Linux_VerifyInternetConnection.lock:
+                Debug.Log("Returning values from the thread")
+                Debug.End(ContinueDebug=True)
+                return [Linux_VerifyInternetConnection.hasInternet, Linux_VerifyInternetConnection.currentAttempt, Linux_VerifyInternetConnection.timeTaken]
         else:
             Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
             Debug.End(ContinueDebug=True)
