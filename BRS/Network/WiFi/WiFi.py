@@ -771,7 +771,7 @@ class Linux_VerifyInternetConnection:
                 connectWiFiClass.timeTaken = timeTakenToConnect
 
     @staticmethod
-    def StartPinging(ssid:str, password:str):
+    def StartPinging():
         """
             StartConnecting:
             ================
