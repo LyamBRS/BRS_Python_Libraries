@@ -624,7 +624,7 @@ class Linux_ConnectWiFi:
                 timeTakenToConnect = timeTakenToConnect + 0.5
                 currentConnectionAttempt = currentConnectionAttempt + 1
 
-            if(readSSID == connectWiFiClass.currentSSID):
+            if(readSSID == connectWiFiClass._ssid):
                 continueToTry = False
                 isConnected = True
 
