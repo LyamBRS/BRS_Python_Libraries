@@ -742,10 +742,8 @@ class Linux_VerifyInternetConnection:
     @staticmethod
     def _internetCheck_thread(connectWiFiClass):
         import time
-        Linux_ConnectToNetwork(connectWiFiClass._ssid, connectWiFiClass._password)
         timeTakenToConnect = 0
         continueToTry:bool = True
-        readSSID:str = ""
         currentConnectionAttempt:int = 0
         isConnected:bool = False
 
