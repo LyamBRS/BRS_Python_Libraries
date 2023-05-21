@@ -490,16 +490,16 @@ class PassengerClass:
             Debug.Error(f"Failed to create passengers from {type(variable)} typed variable to {varType}")
             Debug.End()
             return Execution.Failed
-        
+
+        attendant = Passenger(byte=0, type=PassengerTypes.Div)
+        self.passengers.insert(0, attendant)
+
         Debug.Log("Converting bytes to passengers...")
         for byte in bytes:
             passenger = Passenger(PassengerTypes.Byte, byte)
             if(passenger == None):
                 Debug.Error("Failed to build one of the passengers.")
             self.passengers.append(passenger)
-        
-        attendant = Passenger(byte=0, type=PassengerTypes.Div)
-        self.passengers.insert(0, attendant)
 
         amountOfPassengers = len(self.passengers)
         Debug.Log(f"{amountOfPassengers} passengers and attendant now listed in the class.")
