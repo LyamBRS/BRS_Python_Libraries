@@ -684,6 +684,7 @@ class Linux_ConnectWiFi:
         if Linux_ConnectWiFi.thread and Linux_ConnectWiFi.thread.is_alive():
             Linux_ConnectWiFi.thread.join()
         Debug.Log("Thread is stopped.")
+        Linux_ConnectWiFi.isStarted = False
         Debug.End()
         return Execution.Passed
 
