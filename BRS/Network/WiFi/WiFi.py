@@ -27,6 +27,7 @@ import threading
 LoadingLog.Import("Libraries")
 from ...Utilities.Information import Information
 from ...Utilities.Enums import Execution
+from ...Utilities.Information import Information
 #endregion
 #region -------------------------------------------------------- Kivy
 #endregion
@@ -578,6 +579,129 @@ def Linux_GetCurrentSSID() -> str:
         Debug.End(ContinueDebug=True)
         return None
 
+def Windows_GetCurrentSSID() -> str:
+    """
+        Windows_GetCurrentSSID:
+        =====================
+        Summary:
+        --------
+        Function that returns the current SSID of
+        the network your device is connected to.
+        This is made for Windows.
+
+        If no network is found, `None` is returned.
+        if the command fails, Execution.Failed is returned.
+    """
+    Debug.Start("Windows_GetCurrentSSID", DontDebug=True)
+    try:
+        # Run the iwgetid command and capture the output
+        # output = subprocess.run(["netsh wlan show interfaces | findstr /R \"^....SSID"]).decode('utf-8').strip()
+        Debug.End(ContinueDebug=True)
+        return ""
+    except subprocess.CalledProcessError:
+        Debug.End(ContinueDebug=True)
+        return "ERROR"
+
+def Linux_IsInternetAccessible() -> bool:
+    """
+        Linux_IsInternetAccessible:
+        ===========================
+        Summary:
+        --------
+        Function that returns `True` or
+        `False` depending on if the
+        internet can be accessed by your
+        linux machine.
+
+        If google is down... this won't work.
+    """
+    Debug.Start("Linux_IsInternetAccessible", DontDebug=True)
+    try:
+        ping = subprocess.run(["ping", "www.google.com", "-c", "1"])
+        if(ping.returncode == 0):
+            Debug.End(ContinueDebug=True)
+            return True
+        else:
+            Debug.End(ContinueDebug=True)
+            return False
+    except:
+        Debug.End(ContinueDebug=True)
+        return False
+
+def Windows_IsInternetAccessible() -> bool:
+    """
+        Windows_IsInternetAccessible:
+        ===========================
+        Summary:
+        --------
+        Function that returns `True` or
+        `False` depending on if the
+        internet can be accessed by your
+        linux machine.
+
+        If google is down... this won't work.
+    """
+    Debug.Start("Windows_IsInternetAccessible", DontDebug=True)
+    try:
+        ping = subprocess.run(["ping", "-n", "1", "www.google.com"])
+        if(ping.returncode == 0):
+            Debug.End(ContinueDebug=True)
+            return True
+        else:
+            Debug.End(ContinueDebug=True)
+            return False
+    except:
+        Debug.End(ContinueDebug=True)
+        return False
+
+def Linux_GetNetworkStrength() -> int:
+    """
+        Linux_GetNetworkStrength:
+        =========================
+        Summary:
+        --------
+        Returns a strength from 0 to 100.
+        If the current network does not have
+        any, 0 is returned.
+    """
+    Debug.Start("Linux_GetNetworkStrength", DontDebug=True)
+    try:
+        # Run the iwgetid command and capture the output
+        output = subprocess.check_output(["iwconfig wlan0 | grep \"Link Quality\" | awk \'{print $2}\'"]).decode('utf-8').strip()
+        output.replace("Quality=", "")
+        output.split("/")
+        result = int(output[0]) / int(output[1])
+        result = int(result*100)
+        Debug.End(ContinueDebug=True)
+        return result
+    except subprocess.CalledProcessError:
+        Debug.End(ContinueDebug=True)
+        return 0
+
+def Windows_GetNetworkStrength() -> int:
+    """
+        Windows_GetNetworkStrength:
+        =========================
+        Summary:
+        --------
+        Returns a strength from 0 to 100.
+        If the current network does not have
+        any, 0 is returned.
+    """
+    Debug.Start("Windows_GetNetworkStrength", DontDebug=True)
+    try:
+        # Run the iwgetid command and capture the output
+        # output = subprocess.check_output(["iwconfig wlan0 | grep \"Link Quality\" | awk \'{print $2}\'"]).decode('utf-8').strip()
+        # output.replace("Quality=", "")
+        # output.split("/")
+        # result = int(output[0]) / int(output[1])
+        # result = int(result*100)
+        # Debug.End(ContinueDebug=True)
+        return 0
+    except subprocess.CalledProcessError:
+        Debug.End(ContinueDebug=True)
+        return 0
+
 class Linux_ConnectWiFi:
     """
         Linux_ConnectWiFi:
@@ -846,6 +970,150 @@ class Linux_VerifyInternetConnection:
             Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
             Debug.End(ContinueDebug=True)
             return [False, 0, 0, "ERROR"]
+#endregion
+
+#region -------------------------------------------- Slow Updater thread
+class WiFiStatusUpdater:
+    """
+        WiFiStatusUpdater:
+        ==================
+        Summary:
+        --------
+        This class manages a thread
+        that updates each 10 seconds
+        a bunch of informations about
+        your current WiFi network
+        such as:
+        - strength (0-100)
+        - name (ssid)
+        - can it use the internet
+    """
+
+    thread = None
+    stop_event = threading.Event()
+    isStarted: bool = False
+
+    canUseInternet:bool = False
+    currentSSID:str = None
+    currentWiFiStrength:int = 0
+
+    lock = threading.Lock()
+
+    @staticmethod
+    def _UpdaterThread(connectWiFiClass, information):
+        import time
+
+        currentSSID:str = None
+        currentStrength:int = None
+        hasInternetAccess:bool = False
+
+        timeSlept:int = 0
+
+        while True:
+
+            if information.platform == "Linux":
+                currentSSID = Linux_GetCurrentSSID()
+                currentStrength = Linux_GetNetworkStrength()
+                hasInternetAccess = Linux_IsInternetAccessible()
+
+            if information.platform == "Windows":
+                currentSSID = Windows_GetCurrentSSID()
+                currentStrength = Windows_GetNetworkStrength()
+                hasInternetAccess = Windows_IsInternetAccessible()
+
+            for timeSlept in range(10):
+                time.sleep(1)
+
+                if connectWiFiClass.stop_event.is_set():
+                    break
+
+                with connectWiFiClass.lock:
+                    connectWiFiClass.canUseInternet = hasInternetAccess
+                    connectWiFiClass.currentSSID = currentSSID
+                    connectWiFiClass.currentStrength = currentStrength
+
+            if connectWiFiClass.stop_event.is_set():
+                break
+
+    @staticmethod
+    def StartUpdating():
+        """
+            StartUpdating:
+            ================
+            Summary:
+            --------
+            Starts a thread that updates
+            your networks informations
+            periodically.
+            The values are updated each
+            10 seconds.
+        """
+        Debug.Start("StartUpdating")
+        if WiFiStatusUpdater.isStarted == False:
+            WiFiStatusUpdater.currentAttempt = 0
+            WiFiStatusUpdater.hasInternet = False
+            WiFiStatusUpdater.timeTaken = 0
+
+            if not WiFiStatusUpdater.thread or not WiFiStatusUpdater.thread.is_alive():
+                WiFiStatusUpdater.stop_event.clear()
+                WiFiStatusUpdater.thread = threading.Thread(target=WiFiStatusUpdater._UpdaterThread, args=(WiFiStatusUpdater, Information,))
+                WiFiStatusUpdater.thread.start()
+                WiFiStatusUpdater.isStarted = True
+                Debug.End()
+                return Execution.Passed
+        else:
+            Debug.Error("Thread is already started. You cannot start more than one.")
+            Debug.End()
+            return Execution.Failed
+        Debug.Log("WiFiStatusUpdater is now started")
+        Debug.End()
+        return Execution.Passed
+
+    @staticmethod
+    def StopUpdating():
+        """
+            StopUpdating:
+            ===============
+            Summary:
+            --------
+            Only stops the thread in which
+            we constantly update your wifi
+            network's informations
+            each 10 seconds
+        """
+        Debug.Start("StopUpdating")
+        WiFiStatusUpdater.stop_event.set()
+        if WiFiStatusUpdater.thread and WiFiStatusUpdater.thread.is_alive():
+            WiFiStatusUpdater.thread.join()
+        Debug.Log("Thread is stopped.")
+        WiFiStatusUpdater.isStarted = False
+        Debug.End()
+        return Execution.Passed
+
+    @staticmethod
+    def GetConnectionStatus() -> list:
+        """
+            GetConnectionStatus:
+            =======================
+            Summary:
+            --------
+            Returns the current connection
+            status.
+
+            Returns:
+            --------
+            - [currentSSID:str, canUseInternet:bool, currentWiFiStrength:int (0-100)]
+        """
+        Debug.Start("GetConnectionStatus", DontDebug=True)
+        if WiFiStatusUpdater.isStarted:
+            with WiFiStatusUpdater.lock:
+                Debug.Log("Returning values from the thread")
+                Debug.End(ContinueDebug=True)
+                return [WiFiStatusUpdater.currentSSID, WiFiStatusUpdater.canUseInternet, WiFiStatusUpdater.currentWiFiStrength]
+        else:
+            Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
+            Debug.End(ContinueDebug=True)
+            return ["ERROR", False, 0]
 
 #endregion
 #====================================================================#
