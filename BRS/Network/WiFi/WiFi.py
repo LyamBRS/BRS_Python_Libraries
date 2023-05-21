@@ -667,7 +667,7 @@ def Linux_GetNetworkStrength() -> int:
     Debug.Start("Linux_GetNetworkStrength", DontDebug=True)
     try:
         # Run the iwgetid command and capture the output
-        output = subprocess.check_output(["iwconfig wlan0 | grep \"Link Quality\" | awk \'{print $2}\'"]).decode('utf-8').strip()
+        output = subprocess.check_output(["iwconfig wlan0 | grep \"Link Quality\" | awk '{print $2}'"]).decode('utf-8').strip()
         output.replace("Quality=", "")
         output.split("/")
         result = int(output[0]) / int(output[1])
