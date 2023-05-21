@@ -531,7 +531,7 @@ def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
     config = '\n'.join(config_lines)
 
     Debug.Log("Trying to change permissions of wpa_supplicant.conf")
-    subprocess.check_output("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
+    os.popen("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
 
     os.popen("sudo ifconfig wlan0 down")
 
