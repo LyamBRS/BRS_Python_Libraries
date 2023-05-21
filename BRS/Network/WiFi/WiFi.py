@@ -609,29 +609,29 @@ class Linux_ConnectWiFi:
         Linux_ConnectToNetwork(connectWiFiClass._ssid, connectWiFiClass._password)
         timeTakenToConnect = 0
         continueToTry:bool = True
-        currentSSID:str = ""
-        currentAttempt:int = 0
-        connected:bool = False
+        readSSID:str = ""
+        currentConnectionAttempt:int = 0
+        isConnected:bool = False
 
         while True:
             time.sleep(0.5)
             if Linux_ConnectWiFi.stop_event.is_set():
                 break
 
-            if(currentSSID == connectWiFiClass.currentSSID):
-                continueToTry = False
-                connected = True
-
             if(continueToTry):
-                connected = False
-                currentSSID = Linux_GetCurrentSSID()
+                isConnected = False
+                readSSID = Linux_GetCurrentSSID()
                 timeTakenToConnect = timeTakenToConnect + 0.5
-                currentAttempt = currentAttempt + 1
+                currentConnectionAttempt = currentConnectionAttempt + 1
+
+            if(readSSID == connectWiFiClass.currentSSID):
+                continueToTry = False
+                isConnected = True
 
             with connectWiFiClass.lock:
-                connectWiFiClass.currentSSID = currentSSID
-                connectWiFiClass.connected = connected
-                connectWiFiClass.currentAttempt = currentAttempt
+                connectWiFiClass.currentSSID = readSSID
+                connectWiFiClass.connected = isConnected
+                connectWiFiClass.currentConnectionAttempt = currentConnectionAttempt
                 connectWiFiClass.timeTaken = timeTakenToConnect
 
     @staticmethod
