@@ -568,14 +568,14 @@ def Linux_GetCurrentSSID() -> str:
         If no network is found, `None` is returned.
         if the command fails, Execution.Failed is returned.
     """
-    Debug.Start("Linux_GetCurrentWiFi")
+    Debug.Start("Linux_GetCurrentWiFi", DontDebug=True)
     try:
         # Run the iwgetid command and capture the output
-        output = subprocess.run(['iwgetid', '-r']).decode('utf-8').strip()
-        Debug.End()
+        output = subprocess.check_output(['iwgetid', '-r']).decode('utf-8').strip()
+        Debug.End(ContinueDebug=True)
         return output
     except subprocess.CalledProcessError:
-        Debug.End()
+        Debug.End(ContinueDebug=True)
         return None
 
 class Linux_ConnectWiFi:
