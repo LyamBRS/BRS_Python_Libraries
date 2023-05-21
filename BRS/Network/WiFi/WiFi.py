@@ -1030,7 +1030,7 @@ class WiFiStatusUpdater:
                 with connectWiFiClass.lock:
                     connectWiFiClass.canUseInternet = hasInternetAccess
                     connectWiFiClass.currentSSID = currentSSID
-                    connectWiFiClass.currentStrength = currentStrength
+                    connectWiFiClass.currentWiFiStrength = currentStrength
 
             if connectWiFiClass.stop_event.is_set():
                 break
