@@ -664,18 +664,22 @@ def Linux_GetNetworkStrength() -> int:
         If the current network does not have
         any, 0 is returned.
     """
-    Debug.Start("Linux_GetNetworkStrength", DontDebug=True)
+    Debug.Start("Linux_GetNetworkStrength", DontDebug=False)
     try:
         # Run the iwgetid command and capture the output
         output = subprocess.check_output(["iwconfig", "wlan0", "|", "grep", "\"Link Quality\"" "|", "awk", "'{print $2}'"]).decode('utf-8').strip()
-        output.replace("Quality=", "")
-        output.split("/")
+        # Debug.Log("output")
+        output = output.replace("Quality=", "")
+        # Debug.Log("output")
+        output = output.split("/")
+        # Debug.Log("output")
         result = int(output[0]) / int(output[1])
         result = int(result*100)
         Debug.End(ContinueDebug=True)
         return result
     except subprocess.CalledProcessError:
         Debug.End(ContinueDebug=True)
+        # Debug.Error("Command failed again.")
         return 0
 
 def Windows_GetNetworkStrength() -> int:
@@ -1004,7 +1008,7 @@ class WiFiStatusUpdater:
         import time
 
         currentSSID:str = None
-        currentStrength:int = None
+        currentStrength:int = 0
         hasInternetAccess:bool = False
 
         timeSlept:int = 0
