@@ -534,7 +534,8 @@ def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
     Debug.Log("Trying to change permissions of wpa_supplicant.conf")
     os.popen("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
 
-    os.popen("sudo ifconfig wlan0 down")
+    result = os.popen("sudo ifconfig wlan0 down")
+    result.
 
     #writing to file
     Debug.Log(f"Overwriting wpa_supplicant.conf")
@@ -667,16 +668,20 @@ def Linux_GetNetworkStrength() -> int:
     Debug.Start("Linux_GetNetworkStrength", DontDebug=False)
     try:
         # Run the iwgetid command and capture the output
-        output = subprocess.check_output(["iwconfig", "wlan0", "|", "grep", "\"Link Quality\"" "|", "awk", "'{print $2}'"]).decode('utf-8').strip()
-        # Debug.Log("output")
-        output = output.replace("Quality=", "")
-        # Debug.Log("output")
-        output = output.split("/")
-        # Debug.Log("output")
-        result = int(output[0]) / int(output[1])
-        result = int(result*100)
+        output = subprocess.run(["sudo", "iwconfig", "wlan0"], capture_output=True, text=True)
+
+        quality = 0
+        for line in output.stdout.split("\n"):
+            if "Link" in line:
+                line = line.replace("Link Quality=", "")
+                line = line.split("Signal")[0]
+                values = line.split("/")
+                quality = int(values[0]) / int(values[1])
+                Debug.End(ContinueDebug=True)
+                return int(quality*100)
+
         Debug.End(ContinueDebug=True)
-        return result
+        return 0
     except subprocess.CalledProcessError:
         Debug.End(ContinueDebug=True)
         # Debug.Error("Command failed again.")
