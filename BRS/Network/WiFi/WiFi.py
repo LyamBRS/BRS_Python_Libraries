@@ -20,6 +20,8 @@ LoadingLog.Start("web.py")
 #region ------------------------------------------------------ Python
 LoadingLog.Import("Python")
 import subprocess
+import os
+import threading
 #endregion
 #region --------------------------------------------------------- BRS
 LoadingLog.Import("Libraries")
@@ -509,21 +511,203 @@ def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
     Debug.Start("Linux_ConnectToNetwork")
 
     if(Information.initialized):
-        if(Information.platform != "Windows"):
-            Debug.Error(f"Attempting to call a netsh function on a non windows based OS: {Information.platform}")
+        if(Information.platform != "Linux"):
+            Debug.Error(f"Attempting to call a netsh function on a non linux based OS: {Information.platform}")
             Debug.End()
             return Execution.Incompatibility
         Debug.Log("Platform checked successfully.")
     else:
         Debug.Warn("Warning, BRS's Information class is not initialized. This function cannot execute safety measures.")
 
+    config_lines = [
+        'ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev',
+        'update_config=1',
+        '\n',
+        'network={',
+        '\tssid="{}"'.format(ssid),
+        '\tpsk="{}"'.format(password),
+        '}'
+        ]
+    config = '\n'.join(config_lines)
 
-    Debug.Log("Trying to execute windows terminal command...")
+    Debug.Log("Trying to change permissions of wpa_supplicant.conf")
+    os.popen("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
+
+    os.popen("sudo ifconfig wlan0 down")
+
+    #writing to file
+    Debug.Log(f"Overwriting wpa_supplicant.conf")
+    with open("/etc/wpa_supplicant/wpa_supplicant.conf", "w") as wifi:
+        wifi.write(config)
+        Debug.Log(">>> Success")
+        wifi.close()
+
+    # print(f">>> Changing permissions of wpa_supplicant.conf")
+    # os.popen("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
+
+    Debug.Log("Refreshing configs...")
+    ## refresh configs
+    os.popen("sudo wpa_cli -i wlan0 reconfigure")
+    os.popen("sudo ifconfig wlan0 up")
 
     Debug.Log("SUCCESS")
     Debug.End()
     return True
+#====================================================================#
+#region -------------------------------------------- Bullshit shit
+def Linux_GetCurrentSSID() -> str:
+    """
+        Linux_GetCurrentWiFi:
+        =====================
+        Summary:
+        --------
+        Function that returns the current SSID of
+        the network your device is connected to.
+        This is made for Raspberry Pis.
 
+        If no network is found, `None` is returned.
+        if the command fails, Execution.Failed is returned.
+    """
+    Debug.Start("Linux_GetCurrentWiFi")
+    try:
+        # Run the iwgetid command and capture the output
+        output = subprocess.run(['iwgetid', '-r']).decode('utf-8').strip()
+        Debug.End()
+        return output
+    except subprocess.CalledProcessError:
+        Debug.End()
+        return None
+
+class Linux_ConnectWiFi:
+    """
+        Linux_ConnectWiFi:
+        ==================
+        Summary:
+        --------
+        The class to use if you want to connect to a given
+        wifi in a thread and update the user of the progress
+        of the connection to that WiFi.
+    """
+
+    thread = None
+    stop_event = threading.Event()
+    isStarted: bool = False
+
+    currentAttempt:int = 0
+    currentSSID:str = None
+    connected:bool = False
+    timeTaken:float = 0
+
+    lock = threading.Lock()
+
+    _ssid:str = None
+    _password:str = None
+
+    @staticmethod
+    def _connecting_thread(connectWiFiClass):
+        import time
+        Linux_ConnectToNetwork(connectWiFiClass._ssid, connectWiFiClass._password)
+        timeTakenToConnect = 0
+        continueToTry:bool = True
+        currentSSID:str = ""
+        currentAttempt:int = 0
+
+        while True:
+            time.sleep(0.5)
+
+            if(currentSSID == connectWiFiClass.currentSSID):
+                continueToTry = False
+
+            if(continueToTry):
+                currentSSID = Linux_GetCurrentSSID()
+                timeTakenToConnect = timeTakenToConnect + 0.5
+                currentAttempt = currentAttempt + 1
+
+            with connectWiFiClass.lock:
+                connectWiFiClass.currentSSID = currentSSID
+                connectWiFiClass.connected = not continueToTry
+                connectWiFiClass.currentAttempt = currentAttempt
+                connectWiFiClass.timeTaken = timeTakenToConnect
+
+    @staticmethod
+    def StartConnecting(ssid:str, password:str):
+        """
+            StartConnecting:
+            ================
+            Summary:
+            --------
+            Starts a thread that connects
+            your device to a WiFi network.
+        """
+        Debug.Start("StartConnecting")
+        if Linux_ConnectWiFi.isStarted == False:
+            Linux_ConnectWiFi._ssid = ssid
+            Linux_ConnectWiFi._password = password
+            Linux_ConnectWiFi.currentAttempt = 0
+            Linux_ConnectWiFi.connected = False
+            Linux_ConnectWiFi.currentSSID = None
+            Linux_ConnectWiFi.timeTaken = 0
+
+            if not Linux_ConnectWiFi.thread or not Linux_ConnectWiFi.thread.is_alive():
+                Linux_ConnectWiFi.stop_event.clear()
+                Linux_ConnectWiFi.thread = threading.Thread(target=Linux_ConnectWiFi._connecting_thread, args=(Linux_ConnectWiFi,))
+                Linux_ConnectWiFi.thread.start()
+                Linux_ConnectWiFi.isStarted = True
+                Debug.End()
+                return Execution.Passed
+        else:
+            Debug.Error("Thread is already started. You cannot start more than one.")
+            Debug.End()
+            return Execution.Failed
+        Debug.Log("Linux_ConnectWiFi is now started")
+        Debug.End()
+        return Execution.Passed
+
+    @staticmethod
+    def StopConnecting():
+        """
+            StopConnecting:
+            ===============
+            Summary:
+            --------
+            Only stops the thread in which
+            we constantly read the current SSID
+            hoping its the wanted one.
+        """
+        Debug.Start("StopDriver")
+        Linux_ConnectWiFi.stop_event.set()
+        if Linux_ConnectWiFi.thread and Linux_ConnectWiFi.thread.is_alive():
+            Linux_ConnectWiFi.thread.join()
+        Debug.Log("Thread is stopped.")
+        Debug.End()
+        return Execution.Passed
+
+    @staticmethod
+    def GetConnectionStatus() -> list:
+        """
+            GetConnectionStatus:
+            =======================
+            Summary:
+            --------
+            Returns the current connection
+            status.
+
+            Returns:
+            --------
+            - [isConnected:bool, currentAttempt:int, timeTakenToConnect:float, currentNetworkSSID:str]
+        """
+        Debug.Start("GetConnectionStatus")
+        if Linux_ConnectWiFi.isStarted:
+            with Linux_ConnectWiFi.lock:
+                Debug.Log("Returning values from the thread")
+                Debug.End()
+                return [Linux_ConnectWiFi.connected, Linux_ConnectWiFi.currentAttempt, Linux_ConnectWiFi.timeTaken, Linux_ConnectWiFi.currentSSID]
+        else:
+            Debug.Log("THREAD WAS NOT STARTED. 0 is returned")
+            Debug.End()
+            return [False, 0, 0, "ERROR"]
+
+#endregion
 #====================================================================#
 def GetNetworkInterfaces() -> list:
     """
