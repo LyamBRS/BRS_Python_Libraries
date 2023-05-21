@@ -535,7 +535,6 @@ def Linux_ConnectToNetwork(ssid:str, password:str) -> bool:
     os.popen("sudo chmod a+w /etc/wpa_supplicant/wpa_supplicant.conf")
 
     result = os.popen("sudo ifconfig wlan0 down")
-    result.
 
     #writing to file
     Debug.Log(f"Overwriting wpa_supplicant.conf")
