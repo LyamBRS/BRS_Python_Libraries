@@ -27,7 +27,7 @@ def _(string:str) ->str:
     Debug.Log(f"Language used: {AppLanguage.Current}")
 
     string = AppLanguage.Translate(string)
-    Debug.Log(f"Result: {string}")
+    # Debug.Log(f"Result: {string}")
     Debug.End(ContinueDebug=True)
     return string
 #====================================================================#
