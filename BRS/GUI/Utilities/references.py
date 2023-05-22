@@ -65,7 +65,7 @@ class Rounding:
     '''
     #endregion
     #region   --------------------------- MEMBERS
-    default:float = "20dp"
+    default:float = 20
     """Default value when the widget is not pressed not hovering"""
 
     class Cards:
