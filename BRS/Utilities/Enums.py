@@ -257,5 +257,6 @@ class VarTypes:
     Longlong:str = "q"
     Float:str = "f"
     Double:str = "d"
+    String:str = "s"
 
 LoadingLog.End("Enums.py")

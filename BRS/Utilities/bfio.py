@@ -15,6 +15,7 @@
 #====================================================================#
 # Loading Logs
 #====================================================================#
+from typing import Any
 from ...BRS.Debug.LoadingLog import LoadingLog
 LoadingLog.Start("bfio.py")
 #====================================================================#
@@ -27,7 +28,7 @@ import struct
 #region --------------------------------------------------------- BRS
 LoadingLog.Import("Libraries")
 from ..Debug.consoleLog import Debug
-from .Enums import Execution
+from .Enums import Execution, VarTypes
 #endregion
 #region -------------------------------------------------------- Kivy
 LoadingLog.Import("Kivy")
@@ -38,6 +39,19 @@ LoadingLog.Import('KivyMD')
 #====================================================================#
 # Functions
 #====================================================================#
+def pack_string(string):
+    encoded_string = string.encode('utf-8')  # Encode string to bytes
+    length = len(encoded_string)
+    packed_data = struct.pack(f'{length}s', encoded_string)
+    return packed_data
+
+def unpack_string(packed_data):
+    length = len(packed_data)
+    unpacked_data = struct.unpack(f'{length}s', packed_data)
+    decoded_string = unpacked_data[0].decode('utf-8')  # Decode bytes to string
+    return decoded_string
+
+
 class PassengerTypes:
     """
         PassengerTypes:
@@ -50,6 +64,11 @@ class PassengerTypes:
     Byte:int = 0
     Div:int = 256
     Check:int = 768
+
+    Pilot:int = 512
+    Passenger:int = 0
+    Attendant:int = 256
+    CoPilot:int = 768
 #====================================================================#
 # Classes
 #====================================================================#
@@ -141,16 +160,18 @@ class BFIO:
             if(passenger.type == PassengerTypes.Check):
                 Debug.Log("We finished going through each seat.")
                 Debug.Log("Unless the copilot is stupid and seated himself with the passengers.")
+                Debug.End()
+                return countedData
 
             countedData = (countedData + passenger.value_8bits[1]) % 256
         Debug.Log(f"Counted passenger data resulted in {countedData}.")
         Debug.End()
-        return countedData          
+        return countedData
     # ------------------------------------
-    def _VerifyPlaneChecksum(plane:list) -> Execution:
+    def _VerifyPassengersChecksum(passengers:list) -> Execution:
         """
-            _VerifyPlaneChecksum:
-            =====================
+            _VerifyPassengersChecksum:
+            =========================
             Summary:
             --------
             Private method that confirms
@@ -158,7 +179,24 @@ class BFIO:
             checks out with what we
             counted.
         """
-        pass
+        Debug.Start("_VerifyPassengersChecksum")
+        passengerCount = len(passengers)
+        copilot = passengers[passengerCount-1]
+        if(copilot.type != PassengerTypes.CoPilot):
+            Debug.Error("Last passenger is not a copilot.")
+            Debug.End()
+            return Execution.Failed
+
+        copilotsCheckList = copilot.value_8bits[1]
+        calculatedCheckList = BFIO._GetPlaneChecklist(passengers)
+
+        if(copilotsCheckList != calculatedCheckList):
+            Debug.Error(f"The copilot's checklist: {copilotsCheckList} did not match the calculated checklist: {calculatedCheckList}")
+            Debug.End()
+            return Execution.Failed
+
+        Debug.End()
+        return Execution.Passed
     # ------------------------------------
     def _GetPlaneID(plane:list) -> Execution:
         """
@@ -192,6 +230,66 @@ class BFIO:
 
         """
         pass
+    # ------------------------------------
+    def _GetClassesFromPassengers(passengers:list, varTypes:list) -> list:
+        """
+            _GetClassesFromPassengers:
+            ==========================
+            Summary:
+            --------
+            This method's purpose is to
+            return a list of passengerClass
+            objects that represents the
+            objects within a class.
+
+            Returns:
+            --------
+            - `Execution.Unecessary` = Plane doesnt have passengers
+            - `Execution.Failed` = Plane doesn't make any sense
+            - `list` a list of :ref:`PassengerClass`
+        """
+        Debug.Start("_GetClassesFromPassengers")
+
+        def divide_passenger_list(passenger_list):
+            sublists = []
+            sublist_start = 0
+
+            for i in range(1, len(passenger_list)):
+                if passenger_list[i].type == PassengerTypes.Attendant and passenger_list[i - 1].type == PassengerTypes.Passenger:
+                    sublist = passenger_list[sublist_start:i]
+                    sublists.append(sublist)
+                    sublist_start = i
+
+            # Append the last sublist from the last 1 encountered to the end of the list
+            last_sublist = passenger_list[sublist_start:]
+            sublists.append(last_sublist)
+
+            return sublists
+
+        passengers.pop(0)  # Remove pilot
+        passengers.pop(-1)  # Remove copilot
+
+        secondPassenger:Passenger = passengers[0]
+        if(secondPassenger.type != PassengerTypes.Attendant):
+            Debug.Warn("Second passenger is not an attendant.")
+            if(secondPassenger.type == PassengerTypes.CoPilot):
+                Debug.Warn(f"No passenger classes in this plane")
+                Debug.End()
+                return Execution.Unecessary
+            Debug.Error(f"THIS PLANE IS WRONG AF DAWG")
+            Debug.End()
+            return Execution.Failed
+
+        dividedPassengers = divide_passenger_list(passengers)
+
+        ListOfClasses = []
+        amountOfClasses = len(dividedPassengers)
+        for classNumber in range(amountOfClasses):
+            Debug.Log(f"Converting to type {varTypes[classNumber]}")
+            ListOfClasses.append(ArrivalPassengerClass(dividedPassengers[classNumber], varTypes[classNumber]))
+
+        Debug.End()
+        return ListOfClasses
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
@@ -313,7 +411,7 @@ class Plane:
             Debug.Error("There is more or less variables or classes. They must be the same length bruh.")
             Debug.End()
             return Execution.Failed
-        
+
         self.amountOfClasses = len(wantedClasses)
 
         for currentClassNumber in range(len(variables)):
@@ -321,7 +419,6 @@ class Plane:
             typeToConvertItTo = wantedClasses[currentClassNumber]
 
             boardedPassengerClass = PassengerClass(variableToConvert, typeToConvertItTo)
-            Debug.Log(boardedPassengerClass)
             if(boardedPassengerClass == None):
                 Debug.Error("Failed to board passengers for the specified type.")
                 Debug.End()
@@ -331,20 +428,160 @@ class Plane:
 
             for passenger in boardedPassengerClass.passengers:
                 self.passengers.append(passenger)
-            Debug.Log("Passengers from a class boarded the plane.")
 
             del boardedPassengerClass
 
-        Debug.Log("Pilot is boarding the plane")
+        Debug.Log(f"All passengers are aboard the plane")
+
+        Debug.Log("The pilot is boarding the plane")
         planePilot = Passenger(PassengerTypes.Start, planeID)
         self.passengers.insert(0, planePilot)
 
-        Debug.Log("Co-pilot is doing checklist")
+        Debug.Log("The co-pilot is doing checklist")
         checklistResult = BFIO._GetPlaneChecklist(self.passengers)
         coPilot = Passenger(PassengerTypes.Check, checklistResult)
 
         self.passengers.append(coPilot)
         Debug.Log("All passengers are in the plane! Ready for 9/11")
+        Debug.End()
+    #endregion
+    pass
+
+class NewArrival:
+    #region   --------------------------- DOCSTRING
+    """
+        NewArrival:
+        ===========
+        Summary:
+        --------
+        Builds a plane with a different name.
+        This class builds a plane from arrived
+        passengers basically.
+    """
+    #endregion
+    #region   --------------------------- MEMBERS
+    planeID:int = None
+    """
+        planeID:
+        ========
+        Summary:
+        --------
+        The ID retreived from a plane.
+        ID ranges from 0 to 255 and depends
+        on the other device's airport and gates.
+        Defaults to `None`
+    """
+
+    amountOfClasses:int = None
+    """
+        amountOfClasses:
+        ==========================
+        Summary:
+        --------
+        Says how many classes of regular passengers
+        there is in your plane or the plane analyzed.
+        A class is basically a function parameter.
+    """
+
+    classesSizes:list = []
+    """
+        classesSizes:
+        =============
+        Summary:
+        --------
+        list of integers that tells you
+        how many passengers in each classes
+        there is in that plane.
+        The list is a list of `int` and
+        is of size :ref:`amountOfClasses`
+    """
+    
+    passedTSA:bool = None
+    """
+        passedTSA:
+        ==========
+        Summary:
+        --------
+        boolean variable that is set
+        to `True` if the plane managed
+        to get verified fully and passed
+        through TSA. Otherwise, if
+        problems are detected, its set to
+        `False`. Defaults to `None`.
+    """
+    
+    classes:list = []
+    """
+        classes:
+        ==========
+        Summary:
+        --------
+        This member holds all PassengerClass objects
+        of this plane.
+        Used to decode each classes of passengers
+        individually after the class is initialized.
+    """
+
+    passengers:list = []
+    """
+        list of Passenger objects consisting of
+        the entire plane.
+    """
+    #endregion
+    #region   --------------------------- METHODS
+    #region   -------------------- Public
+    #endregion
+    #region   ------------------- Private
+    #endregion
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+
+    def __init__(self, passengers:list, wantedClasses:list):
+        """
+            Plane:
+            ======
+            Summary:
+            --------
+            This constructor builds a new arrival
+            from a list of passengers and a list of
+            expected classes.
+
+            Arguments:
+            ----------
+            - `passengers`:  list of :ref:`Passenger` objects
+            - `wantedClasses`: a list of VariableType associated with the list of passengers
+        """
+        Debug.Start("Plane -> Analyzing Arrival.")
+        self.passengers = passengers
+        passengerCount = len(passengers)
+
+        pilot:Passenger = passengers[0]
+        if(pilot.type != PassengerTypes.Pilot):
+            Debug.Error(f"The first passenger of this plane is not a pilot!")
+            self.passedTSA = False
+            Debug.End()
+            return
+
+        copilot:Passenger = passengers[passengerCount-1]
+        if(copilot.type != PassengerTypes.CoPilot):
+            Debug.Error(f"The last passenger of this plane is not a copilot!")
+            self.passedTSA = False
+            Debug.End()
+            return
+
+        result = BFIO._VerifyPassengersChecksum(passengers)
+        if(result != Execution.Passed):
+            Debug.Error(f"_VerifyPassengersChecksum returned code: {result}")
+            self.passedTSA = False
+            Debug.End()
+            return
+
+        planeCallsign = pilot.value_8bits[1]
+        self.planeID = planeCallsign
+        Debug.Log(f"Plane's call sign is {self.planeID} and carries {passengerCount} passengers.")
+
+        self.classes = BFIO._GetClassesFromPassengers(passengers, wantedClasses)
+        self.amountOfClasses = len(self.classes)
         Debug.End()
     #endregion
     pass
@@ -360,12 +597,12 @@ class Passenger:
     """
     #endregion
     #region   --------------------------- MEMBERS
-    value_10bits:int = None
+    value_10bits:int
     """
         The regular 10 bits BFIO protocol
         value.
     """
-    value_8bits:list = None
+    value_8bits:list
     """
         A list of 2 bytes representing
         the BFIO data in a byte protocol
@@ -374,7 +611,7 @@ class Passenger:
         - [0] : type
         - [1] : 8 bits data
     """
-    type:int = None
+    type:int
     """
         Compare with memebers of 
         :ref:`PassengersType` 
@@ -396,23 +633,29 @@ class Passenger:
             This constructor builds a plane from
             a planeID and a given list of variables.
         """
-        Debug.Start("Passenger -> Building")
+        Debug.Start("Passenger -> Building", DontDebug=True)
+
+        self.type = None
+        self.value_10bits = None
+        self.value_8bits = []
 
         if(byte < 0 or byte > 255):
             Debug.Error(f"FATAL PASSENGER ERROR. Passenger cant hold bytes of {byte}")
             Debug.End()
             return Execution.Failed
-        
+
         if(type != PassengerTypes.Byte and type != PassengerTypes.Check and type != PassengerTypes.Div and type != PassengerTypes.Start):
             Debug.Error(f"Passenger's specified type; {type} isn't valid.")
             Debug.End()
             return Execution.Failed
-        
+
         self.value_10bits = byte + type
         self.value_8bits = [type >> 8, byte]
         self.type = type
 
-        Debug.End()
+        # PrintPassenger(self)
+
+        Debug.End(ContinueDebug=True)
     #endregion
     pass
 #====================================================================#
@@ -429,7 +672,7 @@ class PassengerClass:
     """
     #endregion
     #region   --------------------------- MEMBERS
-    passengers:list = None
+    passengers:list
     """
         passengers:
         ===========
@@ -442,12 +685,12 @@ class PassengerClass:
         is always the air
         attendant.
     """
-    originalVariable = None
+    originalVariable:Any
     """
         Holds the original variable with
         which the passengers were built.
     """
-    originalVariableType:str = None
+    originalVariableType:str
     """
         Holds the original type
         given to this class to build
@@ -483,18 +726,20 @@ class PassengerClass:
         self.passengers = []
 
         try:
-            bytes = list(struct.pack(varType, variable))
-            sizeOf = len(bytes)
-            Debug.Log(f"There is {sizeOf} bytes to convert.")
+            if(varType != VarTypes.String):
+                bytes = list(struct.pack(varType, variable))
+                sizeOf = len(bytes)
+                Debug.Log(f"There is {sizeOf} bytes to convert.")
+            else:
+                bytes = list(pack_string(variable))
         except:
             Debug.Error(f"Failed to create passengers from {type(variable)} typed variable to {varType}")
             Debug.End()
             return Execution.Failed
 
         attendant = Passenger(byte=0, type=PassengerTypes.Div)
-        self.passengers.insert(0, attendant)
+        self.passengers.append(attendant)
 
-        Debug.Log("Converting bytes to passengers...")
         for byte in bytes:
             passenger = Passenger(PassengerTypes.Byte, byte)
             if(passenger == None):
@@ -502,11 +747,112 @@ class PassengerClass:
             self.passengers.append(passenger)
 
         amountOfPassengers = len(self.passengers)
-        Debug.Log(f"{amountOfPassengers} passengers and attendant now listed in the class.")
+        Debug.Log(f"{amountOfPassengers-1} passengers and 1 attendant now listed in the class.")
         Debug.End()
     #endregion
     pass
 
+class ArrivalPassengerClass:
+    #region   --------------------------- DOCSTRING
+    """
+        ArrivalPassengerClass:
+        ======================
+        Summary:
+        --------
+        Class that is built from passengers
+        to be able to extract a variable
+        from a class of passengers.
+    """
+    #endregion
+    #region   --------------------------- MEMBERS
+    passengers:list
+    """
+        passengers:
+        ===========
+        Summary:
+        --------
+        A list of :ref:`Passenger` objects
+        built when this class was built.
+
+        The first passenger of a class
+        is always the air
+        attendant.
+    """
+    originalVariable:Any
+    """
+        Holds the original variable with
+        which the passengers were built.
+    """
+    originalVariableType:str
+    """
+        Holds the original type
+        given to this class to build
+        the passengers.
+    """
+    #endregion
+    #region   --------------------------- METHODS
+    #region   -------------------- Public
+    #endregion
+    #region   ------------------- Private
+    #endregion
+    #endregion
+    #region   --------------------------- CONSTRUCTOR
+    def __init__(self, passengers:list, varType:str):
+        """
+            ArrivalPassengerClass:
+            ======
+            Summary:
+            --------
+            Object built that extracts a variable
+            from an arrived passenger class.
+            The passengers list must start with
+            an attendant tho.
+
+            Arguments:
+            ----------
+            - `variable` any variables to convert
+            - `varType` the type of the class.
+        """
+        Debug.Start("ArrivalPassengerClass -> Building")
+        Debug.Log(f"Converting to type {varType}")
+        self.originalVariableType = varType
+
+        # for passenger in passengers:
+            # PrintPassenger(passenger)
+
+        if(passengers[0].type != PassengerTypes.Attendant):
+            Debug.Error(f"The first passenger of this class is not an attendant.")
+            Debug.End()
+            return Execution.Failed
+
+        # passengers.pop(0)
+        listOfBytes:list = []
+        passengerCount = len(passengers)
+        for passengerNumber in range(1, passengerCount):
+            listOfBytes.append(passengers[passengerNumber].value_8bits[1])
+
+        # Debug.Log(f"Trying to convert {listOfBytes} to type {varType}")
+
+        try:
+            if varType != VarTypes.String:
+                byteString = bytes(listOfBytes)
+                variable = struct.unpack(varType, byteString)[0]
+            else:
+                byteString = bytes(listOfBytes)
+                variable = unpack_string(byteString)
+        except:
+            Debug.Error(f"Failed to create {varType} typed variable from the bytes given")
+            Debug.End()
+            return Execution.Failed
+
+        self.originalVariable = variable
+        self.originalVariableType = varType
+        self.passengers = passengers
+
+        Debug.End()
+    #endregion
+    pass
+#====================================================================#
 def PrintPlane(plane:Plane):
     Debug.Start("PrintPlane")
     
@@ -546,12 +892,12 @@ def PrintPassengerClass(passengerClass:PassengerClass):
 
 def PrintPassenger(passenger:Passenger):
     if(passenger.type == PassengerTypes.Byte):
-        Debug.Log(f"    - Regular passenger carrying {passenger.value_10bits} BFIO values.")
+        Debug.Log(f"    - Regular passenger carrying {passenger.value_10bits}")
     if(passenger.type == PassengerTypes.Check):
         Debug.Log(f"    - Copilot passenger with a checklist of {passenger.value_8bits[1]}")
     if(passenger.type == PassengerTypes.Start):
         Debug.Log(f"    - Pilot piloting a plane with callsign {passenger.value_8bits[1]}")
-    if(passenger.type == PassengerTypes.Byte):
+    if(passenger.type == PassengerTypes.Div):
         Debug.Log(f"    - Flight attendant.")
 
 LoadingLog.End("AppLoading.py")
