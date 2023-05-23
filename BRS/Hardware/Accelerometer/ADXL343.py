@@ -108,6 +108,7 @@ class ADXL343:
             if not ADXL343.thread or not ADXL343.thread.is_alive():
                 ADXL343.stop_event.clear()
                 ADXL343.thread = threading.Thread(target=ADXL343._reading_thread, args=(ADXL343,))
+                ADXL343.thread.daemon = True
                 ADXL343.thread.start()
                 ADXL343.isStarted = True
                 Debug.End()
