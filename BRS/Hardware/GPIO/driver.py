@@ -106,6 +106,7 @@ class GPIO:
             if not GPIO.thread or not GPIO.thread.is_alive():
                 GPIO.stop_event.clear()
                 GPIO.thread = threading.Thread(target=GPIO._reading_thread, args=(GPIO,))
+                GPIO.thread.daemon = True
                 GPIO.thread.start()
                 GPIO.isStarted = True
                 Debug.End()
