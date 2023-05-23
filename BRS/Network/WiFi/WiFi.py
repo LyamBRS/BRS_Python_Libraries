@@ -788,6 +788,7 @@ class Linux_ConnectWiFi:
             if not Linux_ConnectWiFi.thread or not Linux_ConnectWiFi.thread.is_alive():
                 Linux_ConnectWiFi.stop_event.clear()
                 Linux_ConnectWiFi.thread = threading.Thread(target=Linux_ConnectWiFi._connecting_thread, args=(Linux_ConnectWiFi,))
+                Linux_ConnectWiFi.thread.daemon = True
                 Linux_ConnectWiFi.thread.start()
                 Linux_ConnectWiFi.isStarted = True
                 Debug.End()
@@ -922,6 +923,7 @@ class Linux_VerifyInternetConnection:
             if not Linux_VerifyInternetConnection.thread or not Linux_VerifyInternetConnection.thread.is_alive():
                 Linux_VerifyInternetConnection.stop_event.clear()
                 Linux_VerifyInternetConnection.thread = threading.Thread(target=Linux_VerifyInternetConnection._internetCheck_thread, args=(Linux_VerifyInternetConnection,))
+                Linux_VerifyInternetConnection.thread.daemon = True
                 Linux_VerifyInternetConnection.thread.start()
                 Linux_VerifyInternetConnection.isStarted = True
                 Debug.End()
@@ -1065,6 +1067,7 @@ class WiFiStatusUpdater:
             if not WiFiStatusUpdater.thread or not WiFiStatusUpdater.thread.is_alive():
                 WiFiStatusUpdater.stop_event.clear()
                 WiFiStatusUpdater.thread = threading.Thread(target=WiFiStatusUpdater._UpdaterThread, args=(WiFiStatusUpdater, Information,))
+                WiFiStatusUpdater.thread.daemon = True
                 WiFiStatusUpdater.thread.start()
                 WiFiStatusUpdater.isStarted = True
                 Debug.End()
