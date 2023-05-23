@@ -51,6 +51,7 @@ class AddonEnum:
     Stop:str                        = "Stop"
     Uninstall:str                   = "Uninstall"
     Update:str                      = "Update"
+    PeriodicCallback:str            = "PeriodicCallback"
     GetState:str                    = "GetState"
     ClearProfile:str                = "ClearProfile"
     SaveProfile:str                 = "SaveProfile"
@@ -120,16 +121,17 @@ class Addons:
         --------
         ```
         "Accelerometer" : {
-            "Launch"        : <function>,
-            "Stop"          : <function>,
-            "Uninstall"     : <function>,
-            "Update"        : <function>,
-            "GetState"      : <function>,
-            "ClearProfile"  : <function>,
-            "SaveProfile"   : <function>,
-            "ChangeProfile" : <function>,
-            "LoadProfile"   : <function>,
-            "UnloadProfile" : <function>,
+            "Launch"            : <function>,
+            "Stop"              : <function>,
+            "Uninstall"         : <function>,
+            "Update"            : <function>,
+            "GetState"          : <function>,
+            "ClearProfile"      : <function>,
+            "SaveProfile"       : <function>,
+            "ChangeProfile"     : <function>,
+            "LoadProfile"       : <function>,
+            "UnloadProfile"     : <function>,
+            "PeriodicUpdater"   : <function>,
             "GetAllHardwareControls"        : <function>,
             "GetAllSoftwareActions"         : <function>,
             "ChangeButtonBinding"           : <function>,
@@ -263,21 +265,23 @@ class Addons:
                 - `Execution.Failed` = Couldn't save the given or current profile in cache.
                 - `Execution.Incompatibility` = The addon does not support profiles.
 
-        "ChangeProfile":
+        "PeriodicCallback":
         ---------------
             * [Summary]:
-                - This function's purpose is to replace the name
-                of a saved profile with another. This is used when
-                the user edit its profile name and saves it.
+                - This function is a function that gets periodically called by
+                the main application using Kivy.Clock. Its there to allow your
+                addon to perform operations that needs to be checked regularly
+                but can't easily be placed in a thread.
 
-            * [Arguments]:
-                - `newProfileName:str` = string representing the new profile to save.
-                - `oldProfileName:str` = sring representing the previous profile's name.
+            * [Warning]:
+                - DO NOT PUT LOAD INTENSIVE OPERATIONS IN THIS CALLBACK. THEY
+                SHOULD BE IN THREADS. THIS IS SOLELY TO INTERFACE YOUR ADDONS
+                WITH THE MAIN KIVYMD APPLICATION.
 
             * [Returns]:
-                - `Execution.Passed` = old profile is now saved under new profile
-                - `Execution.Failed` = Couldn't change oldProfile to newProfile
-                - `Execution.Incompatibility` = The addon does not support profiles.
+                - `Execution.Passed` = Callback was successful
+                - `Execution.Failed` = Something went wrong in the callback
+                - `Execution.Incompatibility` = The addon does not support periodic callback.
 
         "LoadProfile":
         --------------
@@ -300,6 +304,19 @@ class Addons:
                 - This function unloads a specified profile from
                 its cached JSONs. if the profile does not exist,
                 it should just unload the currently saved profile.
+
+            * [Arguments]:
+                - `profileToUnload:str` = string representing the profile to unload.
+
+            * [Returns]:
+                - `Execution.Passed` = Profile is unloaded
+                - `Execution.Failed` = Couldn't unload that profile.
+                - `Execution.Incompatibility` = The addon does not support profiles.
+
+        "PeriodicCallback":
+        --------------
+            * [Summary]:
+                - This 
 
             * [Arguments]:
                 - `profileToUnload:str` = string representing the profile to unload.
@@ -705,6 +722,25 @@ class Addons:
         Debug.Start(AddonEnum.UnbindAxisBinding)
         Addons._Execute(AddonEnum.UnbindAxisBinding, [nameOfTheSoftwareAxis])
         Debug.End()
+
+    def ExecutePeriodicCallback():
+        """
+            ExecutePeriodicCallback:
+            ========================
+            Summary:
+            --------
+            This function will execute the
+            periodic callback function of
+            all the addons currently loaded.
+
+            If your application freezes each couple
+            seconds, please verify that no addons
+            are performing heavy tasks in their
+            periodic callback methods.
+        """
+        Debug.Start("ExecutePeriodicCallback")
+        Addons._Execute(AddonEnum.PeriodicCallback)
+        Debug.End()
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -822,6 +858,7 @@ class AddonInfoHandler:
                  ChangeProfile,
                  LoadProfile,
                  UnloadProfile,
+                 PeriodicCallback,
                  GetAllHardwareControls,
                  GetAllSoftwareActions,
                  ChangeButtonBinding,
@@ -878,6 +915,7 @@ class AddonInfoHandler:
         self.information[AddonEnum.ChangeProfile] = ChangeProfile
         self.information[AddonEnum.LoadProfile] = LoadProfile
         self.information[AddonEnum.UnloadProfile] = UnloadProfile
+        self.information[AddonEnum.PeriodicCallback] = PeriodicCallback
         self.information[AddonEnum.GetAllHardwareControls] = GetAllHardwareControls
         self.information[AddonEnum.GetAllSoftwareActions] = GetAllSoftwareActions
         self.information[AddonEnum.ChangeButtonBinding] = ChangeButtonBinding
@@ -1198,6 +1236,22 @@ class AddonFoundations:
             it isn't a supported function.
         """
         Debug.Start("UnbindButtonBinding")
+        Debug.Warn("NOT SUPPORTED")
+        Debug.End()
+        return Execution.Incompatibility
+    # -------------------------------------------
+    def PeriodicCallback(*args) -> Execution:
+        """
+            `Attention`:
+            ==========
+            This function is not yet defined in
+            this addon. It will return
+            `Execution.Incompatibility` until
+            its defined in your class. This means
+            that the application will think that
+            it isn't a supported function.
+        """
+        Debug.Start("PeriodicCallback")
         Debug.Warn("NOT SUPPORTED")
         Debug.End()
         return Execution.Incompatibility
