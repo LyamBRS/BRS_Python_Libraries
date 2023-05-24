@@ -530,7 +530,7 @@ class Addons:
             addons there is.
         """
         Debug.Start("_Execute")
-        Debug.Log(f"performing {nameOfFunctionToExecute} on all addons...")
+        Debug.Log(f"performing {nameOfFunctionToExecute} on all {len(Addons._listedAddons)} addons...")
         for addonName, addonData in Addons._listedAddons.items():
             Debug.Log(f"Executing {addonName}'s {nameOfFunctionToExecute} : {Addons._listedAddons[addonName][nameOfFunctionToExecute]}")
             
@@ -684,7 +684,7 @@ class Addons:
                     Debug.Warn(f"{whichAddonToBindItTo} may already have {nameOfTheHardwareAxis} binded to {nameOfTheSoftwareAxis}")
                     Debug.End()
                     return Execution.Unecessary
-                Debug.Error("Something went wrong.")
+                Debug.Error(f"Something went wrong. Return code: {result}")
             else:
                 Debug.Log(f"Success returned when binding {nameOfTheHardwareAxis} to {nameOfTheSoftwareAxis}")
                 Debug.End()
@@ -738,9 +738,9 @@ class Addons:
             are performing heavy tasks in their
             periodic callback methods.
         """
-        Debug.Start("ExecutePeriodicCallback")
+        Debug.Start("ExecutePeriodicCallback", DontDebug=True)
         Addons._Execute(AddonEnum.PeriodicCallback)
-        Debug.End()
+        Debug.End(ContinueDebug=True)
     #endregion
     #region   --------------------------- CONSTRUCTOR
     #endregion
@@ -760,36 +760,37 @@ class AddonInfoHandler:
     """
     #endregion
     #region   --------------------------- MEMBERS
-    information:dict = {
-            "Launch"        : None,
-            "Stop"          : None,
-            "Uninstall"     : None,
-            "Update"        : None,
-            "GetState"      : None,
-            "ClearProfile"  : None,
-            "SaveProfile"   : None,
-            "ChangeProfile" : None,
-            "LoadProfile"   : None,
-            "GetAllHardwareControls"        : None,
-            "GetAllSoftwareActions"         : None,
-            "ChangeButtonBinding"           : None,
-            "ChangeAxisBinding"             : None,
-            "ChangeButtonActionBinding"     : None,
-            "ChangeAxisActionBinding"       : None,
-
-            "information" : {
-                "version" : 1,
-                "name" : None,
-                "type" : None,
-                "repository" : None,
-                "description" : None,
-                "hasHardwareButtons" : False,
-                "hasHardwareAxes" : False,
-                "readsSoftwareButtons" : False,
-                "readsSoftwareAxes" : False,
-                "isCompatible" : False
-            }
-        }
+    information:dict = None
+    # {
+            # "Launch"        : None,
+            # "Stop"          : None,
+            # "Uninstall"     : None,
+            # "Update"        : None,
+            # "GetState"      : None,
+            # "ClearProfile"  : None,
+            # "SaveProfile"   : None,
+            # "ChangeProfile" : None,
+            # "LoadProfile"   : None,
+            # "GetAllHardwareControls"        : None,
+            # "GetAllSoftwareActions"         : None,
+            # "ChangeButtonBinding"           : None,
+            # "ChangeAxisBinding"             : None,
+            # "ChangeButtonActionBinding"     : None,
+            # "ChangeAxisActionBinding"       : None,
+            #
+            # "information" : {
+                # "version" : 1,
+                # "name" : None,
+                # "type" : None,
+                # "repository" : None,
+                # "description" : None,
+                # "hasHardwareButtons" : False,
+                # "hasHardwareAxes" : False,
+                # "readsSoftwareButtons" : False,
+                # "readsSoftwareAxes" : False,
+                # "isCompatible" : False
+            # }
+        # }
     """
         information:
         ============
@@ -837,36 +838,36 @@ class AddonInfoHandler:
     #endregion
     #region   --------------------------- CONSTRUCTOR
     def __init__(self,
-                 name:str,
-                 description:str,
-                 version:str,
-                 type:str,
-                 repository:str,
-                 hasHardwareButtons:bool,
-                 hasHardwareAxes:bool,
-                 readsSoftwareButtons:bool,
-                 readsSoftwareAxes:bool,
-                 MDIcon:str,
+                 name:str = None,
+                 description:str = None,
+                 version:str = None,
+                 type:str = None,
+                 repository:str = None,
+                 hasHardwareButtons:bool = None,
+                 hasHardwareAxes:bool = None,
+                 readsSoftwareButtons:bool = None,
+                 readsSoftwareAxes:bool = None,
+                 MDIcon:str = None,
 
-                 LaunchFunction,
-                 StopFunction,
-                 UninstallFunction,
-                 UpdateFunction,
-                 GetStateFunction,
-                 ClearProfileFunction,
-                 SaveProfile,
-                 ChangeProfile,
-                 LoadProfile,
-                 UnloadProfile,
-                 PeriodicCallback,
-                 GetAllHardwareControls,
-                 GetAllSoftwareActions,
-                 ChangeButtonBinding,
-                 ChangeAxisBinding,
-                 UnbindButtonBinding,
-                 UnbindAxisBinding,
-                 ChangeButtonActionBinding,
-                 ChangeAxisActionBinding
+                 LaunchFunction = None,
+                 StopFunction = None,
+                 UninstallFunction = None,
+                 UpdateFunction = None,
+                 GetStateFunction = None,
+                 ClearProfileFunction = None,
+                 SaveProfile = None,
+                 ChangeProfile = None,
+                 LoadProfile = None,
+                 UnloadProfile = None,
+                 PeriodicCallback = None,
+                 GetAllHardwareControls = None,
+                 GetAllSoftwareActions = None,
+                 ChangeButtonBinding = None,
+                 ChangeAxisBinding = None,
+                 UnbindButtonBinding = None,
+                 UnbindAxisBinding = None,
+                 ChangeButtonActionBinding = None,
+                 ChangeAxisActionBinding = None
                  ):
         """
             AddonInfoHandler:
@@ -884,6 +885,37 @@ class AddonInfoHandler:
             as their expected returned values and input parameters.
         """
         Debug.Start("AddonInfoHandler -> __init__")
+
+        self.information = {
+            "Launch"        : None,
+            "Stop"          : None,
+            "Uninstall"     : None,
+            "Update"        : None,
+            "GetState"      : None,
+            "ClearProfile"  : None,
+            "SaveProfile"   : None,
+            "ChangeProfile" : None,
+            "LoadProfile"   : None,
+            "GetAllHardwareControls"        : None,
+            "GetAllSoftwareActions"         : None,
+            "ChangeButtonBinding"           : None,
+            "ChangeAxisBinding"             : None,
+            "ChangeButtonActionBinding"     : None,
+            "ChangeAxisActionBinding"       : None,
+
+            "information" : {
+                "version" : 1,
+                "name" : None,
+                "type" : None,
+                "repository" : None,
+                "description" : None,
+                "hasHardwareButtons" : False,
+                "hasHardwareAxes" : False,
+                "readsSoftwareButtons" : False,
+                "readsSoftwareAxes" : False,
+                "isCompatible" : False
+            }
+        }
 
         Debug.Log("Saving regular informations...")
         informationsToSave:dict = {
