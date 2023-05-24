@@ -52,6 +52,7 @@ def unpack_string(packed_data):
     return decoded_string
 
 
+
 class PassengerTypes:
     """
         PassengerTypes:
@@ -85,6 +86,19 @@ class BFIO:
     """
     #endregion
     #region   --------------------------- MEMBERS
+    class UDP:
+        """
+            BFIO: UDP
+            ==========
+            Summary:
+            ---------
+            This class holds references used
+            when BFIO is used through an UDP
+            protocol.
+        """
+        portToSendToAccessPoint:int = 4210
+        portToReceiveFromAccessPoint:int = 4211
+
     #endregion
     #region   --------------------------- METHODS
     #region   -------------------- Public
