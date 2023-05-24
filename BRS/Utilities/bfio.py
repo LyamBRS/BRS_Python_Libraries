@@ -332,7 +332,7 @@ class Plane:
         A class is basically a function parameter.
     """
 
-    classesSizes:list = []
+    classesSizes:list = None
     """
         classesSizes:
         =============
@@ -344,7 +344,7 @@ class Plane:
         The list is a list of `int` and
         is of size :ref:`amountOfClasses`
     """
-    
+
     passedTSA:bool = None
     """
         passedTSA:
@@ -358,8 +358,8 @@ class Plane:
         problems are detected, its set to
         `False`. Defaults to `None`.
     """
-    
-    classes:list = []
+
+    classes:list = None
     """
         classes:
         ==========
@@ -371,7 +371,7 @@ class Plane:
         individually after the class is initialized.
     """
 
-    passengers:list = []
+    passengers:list = None
     """
         list of Passenger objects consisting of
         the entire plane.
@@ -400,6 +400,10 @@ class Plane:
             - `wantedClasses`: a list of VariableType associated with the list of passengers
         """
         Debug.Start("Plane -> Building and Boarding.")
+
+        self.classes = []
+        self.classesSizes = []
+        self.passengers = []
 
         tsaResult = BFIO._CheckPlaneID(planeID)
         if(tsaResult != Execution.Passed):
@@ -484,7 +488,7 @@ class NewArrival:
         A class is basically a function parameter.
     """
 
-    classesSizes:list = []
+    classesSizes:list = None
     """
         classesSizes:
         =============
@@ -496,7 +500,7 @@ class NewArrival:
         The list is a list of `int` and
         is of size :ref:`amountOfClasses`
     """
-    
+
     passedTSA:bool = None
     """
         passedTSA:
@@ -510,8 +514,8 @@ class NewArrival:
         problems are detected, its set to
         `False`. Defaults to `None`.
     """
-    
-    classes:list = []
+
+    classes:list = None
     """
         classes:
         ==========
@@ -523,7 +527,7 @@ class NewArrival:
         individually after the class is initialized.
     """
 
-    passengers:list = []
+    passengers:list = None
     """
         list of Passenger objects consisting of
         the entire plane.
@@ -553,6 +557,10 @@ class NewArrival:
             - `wantedClasses`: a list of VariableType associated with the list of passengers
         """
         Debug.Start("Plane -> Analyzing Arrival.")
+        self.classes = []
+        self.classesSizes = []
+        self.passengers = []
+
         self.passengers = passengers
         passengerCount = len(passengers)
 
