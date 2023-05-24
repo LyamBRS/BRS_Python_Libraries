@@ -102,6 +102,42 @@ class BFIO:
     #endregion
     #region   --------------------------- METHODS
     #region   -------------------- Public
+    # ------------------------------------
+    def GetPassengersFromDualBytes(listOfBytes:bytes) -> list:
+        """
+            GetPassengersFromDualBytes:
+            ===========================
+            Summary:
+            --------
+            This function's purpose is to
+            convert receivd bytes (0-255)
+            to a list of :ref:`Passengers` objects.
+
+            This function is to be used in
+            communication protocols that only
+            works with bytes and can't work with
+            series of 10 bits values.
+
+            The orders of your ints must be:
+            - [identifiant, value, identifiant, value ...]
+        """
+
+        val = struct.unpack('B' * len(listOfBytes), listOfBytes)
+        listOfInts = list(val)
+
+        passengers:list = []
+
+        for index in range(0, len(listOfInts), 2):
+            typeOfPassenger = listOfInts[index]
+            luggage = listOfInts[index + 1] if index + 1 < len(listOfInts) else None
+
+            typeOfPassenger = typeOfPassenger << 8
+            passenger = Passenger(typeOfPassenger, luggage)
+
+            passengers.append(passenger)
+        
+        return passengers
+    # ------------------------------------
     def BuildAndBoardPlane() -> list:
         """
             BuildAndBoardPlane:
