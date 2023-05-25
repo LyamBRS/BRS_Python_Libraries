@@ -76,7 +76,7 @@ class UDPReader:
         will have no effect.
     """
 
-    port:int = 4210
+    port:int = 4211
     """
         port:
         =====
@@ -131,7 +131,7 @@ class UDPReader:
                     udpClass.listOfMessageReceived.append({addr[0]:data})
                     if(len(udpClass.listOfMessageReceived) > 50):
                         udpClass.listOfMessageReceived.pop(0)
-            except TimeoutError as e:
+            except:
                 pass
 
         # Close the socket
