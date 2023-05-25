@@ -161,7 +161,7 @@ class UART:
                         stupidPython.receivedPassengers.clear()
                         stupidPython.receivedPassengers.append(arrival)
                 else:
-                    print(f"Adding passengers to a list of {len(stupidPython.receivedPassengers)}")
+                    # print(f"Adding passengers to a list of {len(stupidPython.receivedPassengers)}")
                     if(arrival.type == PassengerTypes.CoPilot):
                         # The rear of a plane was received
                         stupidPython.receivingPlane = False
