@@ -383,7 +383,13 @@ class BFIO:
 
         ListOfClasses = []
         amountOfClasses = len(dividedPassengers)
-        for classNumber in range(amountOfClasses-1):
+        for classNumber in range(amountOfClasses):
+
+            if(classNumber > len(varTypes)-1):
+                Debug.Error("Too many classes compared to var types")
+                Debug.End()
+                return Execution.Failed
+
             Debug.Log(f"Converting to type {varTypes[classNumber]}")
             ListOfClasses.append(ArrivalPassengerClass(dividedPassengers[classNumber], varTypes[classNumber]))
 
