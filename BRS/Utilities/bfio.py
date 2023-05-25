@@ -546,6 +546,7 @@ class Plane:
 
         self.passengers.append(coPilot)
         Debug.Log("All passengers are in the plane! Ready for 9/11")
+        self.passedTSA = True
         Debug.End()
     #endregion
     pass
@@ -689,6 +690,7 @@ class NewArrival:
 
         self.classes = BFIO._GetClassesFromPassengers(passengers, wantedClasses)
         self.amountOfClasses = len(self.classes)
+        self.passedTSA = True
         Debug.End()
     #endregion
     pass
