@@ -189,7 +189,7 @@ class UART:
 
     @staticmethod
     def _writing_thread(uartClass):
-        from ...Utilities.bfio import Plane, Passenger
+        from ...Utilities.bfio import Plane, Passenger, PrintPassenger, Debug
         planesReadyForTakeOff:list = []
 
         while True:
@@ -202,6 +202,9 @@ class UART:
                     for plane in planesReadyForTakeOff:
                         # passenger:Passenger
                         for passenger in plane.passengers:
+                            Debug.enableConsole = True
+                            PrintPassenger(passenger)
+                            Debug.enableConsole = False
                             uartClass.serialPortObject.write(passenger.value_8bits[0])
                             uartClass.serialPortObject.write(passenger.value_8bits[1])
 
