@@ -228,7 +228,10 @@ class BFIO:
             typed plane. Returns `True` and `False` if not.
         """
         Debug.Start("IsPassengerGroupAMandatoryPlane")
-        Passenger.value_8bits
+        
+        pilot = passengers[0]
+        PrintPassenger(pilot)
+
         if(passengers[0].value_8bits[1] < 10):
             Debug.Log("That group is made for mandatory functions")
             Debug.End()
