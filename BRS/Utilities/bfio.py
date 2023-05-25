@@ -217,6 +217,44 @@ class BFIO:
         """
         pass
     # ------------------------------------
+    def IsPassengerGroupAMandatoryPlane(passengers:list):
+        """
+            IsPassengerGroupAMandatoryPlane:
+            ================================
+            Summary:
+            --------
+            Function that tells you if the group
+            of passengers ya got is a mandatory function
+            typed plane. Returns `True` and `False` if not.
+        """
+        Debug.Start("IsPassengerGroupAMandatoryPlane")
+        Passenger.value_8bits
+        if(passengers[0].value_8bits[1] < 10):
+            Debug.Log("That group is made for mandatory functions")
+            Debug.End()
+            return True
+        else:
+            Debug.Log("That group is not a mandatory functions")
+            Debug.End()
+            return False
+    # ------------------------------------
+    def ParsePassengersIntoMandatoryPlane(passengers:list):
+        """
+            ParsePassengersIntoMandatoryPlane:
+            ==================================
+            Summary:
+            --------
+            Takes a list of passengers object
+            and attempts to build them into a
+            :ref:`NewArrival` object based on mandatory
+            functions.
+        """
+        Debug.Start("ParsePassengersIntoMandatoryPlane")
+        Passenger.value_8bits
+        MandatoryPlane = NewArrival(passengers, MandatoryFunctionRequestVarTypeLists[passengers[0].value_8bits[1]])
+
+        Debug.End()
+        return MandatoryPlane
     #endregion
     #region   ------------------- Private
     def _CheckPlaneID(planeID:int) -> Execution:

@@ -79,37 +79,135 @@ class UART:
     stopEventWriting = threading.Event()
     isStarted: bool = False
 
-    serialPort = None
+    serialPort:str = None
     """
         serialPort:
         ===========
+        summary:
+        --------
+        The name of the serial port you want to use.
+        Defaults to NONE so be careful.
     """
 
-    valuesToWrite:list = []
-    readValues:list = []
+    serialPortObject = None
+
+    maxGroupsSlots = 10
+    """
+        Defines how many groups of
+        arrived passengers you can store
+        in your BFIO class. Defaults to 10.
+        After which, no more groups are stored.
+        They are ignored.
+    """
+
+    planesToWrite:list = []
+    groupsOfArrivedPassengers:list = []
 
     lockReading = threading.Lock()
     lockWriting = threading.Lock()
 
     @staticmethod
     def _reading_thread(uartClass):
+        from ...Utilities.bfio import BFIO, NewArrival, PassengerTypes, MandatoryPlaneIDs
+
+        def GetPassengerArrivals() -> list:
+            """
+                Only reads passengers that arrived.
+                returns them in groupes of 2.
+            """
+            # Clear the buffer of any passengers.
+            newArrivals = []
+            while uartClass.serialPortObject.in_waiting >= 2:
+                try:
+                    data = uartClass.serialPortObject.read(2)
+                    # print(f"{data[0]}, {data[1]}")
+                    if(data[0] > 3):
+                        print("Fuck up detected. Offsetting by 1 value.")
+                        uartClass.serialPortObject.read(1)
+                except:
+                    print(f"Timed out when trying to read bytes.")
+                passengerList = BFIO.GetPassengersFromDualBytes(data)
+                
+                for passenger in passengerList:
+                    if(passenger.passedTSA):
+                        newArrivals.append(passenger)
+                    else:
+                        print(f">>> {passenger.initErrorMessage} ")
+            
+            return newArrivals
+        ################################################
+        ################################################
+        class stupidPython:
+            receivingPlane:bool = False
+            receivedPassengers:list = []
+        
+        def HandleNewArrivals() -> NewArrival:
+            """
+                Appends passengers to a list.
+                Only starts doing so when it saw
+                a pilot in the new arrivals.
+                Stops when a co-pilot is seen.
+            """
+            arrivedPassengers = []
+            # Get passengers that arrived.
+            newArrivals = GetPassengerArrivals()
+            print(f"Concatenating arrivals to a list of {len(stupidPython.receivedPassengers)}")
+            for arrival in newArrivals:
+                
+                if(not stupidPython.receivingPlane):
+                    if(arrival.type == PassengerTypes.Pilot):
+                        print("Pilot received.")
+                        stupidPython.receivingPlane = True
+                        stupidPython.receivedPassengers.clear()
+                        stupidPython.receivedPassengers.append(arrival)
+                else:
+                    print(f"Adding passengers to a list of {len(stupidPython.receivedPassengers)}")
+                    if(arrival.type == PassengerTypes.CoPilot):
+                        # The rear of a plane was received
+                        stupidPython.receivingPlane = False
+                        print("Co-Pilot received")
+        
+                    stupidPython.receivedPassengers.append(arrival)
+                    if(stupidPython.receivingPlane == False):
+                        print("Passengers grouped into plane.")
+                        arrivedPassengers.append(stupidPython.receivedPassengers.copy())
+            return arrivedPassengers
+        ################################################
         while True:
             if uartClass.stopEventReading.is_set():
                 break
 
+            arrivedGroupsOfPassengers = HandleNewArrivals()
+
             with uartClass.lockReading:
-                uartClass.gpioList = newListJustDropped
+                if(len(arrivedGroupsOfPassengers) > 0):
+                    for group in arrivedGroupsOfPassengers:
+                        if(len(uartClass.groupsOfArrivedPassengers) < uartClass.maxGroupsSlots):
+                            uartClass.groupsOfArrivedPassengers.append(group)
+        ################################################
         uartClass.isStarted = False
 
     @staticmethod
     def _writing_thread(uartClass):
-        shitToWriteOnPort:list = []
+        from ...Utilities.bfio import Plane, Passenger
+        planesReadyForTakeOff:list = []
+
         while True:
             if uartClass.stopEventWriting.is_set():
                 break
 
+            if(planesReadyForTakeOff != None):
+                if(len(planesReadyForTakeOff) > 0):
+                    # plane:Plane
+                    for plane in planesReadyForTakeOff:
+                        # passenger:Passenger
+                        for passenger in plane.passengers:
+                            uartClass.serialPortObject.write(passenger.value_8bits[0])
+                            uartClass.serialPortObject.write(passenger.value_8bits[1])
+
+            planesReadyForTakeOff.clear()
             with uartClass.lockWriting:
-                shitToWriteOnPort = uartClass.valuesToWrite
+                planesReadyForTakeOff = uartClass.planesToWrite
         uartClass.isStarted = False
 
     @staticmethod
@@ -137,8 +235,9 @@ class UART:
             if not UART.RXthread or not UART.RXthread.is_alive():
                 UART.stopEventReading.clear()
                 UART.stopEventWriting.clear()
+                UART.serialPortObject = serial.Serial(UART.serialPort, baudrate=9600, timeout=0.05)
                 UART.RXthread = threading.Thread(target=UART._reading_thread, args=(UART,))
-                UART.TXthread = threading.Thread(target=UART._writing_thread, args=(UART,serial.Serial(port, baudrate=9600, timeout=1)))
+                UART.TXthread = threading.Thread(target=UART._writing_thread, args=(UART,))
                 UART.RXthread.daemon = True
                 UART.TXthread.daemon = True
                 UART.RXthread.start()
@@ -174,6 +273,10 @@ class UART:
 
         if UART.TXthread and UART.TXthread.is_alive():
             UART.TXthread.join()
+        
+        Debug.Log("Stopping Serial Port Object.")
+        UART.serialPortObject.close()
+        Debug.Log("Success.")
 
         UART.isStarted = False
         Debug.Log("RXthread is stopped.")
@@ -182,16 +285,13 @@ class UART:
         return Execution.Passed
 
     @staticmethod
-    def GetList() -> list:
+    def GetReceivedPlanes() -> list:
         """
-            GetList:
-            ========
+            GetReceivedPlanes:
+            ==================
             Summary:
             --------
-            Returns a list that contains
-            dictionary that explains everything
-            about the current UART of your
-            Raspberry Pi.
+            Updates the received plane list. 
 
             Returns:
             --------
@@ -200,60 +300,69 @@ class UART:
         """
         Debug.Start("GetList")
         if UART.isStarted:
-            with UART.lock:
+            with UART.lockReading:
                 Debug.Log("Returning values from the RXthread")
                 Debug.End()
-                return UART.gpioList
+                return UART.groupsOfArrivedPassengers
         else:
-            Debug.Log("RXthread WAS NOT STARTED. 0 is returned")
+            Debug.Log("RXthread WAS NOT STARTED. Execution.Failed is returned")
+            Debug.End()
+            return Execution.Failed
+        
+    def QueuePlaneOnTaxiway(planeToTakeOff) -> Execution:
+        """
+            QueuePlaneOnTaxiway:
+            ====================
+            Summary:
+            --------
+            Puts a plane to be sent on Serial.
+
+            Returns:
+            --------
+            - [{},{},{} ...]
+            - `Execution.Failed` = RXthread isn't started.
+        """
+        Debug.Start("QueuePlaneOnTaxiway")
+        if UART.isStarted:
+            with UART.lockWriting:
+                UART.planesToWrite.append(planeToTakeOff)
+                Debug.End()
+                return Execution.Passed
+        else:
+            Debug.Log("TXthread WAS NOT STARTED. Execution.Failed is returned")
             Debug.End()
             return Execution.Failed
 
     @staticmethod
-    def GetGPIOLevel(gpioNumber:int, accountForPullMode:bool = False) -> bool:
+    def GetOldestReceivedGroupOfPassengers() -> list:
         """
-            GetGPIOLevel:
-            =============
+            GetOldestReceivedGroupOfPassengers:
+            ===================================
             Summary:
             --------
-            Function that returns the level of a specified
-            UART number.
+            Method that returns the oldest received
+            group of passengers. it also removes
+            it from the list of saved groups of passengers
 
-            Arguments:
-            ----------
-            - `gpioNumber:int` = Which UART to extract the level from.
-            - `accountForPullMode:bool` = Defaults to False. Decides if we should inverse the return if the UART is a pull up.
-
-            Returns:
-            --------
-            - `Execution.Failed` = RXthread is not started
-            - `Execution.Unecessary` = UART could not be found in the current list.
-            - `True` = level of UART is HIGH - ON - VCC - 3.3V
-            - `False` = level of UART is LOW - OFF - GND - 0V
         """
-        Debug.Start("GetGPIOLevel")
+        Debug.Start("GetOldestReceivedGroupOfPassengers")
 
         if(UART.isStarted):
-            for UART in UART.gpioList:
-                if(UART[GpioEnum.UART] == gpioNumber):
-                    level = UART[GpioEnum.level]
-                    if(accountForPullMode == False):
-                        Debug.End()
-                        return level==1
+            
+            try:
+                UART.GetReceivedPlanes()
+                OldestGroupOfPassengers = UART.groupsOfArrivedPassengers.pop(0)
+            except:
+                Debug.Warn("No groups of passengers to return.")
+                Debug.End()
+                return None
 
-                    pull = UART[GpioEnum.pullMode]
-                    if(pull == "UP"):
-                        level = 1-level
-                    Debug.End()
-                    return level==1
-            Debug.Warn(f"UART {gpioNumber} was not found in the current list.")
+            Debug.Log(f"Returning a group of passengers")
             Debug.End()
-            return Execution.Unecessary
+            return OldestGroupOfPassengers
         else:
             Debug.Log("UART RXthread WAS NOT STARTED.")
             Debug.End()
             return Execution.Failed
-
-        Debug.End()
 #====================================================================#
 LoadingLog.End("driver.py")
