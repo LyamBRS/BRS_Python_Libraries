@@ -688,7 +688,18 @@ class NewArrival:
         self.planeID = planeCallsign
         Debug.Log(f"Plane's call sign is {self.planeID} and carries {passengerCount} passengers.")
 
-        self.classes = BFIO._GetClassesFromPassengers(passengers, wantedClasses)
+        classes = BFIO._GetClassesFromPassengers(passengers, wantedClasses)
+        if(classes == Execution.Failed):
+            Debug.Error("One or more classes failed conversion.")
+            self.passedTSA = False
+            Debug.End()
+            return
+        if(classes == Execution.Crashed):
+            Debug.Error("One or more classes crashed.")
+            self.passedTSA = False
+            Debug.End()
+            return
+
         self.amountOfClasses = len(self.classes)
         self.passedTSA = True
         Debug.End()
@@ -926,6 +937,7 @@ class ArrivalPassengerClass:
         given to this class to build
         the passengers.
     """
+    passedTSA:bool = None
     #endregion
     #region   --------------------------- METHODS
     #region   -------------------- Public
@@ -959,8 +971,9 @@ class ArrivalPassengerClass:
 
         if(passengers[0].type != PassengerTypes.Attendant):
             Debug.Error(f"The first passenger of this class is not an attendant.")
+            self.passedTSA = False
             Debug.End()
-            return Execution.Failed
+            return
 
         # passengers.pop(0)
         listOfBytes:list = []
@@ -978,13 +991,15 @@ class ArrivalPassengerClass:
                 byteString = bytes(listOfBytes)
                 variable = unpack_string(byteString)
         except:
-            Debug.Error(f"Failed to create {varType} typed variable from the bytes given")
+            Debug.Error(f"Failed to create {varType} typed variable from {listOfBytes}")
+            self.passedTSA = False
             Debug.End()
-            return Execution.Failed
+            return
 
         self.originalVariable = variable
         self.originalVariableType = varType
         self.passengers = passengers
+        self.passedTSA = True
 
         Debug.End()
     #endregion
