@@ -201,12 +201,15 @@ class UART:
                     # plane:Plane
                     for plane in planesReadyForTakeOff:
                         # passenger:Passenger
-                        for passenger in plane.passengers:
-                            Debug.enableConsole = True
-                            PrintPassenger(passenger)
-                            Debug.enableConsole = False
-                            uartClass.serialPortObject.write(passenger.value_8bits[0])
-                            uartClass.serialPortObject.write(passenger.value_8bits[1])
+                        if(plane != None):
+                            for passenger in plane.passengers:
+                                Debug.enableConsole = True
+                                PrintPassenger(passenger)
+                                Debug.enableConsole = False
+                                uartClass.serialPortObject.write(passenger.value_8bits[0])
+                                uartClass.serialPortObject.write(passenger.value_8bits[1])
+                        else:
+                            print(">>> WRITING: PLANE IS NULL")
 
             planesReadyForTakeOff.clear()
             with uartClass.lockWriting:
