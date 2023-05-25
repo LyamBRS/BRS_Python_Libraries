@@ -151,7 +151,7 @@ class UART:
             arrivedPassengers = []
             # Get passengers that arrived.
             newArrivals = GetPassengerArrivals()
-            print(f"Concatenating arrivals to a list of {len(stupidPython.receivedPassengers)}")
+            # print(f"Concatenating arrivals to a list of {len(stupidPython.receivedPassengers)}")
             for arrival in newArrivals:
                 
                 if(not stupidPython.receivingPlane):
