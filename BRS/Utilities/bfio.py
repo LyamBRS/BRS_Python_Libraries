@@ -666,8 +666,6 @@ class NewArrival:
         self.classesSizes = []
         self.passengers = []
 
-        PrintPassenger(passengers)
-
         self.passengers = passengers
         passengerCount = len(passengers)
 
