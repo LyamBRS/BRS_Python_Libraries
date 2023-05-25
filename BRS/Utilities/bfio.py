@@ -995,6 +995,8 @@ class ArrivalPassengerClass:
             self.passedTSA = False
             Debug.End()
             return
+        
+        Debug.Log(f"Variable is: {variable}")
 
         self.originalVariable = variable
         self.originalVariableType = varType
