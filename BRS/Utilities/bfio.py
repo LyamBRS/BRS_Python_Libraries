@@ -51,7 +51,56 @@ def unpack_string(packed_data):
     decoded_string = unpacked_data[0].decode('utf-8')  # Decode bytes to string
     return decoded_string
 
+class MandatoryPlaneIDs:
+    """
+        MandatoryPlaneIDs:
+        ==================
+        Summary:
+        --------
+        A class containing 
+        members that represents
+        each mandatory BFIO function
+        IDs. Your device should use
+        this when identifying arrived
+        pilots.
+    """
+    ping:int = 0
+    status:int = 1
+    handshake:int = 2
+    errorMessage:int = 3
+    deviceType:int = 4
+    uniqueID:int = 5
+    restartProtocol:int = 6
+    universalInfo:int = 7
+    communicationError:int = 8
 
+MandatoryFunctionRequestVarTypeLists = {
+    MandatoryPlaneIDs.ping               : [VarTypes.Bool],
+    MandatoryPlaneIDs.status             : [VarTypes.Unsigned.Char],
+    MandatoryPlaneIDs.handshake          : [],
+    MandatoryPlaneIDs.errorMessage       : [VarTypes.String],
+    MandatoryPlaneIDs.deviceType         : [VarTypes.Unsigned.Char],
+    MandatoryPlaneIDs.uniqueID           : [VarTypes.Unsigned.LongLong],
+    MandatoryPlaneIDs.restartProtocol    : [],
+    MandatoryPlaneIDs.universalInfo      : [VarTypes.Unsigned.LongLong, VarTypes.Unsigned.LongLong, VarTypes.Unsigned.Char, VarTypes.Unsigned.Char, VarTypes.String, VarTypes.String, VarTypes.String],
+    MandatoryPlaneIDs.communicationError : []
+}
+"""
+    MandatoryFunctionRequestVarTypeLists:
+    =====================================
+    Summary:
+    --------
+    A dictionary of lists that represents
+    the var types lists passed to plane
+    object builders when a mandatory
+    plane is received.
+
+    If you receive a PING pilot for example,
+    you'll take the list of passengers of that
+    plane and build a :ref:`NewArrival` by giving
+    it the received passengers objects and the
+    list of vartypes associated with Ping.
+"""
 
 class PassengerTypes:
     """
@@ -121,7 +170,6 @@ class BFIO:
             The orders of your ints must be:
             - [identifiant, value, identifiant, value ...]
         """
-
         val = struct.unpack('B' * len(listOfBytes), listOfBytes)
         listOfInts = list(val)
 
