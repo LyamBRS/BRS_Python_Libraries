@@ -41,26 +41,26 @@ from ...Debug.consoleLog import Debug
 #====================================================================#
 # Classes
 #====================================================================#
-characters = {
-    "/dev/ttyAMA0" : "TX1_B",
-    "/dev/ttyAMA2" : "TX2_A",
-    "/dev/ttyAMA3" : "TX1_A",
-    "/dev/ttyAMA4" : "TX2_B",
-    "/dev/ttyAMA5" : "DEBUG",
-}
+# characters = {
+    # "/dev/ttyAMA0" : "TX1_B",
+    # "/dev/ttyAMA2" : "TX2_A",
+    # "/dev/ttyAMA3" : "TX1_A",
+    # "/dev/ttyAMA4" : "TX2_B",
+    # "/dev/ttyAMA5" : "DEBUG",
+# }
 
-print("========================================== - [BRS]")
-print("Sending at 9600 baud on serial ports...")
+# print("========================================== - [BRS]")
+# print("Sending at 9600 baud on serial ports...")
 # Open each serial port and send the corresponding character
-for port, character in characters.items():
-    try:
-        ser = serial.Serial(port, baudrate=9600, timeout=1)
-        ser.write(character.encode())
-        ser.close()
-        print(f">>> Character {character} sent on {port}")
-    except serial.SerialException as e:
-        print(f">>> Failed to send on port {port}")
-    time.sleep(0.5)  # Add a delay between sending characters
+# for port, character in characters.items():
+    # try:
+        # ser = serial.Serial(port, baudrate=9600, timeout=1)
+        # ser.write(character.encode())
+        # ser.close()
+        # print(f">>> Character {character} sent on {port}")
+    # except serial.SerialException as e:
+        # print(f">>> Failed to send on port {port}")
+    # time.sleep(0.5)  # Add a delay between sending characters
 
 
 
