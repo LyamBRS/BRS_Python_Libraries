@@ -723,6 +723,28 @@ class Passenger:
         Compare with memebers of 
         :ref:`PassengersType` 
     """
+    passedTSA:bool = None
+    """
+        passedTSA:
+        ==========
+        Summary:
+        --------
+        tells you if your passenger is a valid working
+        member of society and can be used when you build
+        your plane. If this isn't `True` after you build
+        a Passenger object... discard it, its a terrorist!
+    """
+    initErrorMessage:str = None
+    """
+        initErrorMessage:
+        =================
+        Summary:
+        --------
+        The error message generated
+        when a Passenger class built
+        wasn't right. This is paired with
+        :ref:`passedTSA`
+    """
     #endregion
     #region   --------------------------- METHODS
     #region   -------------------- Public
@@ -748,19 +770,25 @@ class Passenger:
 
         if(byte < 0 or byte > 255):
             Debug.Error(f"FATAL PASSENGER ERROR. Passenger cant hold bytes of {byte}")
+            self.initErrorMessage = f"FATAL PASSENGER ERROR. Passenger cant hold bytes of {byte}"
+            self.passedTSA = False
             Debug.End()
-            return Execution.Failed
+            return
 
         if(type != PassengerTypes.Byte and type != PassengerTypes.Check and type != PassengerTypes.Div and type != PassengerTypes.Start):
             Debug.Error(f"Passenger's specified type; {type} isn't valid.")
+            self.initErrorMessage = f"Passenger's specified type; {type} isn't valid."
+            self.passedTSA = False
             Debug.End()
-            return Execution.Failed
+            return
 
         self.value_10bits = byte + type
         self.value_8bits = [type >> 8, byte]
         self.type = type
 
         # PrintPassenger(self)
+        self.initErrorMessage = ""
+        self.passedTSA = True
 
         Debug.End(ContinueDebug=True)
     #endregion
