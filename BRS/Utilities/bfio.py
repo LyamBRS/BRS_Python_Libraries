@@ -383,7 +383,7 @@ class BFIO:
 
         ListOfClasses = []
         amountOfClasses = len(dividedPassengers)
-        for classNumber in range(amountOfClasses):
+        for classNumber in range(amountOfClasses-1):
             Debug.Log(f"Converting to type {varTypes[classNumber]}")
             ListOfClasses.append(ArrivalPassengerClass(dividedPassengers[classNumber], varTypes[classNumber]))
 
