@@ -253,8 +253,9 @@ class BFIO:
             functions.
         """
         Debug.Start("ParsePassengersIntoMandatoryPlane")
-        Passenger.value_8bits
-        MandatoryPlane = NewArrival(passengers, MandatoryFunctionRequestVarTypeLists[passengers[0].value_8bits[1]])
+        pilot = passengers[0]
+        callsign = pilot.value_8bits[1]
+        MandatoryPlane = NewArrival(passengers, MandatoryFunctionRequestVarTypeLists[callsign])
 
         Debug.End()
         return MandatoryPlane
