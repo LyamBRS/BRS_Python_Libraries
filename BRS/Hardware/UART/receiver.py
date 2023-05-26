@@ -205,6 +205,7 @@ class UART:
                 if(len(planesReadyForTakeOff) > 0):
                     # plane:Plane
                     for plane in planesReadyForTakeOff:
+                        print("PLANE TAKEOFF")
                         # passenger:Passenger
                         if(plane != None):
                             for passenger in plane.passengers:
