@@ -480,6 +480,16 @@ class Addons:
                 - `Execution.Incompatibility` = The addon does not support action binding.
 
     """
+    
+    _addonsToStop:list = []
+    """
+        You cant stop addons while in the periodic callback...
+        cuz you'll change the size of the addons dictionary
+        while its itering through it.
+
+        This makes it so your addon will close the next time
+        the periodic callback is executed.
+    """
     #endregion
     #region   --------------------------- METHODS
     def AddNewAddon(newAddonsName, addonsInformation:dict) -> Execution:
@@ -549,8 +559,7 @@ class Addons:
         Debug.Log("Calling the Stop function of the Addon.")
         Addons._listedAddons[addonToStop][AddonEnum.Stop]()
 
-        Addons._listedAddons.pop(addonToStop)
-        Debug.Log(f"{addonToStop} is no longer listed as an Addon.")
+        Addons._addonsToStop.append(addonToStop)
         Debug.End()
         return Execution.Passed
     # -----------------------------------
@@ -775,6 +784,15 @@ class Addons:
             periodic callback methods.
         """
         Debug.Start("ExecutePeriodicCallback", DontDebug=True)
+
+        if(len(Addons._addonsToStop) > 0):
+            for addon in Addons._addonsToStop:
+                try:
+                    Addons._listedAddons.pop(addon)
+                    Debug.Log("Addon is now stopped")
+                except:
+                    pass
+
         Addons._Execute(AddonEnum.PeriodicCallback)
         Debug.End(ContinueDebug=True)
     #endregion
