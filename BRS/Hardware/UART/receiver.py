@@ -212,8 +212,8 @@ class UART:
                                 # Debug.enableConsole = True
                                 # PrintPassenger(passenger)
                                 # Debug.enableConsole = False
-                                uartClass.serialPortObject.write(passenger.value_8bits[0])
-                                uartClass.serialPortObject.write(passenger.value_8bits[1])
+                                uartClass.serialPortObject.write(int.to_bytes(passenger.value_8bits[0], length=1, byteorder="big", signed=False))
+                                uartClass.serialPortObject.write(int.to_bytes(passenger.value_8bits[1], length=1, byteorder="big", signed=False))
                         else:
                             pass
                             # print(">>> WRITING: PLANE IS NULL")
