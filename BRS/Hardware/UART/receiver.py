@@ -117,14 +117,14 @@ class UART:
             """
             # Clear the buffer of any passengers.
             newArrivals = []
-            if(uartClass.serialPortObject.in_waiting >= 2):
-                while uartClass.serialPortObject.in_waiting >= 2:
+            if(serialPortObject.in_waiting >= 2):
+                while serialPortObject.in_waiting >= 2:
                     try:
-                        data = uartClass.serialPortObject.read(2)
+                        data = serialPortObject.read(2)
                         # print(f"{data[0]}, {data[1]}")
                         if(data[0] > 3):
                             # print("Fuck up detected. Offsetting by 1 value.")
-                            uartClass.serialPortObject.read(1)
+                            serialPortObject.read(1)
                     except:
                         pass
                         # print(f"Timed out when trying to read bytes.")
@@ -178,28 +178,15 @@ class UART:
                             arrivedPassengers.append(stupidPython.receivedPassengers.copy())
             return arrivedPassengers
         ################################################
+        serialPortObject = serial.Serial(uartClass.serialPort, baudrate=9600, timeout=0.01)
+        planesReadyForTakeOff:list = []
         while True:
+
+
             if uartClass.stopEventReading.is_set():
                 break
 
             arrivedGroupsOfPassengers = HandleNewArrivals()
-
-            with uartClass.lockReading:
-                if(len(arrivedGroupsOfPassengers) > 0):
-                    for group in arrivedGroupsOfPassengers:
-                        if(len(uartClass.groupsOfArrivedPassengers) < uartClass.maxGroupsSlots):
-                            uartClass.groupsOfArrivedPassengers.append(group)
-        ################################################
-        uartClass.isStarted = False
-
-    @staticmethod
-    def _writing_thread(uartClass):
-        from ...Utilities.bfio import Plane, Passenger, PrintPassenger, Debug
-        planesReadyForTakeOff:list = []
-
-        while True:
-            if uartClass.stopEventWriting.is_set():
-                break
 
             if(planesReadyForTakeOff != None):
                 if(len(planesReadyForTakeOff) > 0):
@@ -212,16 +199,26 @@ class UART:
                                 # Debug.enableConsole = True
                                 # PrintPassenger(passenger)
                                 # Debug.enableConsole = False
-                                uartClass.serialPortObject.write(int.to_bytes(passenger.value_8bits[0], length=1, byteorder="big", signed=False))
-                                uartClass.serialPortObject.write(int.to_bytes(passenger.value_8bits[1], length=1, byteorder="big", signed=False))
+                                serialPortObject.write(int.to_bytes(passenger.value_8bits[0], length=1, byteorder="big", signed=False))
+                                serialPortObject.write(int.to_bytes(passenger.value_8bits[1], length=1, byteorder="big", signed=False))
                         else:
                             pass
                             # print(">>> WRITING: PLANE IS NULL")
 
-            planesReadyForTakeOff.clear()
-            with uartClass.lockWriting:
+            with uartClass.lockReading:
                 planesReadyForTakeOff = uartClass.planesToWrite
+
+                if(len(arrivedGroupsOfPassengers) > 0):
+                    for group in arrivedGroupsOfPassengers:
+                        if(len(uartClass.groupsOfArrivedPassengers) < uartClass.maxGroupsSlots):
+                            uartClass.groupsOfArrivedPassengers.append(group)
+        ################################################
+        serialPortObject.close()
         uartClass.isStarted = False
+
+    @staticmethod
+    def _writing_thread(uartClass):
+        pass
 
     @staticmethod
     def StartDriver():
@@ -247,14 +244,14 @@ class UART:
         if UART.isStarted == False:
             if not UART.RXthread or not UART.RXthread.is_alive():
                 UART.stopEventReading.clear()
-                UART.stopEventWriting.clear()
+                # UART.stopEventWriting.clear()
                 UART.serialPortObject = serial.Serial(UART.serialPort, baudrate=9600, timeout=0.01)
                 UART.RXthread = threading.Thread(target=UART._reading_thread, args=(UART,))
-                UART.TXthread = threading.Thread(target=UART._writing_thread, args=(UART,))
+                # UART.TXthread = threading.Thread(target=UART._writing_thread, args=(UART,))
                 UART.RXthread.daemon = True
-                UART.TXthread.daemon = True
+                # UART.TXthread.daemon = True
                 UART.RXthread.start()
-                UART.TXthread.start()
+                # UART.TXthread.start()
                 UART.isStarted = True
                 Debug.End()
                 return Execution.Passed
@@ -340,7 +337,7 @@ class UART:
         """
         Debug.Start("QueuePlaneOnTaxiway")
         if UART.isStarted:
-            with UART.lockWriting:
+            with UART.lockReading:
                 UART.planesToWrite.append(planeToTakeOff)
                 Debug.End()
                 return Execution.Passed
