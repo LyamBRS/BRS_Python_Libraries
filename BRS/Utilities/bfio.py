@@ -779,6 +779,7 @@ class NewArrival:
             Debug.End()
             return
 
+        self.classes = classes
         self.amountOfClasses = len(self.classes)
         self.passedTSA = True
         Debug.End()
