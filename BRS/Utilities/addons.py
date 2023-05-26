@@ -518,6 +518,42 @@ class Addons:
         Debug.End()
         return Execution.Passed
     # -----------------------------------
+    def StopOne(addonToStop:str) -> Execution:
+        """
+            StopOne:
+            ========
+            Summary:
+            --------
+            Removes an addon from the list of saved addons.
+            it also calls its Stop function.
+
+            Arguments:
+            ----------
+            - `addonToStop:str` : string reprenting the name of the running addon to stop.
+
+            Returns:
+            --------
+            - `Execution.Passed` : Your addon is now stopped and unloaded.
+            - `Execution.Unecessary` : No addons are running with the specified name in :ref:`_listedAddons`.
+        """
+        Debug.Start("Addons -> StopOne")
+
+        if(addonToStop not in Addons._listedAddons):
+            Debug.Error(f"{addonToStop} is not listed.")
+            Debug.End()
+            return Execution.Unecessary
+        
+        # Checking all keys of the specified dictionary:
+        Debug.Warn("DO-ME: Checks for addon's passed dictionaries are bypassed.")
+
+        Debug.Log("Calling the Stop function of the Addon.")
+        Addons._listedAddons[addonToStop][AddonEnum.Stop]()
+
+        Addons._listedAddons.pop(addonToStop)
+        Debug.Log(f"{addonToStop} is no longer listed as an Addon.")
+        Debug.End()
+        return Execution.Passed
+    # -----------------------------------
     def _Execute(nameOfFunctionToExecute:str, passedArguments:list = None, returnFirstError:bool = False):
         """
             _Execute:
