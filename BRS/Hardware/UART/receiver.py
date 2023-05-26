@@ -113,28 +113,29 @@ class UART:
         def GetPassengerArrivals() -> list:
             """
                 Only reads passengers that arrived.
-                returns them in groupes of 2.
+                returns them in groups of 2.
             """
             # Clear the buffer of any passengers.
             newArrivals = []
-            while uartClass.serialPortObject.in_waiting >= 2:
-                try:
-                    data = uartClass.serialPortObject.read(2)
-                    # print(f"{data[0]}, {data[1]}")
-                    if(data[0] > 3):
-                        # print("Fuck up detected. Offsetting by 1 value.")
-                        uartClass.serialPortObject.read(1)
-                except:
-                    pass
-                    # print(f"Timed out when trying to read bytes.")
-                passengerList = BFIO.GetPassengersFromDualBytes(data)
-
-                for passenger in passengerList:
-                    if(passenger.passedTSA):
-                        newArrivals.append(passenger)
-                    else:
+            if(uartClass.serialPortObject.in_waiting >= 2):
+                while uartClass.serialPortObject.in_waiting >= 2:
+                    try:
+                        data = uartClass.serialPortObject.read(2)
+                        # print(f"{data[0]}, {data[1]}")
+                        if(data[0] > 3):
+                            # print("Fuck up detected. Offsetting by 1 value.")
+                            uartClass.serialPortObject.read(1)
+                    except:
                         pass
-                        # print(f">>> {passenger.initErrorMessage} ")
+                        # print(f"Timed out when trying to read bytes.")
+                    passengerList = BFIO.GetPassengersFromDualBytes(data)
+
+                    for passenger in passengerList:
+                        if(passenger.passedTSA):
+                            newArrivals.append(passenger)
+                        else:
+                            pass
+                            # print(f">>> {passenger.initErrorMessage} ")
 
             return newArrivals
         ################################################
@@ -142,7 +143,7 @@ class UART:
         class stupidPython:
             receivingPlane:bool = False
             receivedPassengers:list = []
-        
+
         def HandleNewArrivals() -> NewArrival:
             """
                 Appends passengers to a list.
@@ -155,7 +156,7 @@ class UART:
             newArrivals = GetPassengerArrivals()
             # print(f"Concatenating arrivals to a list of {len(stupidPython.receivedPassengers)}")
             for arrival in newArrivals:
-                
+
                 if(not stupidPython.receivingPlane):
                     if(arrival.type == PassengerTypes.Pilot):
                         # print("Pilot received.")
@@ -168,7 +169,7 @@ class UART:
                         # The rear of a plane was received
                         stupidPython.receivingPlane = False
                         # print("Co-Pilot received")
-        
+
                     stupidPython.receivedPassengers.append(arrival)
                     if(stupidPython.receivingPlane == False):
                         # print("Passengers grouped into plane.")
@@ -244,7 +245,7 @@ class UART:
             if not UART.RXthread or not UART.RXthread.is_alive():
                 UART.stopEventReading.clear()
                 UART.stopEventWriting.clear()
-                UART.serialPortObject = serial.Serial(UART.serialPort, baudrate=9600, timeout=0.05)
+                UART.serialPortObject = serial.Serial(UART.serialPort, baudrate=9600, timeout=0.01)
                 UART.RXthread = threading.Thread(target=UART._reading_thread, args=(UART,))
                 UART.TXthread = threading.Thread(target=UART._writing_thread, args=(UART,))
                 UART.RXthread.daemon = True
