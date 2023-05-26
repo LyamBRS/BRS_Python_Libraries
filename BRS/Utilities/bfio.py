@@ -682,6 +682,37 @@ class NewArrival:
     #endregion
     #region   --------------------------- METHODS
     #region   -------------------- Public
+    def GetParameter(self, parameterNumber:int):
+        """
+            GetParameter:
+            =============
+            Summary:
+            --------
+            Extracts a parameter from this plane.
+        """
+        Debug.Start("NewArrival -> GetParameter")
+        if(not self.passedTSA):
+            Debug.Error("CANNOT EXTRACT PARAMETERS FROM SELF CUZ WE DIDN'T PASS TSA.")
+            Debug.End()
+            return Execution.Failed
+
+        if(parameterNumber > len(self.classes)):
+            Debug.Error(f"Parameter is out of bound. This plane only has {len(self.classes)} parameters")
+            Debug.End()
+            return Execution.Failed
+
+        passengerClass:ArrivalPassengerClass
+        passengerClass = self.classes[parameterNumber]
+        if(not passengerClass.passedTSA):
+            Debug.Error(f"Parameter is corrupted.")
+            Debug.End()
+            return Execution.Failed
+
+        Debug.Log(f">>> Success. Returning: {passengerClass.originalVariable}")
+        Debug.End()
+        return passengerClass.originalVariable
+
+
     #endregion
     #region   ------------------- Private
     #endregion
