@@ -696,10 +696,10 @@ class NewArrival:
             Debug.End()
             return Execution.Failed
 
-        if(parameterNumber > len(self.classes)):
+        if(parameterNumber > len(self.classes-1)):
             Debug.Error(f"Parameter is out of bound. This plane only has {len(self.classes)} parameters")
             Debug.End()
-            return Execution.Failed
+            return Execution.Incompatibility
 
         passengerClass:ArrivalPassengerClass
         passengerClass = self.classes[parameterNumber]
