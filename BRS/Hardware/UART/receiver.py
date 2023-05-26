@@ -254,7 +254,7 @@ class UART:
         else:
             Debug.Error("Threads are already started. You cannot start more than 2.")
             Debug.End()
-            return Execution.Failed
+            return Execution.Unecessary
         Debug.Log("UART is now started")
         Debug.End()
         return Execution.Passed
