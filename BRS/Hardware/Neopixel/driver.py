@@ -837,10 +837,15 @@ class DriverHandler:
         if(result != True):
             Debug.Error("Failed to read file.")
             printFatalDriverError("638: Failed to read JSON")
-            NeopixelHandler.currentMode = "OFF"
-            DriverHandler.Close()
-            Debug.End()
-            return Execution.Crashed
+
+            time.sleep(0.05)
+            result = DriverHandler.InputJsonObject.ReadFile()
+            if(result != True):
+                printFatalDriverError("844: Failed to read JSON again.")
+                NeopixelHandler.currentMode = "OFF"
+                DriverHandler.Close()
+                Debug.End()
+                return Execution.Crashed
 
         if(DriverHandler.InputJsonObject.jsonData["State"] != "ON"):
             Debug.Log("Driver should turn off now.")
