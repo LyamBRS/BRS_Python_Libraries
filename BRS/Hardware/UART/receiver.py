@@ -155,25 +155,27 @@ class UART:
             # Get passengers that arrived.
             newArrivals = GetPassengerArrivals()
             # print(f"Concatenating arrivals to a list of {len(stupidPython.receivedPassengers)}")
-            for arrival in newArrivals:
 
-                if(not stupidPython.receivingPlane):
-                    if(arrival.type == PassengerTypes.Pilot):
-                        # print("Pilot received.")
-                        stupidPython.receivingPlane = True
-                        stupidPython.receivedPassengers.clear()
+            if(len(newArrivals) > 1):
+                for arrival in newArrivals:
+
+                    if(not stupidPython.receivingPlane):
+                        if(arrival.type == PassengerTypes.Pilot):
+                            # print("Pilot received.")
+                            stupidPython.receivingPlane = True
+                            stupidPython.receivedPassengers.clear()
+                            stupidPython.receivedPassengers.append(arrival)
+                    else:
+                        # print(f"Adding passengers to a list of {len(stupidPython.receivedPassengers)}")
+                        if(arrival.type == PassengerTypes.CoPilot):
+                            # The rear of a plane was received
+                            stupidPython.receivingPlane = False
+                            # print("Co-Pilot received")
+
                         stupidPython.receivedPassengers.append(arrival)
-                else:
-                    # print(f"Adding passengers to a list of {len(stupidPython.receivedPassengers)}")
-                    if(arrival.type == PassengerTypes.CoPilot):
-                        # The rear of a plane was received
-                        stupidPython.receivingPlane = False
-                        # print("Co-Pilot received")
-
-                    stupidPython.receivedPassengers.append(arrival)
-                    if(stupidPython.receivingPlane == False):
-                        # print("Passengers grouped into plane.")
-                        arrivedPassengers.append(stupidPython.receivedPassengers.copy())
+                        if(stupidPython.receivingPlane == False):
+                            # print("Passengers grouped into plane.")
+                            arrivedPassengers.append(stupidPython.receivedPassengers.copy())
             return arrivedPassengers
         ################################################
         while True:
