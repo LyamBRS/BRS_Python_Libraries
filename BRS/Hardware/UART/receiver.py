@@ -122,18 +122,20 @@ class UART:
                     data = uartClass.serialPortObject.read(2)
                     # print(f"{data[0]}, {data[1]}")
                     if(data[0] > 3):
-                        print("Fuck up detected. Offsetting by 1 value.")
+                        # print("Fuck up detected. Offsetting by 1 value.")
                         uartClass.serialPortObject.read(1)
                 except:
-                    print(f"Timed out when trying to read bytes.")
+                    pass
+                    # print(f"Timed out when trying to read bytes.")
                 passengerList = BFIO.GetPassengersFromDualBytes(data)
-                
+
                 for passenger in passengerList:
                     if(passenger.passedTSA):
                         newArrivals.append(passenger)
                     else:
-                        print(f">>> {passenger.initErrorMessage} ")
-            
+                        pass
+                        # print(f">>> {passenger.initErrorMessage} ")
+
             return newArrivals
         ################################################
         ################################################
@@ -156,7 +158,7 @@ class UART:
                 
                 if(not stupidPython.receivingPlane):
                     if(arrival.type == PassengerTypes.Pilot):
-                        print("Pilot received.")
+                        # print("Pilot received.")
                         stupidPython.receivingPlane = True
                         stupidPython.receivedPassengers.clear()
                         stupidPython.receivedPassengers.append(arrival)
@@ -165,11 +167,11 @@ class UART:
                     if(arrival.type == PassengerTypes.CoPilot):
                         # The rear of a plane was received
                         stupidPython.receivingPlane = False
-                        print("Co-Pilot received")
+                        # print("Co-Pilot received")
         
                     stupidPython.receivedPassengers.append(arrival)
                     if(stupidPython.receivingPlane == False):
-                        print("Passengers grouped into plane.")
+                        # print("Passengers grouped into plane.")
                         arrivedPassengers.append(stupidPython.receivedPassengers.copy())
             return arrivedPassengers
         ################################################
@@ -203,13 +205,14 @@ class UART:
                         # passenger:Passenger
                         if(plane != None):
                             for passenger in plane.passengers:
-                                Debug.enableConsole = True
-                                PrintPassenger(passenger)
-                                Debug.enableConsole = False
+                                # Debug.enableConsole = True
+                                # PrintPassenger(passenger)
+                                # Debug.enableConsole = False
                                 uartClass.serialPortObject.write(passenger.value_8bits[0])
                                 uartClass.serialPortObject.write(passenger.value_8bits[1])
                         else:
-                            print(">>> WRITING: PLANE IS NULL")
+                            pass
+                            # print(">>> WRITING: PLANE IS NULL")
 
             planesReadyForTakeOff.clear()
             with uartClass.lockWriting:
