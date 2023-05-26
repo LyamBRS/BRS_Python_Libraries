@@ -287,7 +287,10 @@ class UART:
             UART.TXthread.join()
         
         Debug.Log("Stopping Serial Port Object.")
-        UART.serialPortObject.close()
+        try:
+            UART.serialPortObject.close()
+        except:
+            Debug.Error("serialPortObject couldn't be closed. maybe its None typed and wasn't ever opened.")
         Debug.Log("Success.")
 
         UART.isStarted = False
