@@ -693,21 +693,21 @@ class Addons:
             software representation.
         """
         Debug.Start(AddonEnum.ChangeButtonBinding)
-        try:
-            result = Addons._listedAddons[whichAddonToBindItTo][AddonEnum.ChangeButtonBinding](nameOfTheSoftwareButton, nameOfTheHardwareButton)
-            if(result != Execution.Passed):
-                if(result == Execution.Unecessary):
-                    Debug.Warn(f"{whichAddonToBindItTo} may already have {nameOfTheHardwareButton} binded to {nameOfTheSoftwareButton}")
-                    Debug.End()
-                    return Execution.Unecessary
-                Debug.Error("Something went wrong.")
-            else:
-                Debug.Log(f"Success returned when binding {nameOfTheHardwareButton} to {nameOfTheSoftwareButton}")
+        # try:
+        result = Addons._listedAddons[whichAddonToBindItTo][AddonEnum.ChangeButtonBinding](nameOfTheSoftwareButton, nameOfTheHardwareButton)
+        if(result != Execution.Passed):
+            if(result == Execution.Unecessary):
+                Debug.Warn(f"{whichAddonToBindItTo} may already have {nameOfTheHardwareButton} binded to {nameOfTheSoftwareButton}")
                 Debug.End()
-                return Execution.Passed
-        except:
-            Debug.Error(f"Crash occured when trying to bind {whichAddonToBindItTo}'s {nameOfTheHardwareButton} to {nameOfTheSoftwareButton}.")
-            Debug.Error(f"{whichAddonToBindItTo} may not exist.")
+                return Execution.Unecessary
+            Debug.Error("Something went wrong.")
+        else:
+            Debug.Log(f"Success returned when binding {nameOfTheHardwareButton} to {nameOfTheSoftwareButton}")
+            Debug.End()
+            return Execution.Passed
+        # except:
+            # Debug.Error(f"Crash occured when trying to bind {whichAddonToBindItTo}'s {nameOfTheHardwareButton} to {nameOfTheSoftwareButton}.")
+            # Debug.Error(f"{whichAddonToBindItTo} may not exist.")
         Debug.End()
         return Execution.Failed
 
