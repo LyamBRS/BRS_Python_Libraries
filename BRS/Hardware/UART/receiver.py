@@ -204,7 +204,7 @@ class UART:
                         else:
                             pass
                             # print(">>> WRITING: PLANE IS NULL")
-
+            planesReadyForTakeOff.clear()
             with uartClass.lockReading:
                 planesReadyForTakeOff = uartClass.planesToWrite
 
