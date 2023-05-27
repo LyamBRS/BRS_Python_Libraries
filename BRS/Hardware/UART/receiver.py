@@ -11,6 +11,7 @@
 # Loading Logs
 #====================================================================#
 from Libraries.BRS_Python_Libraries.BRS.Utilities.Information import Information
+from Libraries.BRS_Python_Libraries.BRS.Utilities.bfio import PrintPassenger
 from ...Debug.LoadingLog import LoadingLog
 LoadingLog.Start("driver.py")
 #====================================================================#
@@ -132,6 +133,7 @@ class UART:
 
                     for passenger in passengerList:
                         if(passenger.passedTSA):
+                            PrintPassenger(passenger)
                             newArrivals.append(passenger)
                         else:
                             pass
