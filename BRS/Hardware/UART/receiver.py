@@ -321,7 +321,7 @@ class UART:
             Debug.Log("RXthread WAS NOT STARTED. Execution.Failed is returned")
             Debug.End()
             return Execution.Failed
-        
+
     def QueuePlaneOnTaxiway(planeToTakeOff) -> Execution:
         """
             QueuePlaneOnTaxiway:
