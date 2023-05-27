@@ -550,6 +550,7 @@ class Plane:
         self.classes = []
         self.classesSizes = []
         self.passengers = []
+        self.planeID = planeID
 
         tsaResult = BFIO._CheckPlaneID(planeID)
         if(tsaResult != Execution.Passed):
