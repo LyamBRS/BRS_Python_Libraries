@@ -182,7 +182,6 @@ class UART:
         planesReadyForTakeOff:list = []
         while True:
 
-
             if uartClass.stopEventReading.is_set():
                 break
 
@@ -321,6 +320,28 @@ class UART:
             Debug.Log("RXthread WAS NOT STARTED. Execution.Failed is returned")
             Debug.End()
             return Execution.Failed
+
+    def Reset() -> Execution:
+        """
+            Reset:
+            ======
+            Summary:
+            --------
+            Resets everything. Clears
+            any planes that are left
+            in buffers, clears planes
+            that are sending and so on.
+        """
+        Debug.Start("UART -> Reset")
+        if UART.isStarted:
+            with UART.lockReading:
+                UART.groupsOfArrivedPassengers.clear()
+                UART.planesToWrite.clear()
+        else:
+            Debug.Log("UART WAS NOT STARTED. Execution.Failed is returned")
+            Debug.End()
+            return Execution.Failed
+        Debug.End()
 
     def QueuePlaneOnTaxiway(planeToTakeOff) -> Execution:
         """
