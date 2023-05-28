@@ -209,6 +209,7 @@ class UART:
             with uartClass.lockReading:
                 planesReadyForTakeOff = uartClass.planesToWrite
                 uartClass.planesToWrite.clear()
+
                 if(len(arrivedGroupsOfPassengers) > 0):
                     for group in arrivedGroupsOfPassengers:
                         if(len(uartClass.groupsOfArrivedPassengers) < uartClass.maxGroupsSlots):
