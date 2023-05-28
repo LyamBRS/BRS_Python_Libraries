@@ -183,6 +183,7 @@ class UART:
         serialPortObject = serial.Serial(uartClass.serialPort, baudrate=9600, timeout=0.01)
         serialPortObject.reset_output_buffer()
         serialPortObject.reset_input_buffer()
+        serialPortObject.open()
         planesReadyForTakeOff:list = []
         while True:
 
