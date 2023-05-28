@@ -206,6 +206,7 @@ class UART:
                 if(len(planesReadyForTakeOff) > 0):
                     # plane:Plane
                     for plane in planesReadyForTakeOff:
+                        planesReadyForTakeOff.pop(0)
                         print("PLANE TAKEOFF")
                         # passenger:Passenger
                         if(plane != None):
@@ -221,8 +222,8 @@ class UART:
             planesReadyForTakeOff.clear()
             with uartClass.lockReading:
                 planesReadyForTakeOff = uartClass.planesToWrite
-                uartClass.planesToWrite.clear()
                 uartClass.planesTakingOff = len(planesReadyForTakeOff)
+                uartClass.planesToWrite.clear()
 
                 if(len(arrivedGroupsOfPassengers) > 0):
                     for group in arrivedGroupsOfPassengers:
