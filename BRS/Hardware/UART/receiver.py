@@ -285,13 +285,15 @@ class UART:
 
         if UART.TXthread and UART.TXthread.is_alive():
             UART.TXthread.join()
-        
+
         Debug.Log("Stopping Serial Port Object.")
         try:
             UART.serialPortObject.close()
         except:
             Debug.Error("serialPortObject couldn't be closed. maybe its None typed and wasn't ever opened.")
         Debug.Log("Success.")
+
+        UART.Reset()
 
         UART.isStarted = False
         Debug.Log("RXthread is stopped.")
