@@ -692,18 +692,21 @@ class NewArrival:
             Extracts a parameter from this plane.
         """
         Debug.Start("NewArrival -> GetParameter")
+
+        # Is the plane validated? Is the checksum correct.
         if(not self.passedTSA):
             Debug.Error("CANNOT EXTRACT PARAMETERS FROM SELF CUZ WE DIDN'T PASS TSA.")
             Debug.End()
             return Execution.Failed
 
+        # Is the wanted parameter within the amount of saved parameters.
         if(parameterNumber > len(self.classes)-1):
             Debug.Error(f"Parameter is out of bound. This plane only has {len(self.classes)} parameters")
             Debug.End()
             return Execution.Incompatibility
 
-        passengerClass:ArrivalPassengerClass
-        passengerClass = self.classes[parameterNumber]
+        # Transform the passengers into an Arrival passenger class.
+        passengerClass:ArrivalPassengerClass = self.classes[parameterNumber]
         if(not passengerClass.passedTSA):
             Debug.Error(f"Parameter is corrupted.")
             Debug.End()
@@ -1044,11 +1047,8 @@ class ArrivalPassengerClass:
             - `varType` the type of the class.
         """
         Debug.Start("ArrivalPassengerClass -> Building")
-        Debug.Log(f"Converting to type {varType}")
+        Debug.Log(f"Converting passengers to variable type: {varType}")
         self.originalVariableType = varType
-
-        # for passenger in passengers:
-            # PrintPassenger(passenger)
 
         if(passengers[0].type != PassengerTypes.Attendant):
             Debug.Error(f"The first passenger of this class is not an attendant.")
@@ -1088,219 +1088,7 @@ class ArrivalPassengerClass:
     #endregion
     pass
 #====================================================================#
-# class GateFoundation:
-#     #region   --------------------------- DOCSTRING
-#     """
-#         GateFoundation:
-#         ======================
-#         Summary:
-#         --------
-#         A class to be inherited by gate classes.
-#         This class contains all the standard functions
-#         used by the gates you will be building.
-#     """
-#     #endregion
-#     #region   --------------------------- MEMBERS
-#     maxPassengerCapacity:int = None
-#     """
-#         maxPassengerCapacity:
-#         =====================
-#         Summary:
-#         --------
-#         How many passengers can planes that
-#         are docked to this gate carry?
-#         This include
-#     """
 
-#     id:int = None
-#     """
-#         id:
-#         ===
-#         Summary:
-#         ---------
-#         The ID of the gate. This is used to build
-#         planes as well as verify the ones attempting
-#         to dock to your gate.
-#     """
-    
-#     state:int = None
-#     """
-#         state:
-#         ======
-#         Summary:
-#         --------
-#         Holds the state of the gate.
-
-#         - 0: Out of service.
-#         - 1: Request needs to be sent.
-#         - 2: Answer needs to be sent.
-#         - 3: Gate is available for anything.
-
-#         Defaults to `None`
-#     """
-
-#     varTypesToSendAsAnswers:list = None
-#     """
-#         varTypesToSendAsAnswers:
-#         ========================
-#         Summary:
-#         --------
-#         A list of types of variables
-#         that are to be sent when this
-#         gate will build an answer plane
-#         to a master's function execution
-#         request.
-
-#         This should be set in your __init__
-
-#         Example:
-#         --------
-#         varTypesToSendAsAnswers = [
-#             VarTypeEnum.Bool,
-#             VarTypeEnum.Bool
-#         ]
-#     """
-
-#     varTypesToSendAsRequests:list = None
-#     """
-#         varTypesToSendAsRequests:
-#         ========================
-#         Summary:
-#         --------
-#         A list of types of variables
-#         that are to be sent when this
-#         gate will build a request plane
-#         to ask a device to execute the
-#         function associated with the ID.
-
-#         This should be set in your __init__
-
-#         Example:
-#         --------
-#         varTypesToSendAsAnswers = [
-#             VarTypeEnum.Bool,
-#             VarTypeEnum.Bool
-#         ]
-#     """
-
-#     masterVarGetter:Any = None
-#     """
-#         masterVarGetter:
-#         ================
-#         Summary:
-#         --------
-#         This member needs to be replaced
-#         by a function that returns a list
-#         of variables (in the same order as :ref:`varTypesToSendAsRequests`)
-#         The gate will execute that
-#         getter function when the runway
-#         wants to have a function request plane.
-
-#         You need to tell the gate in your __init__ what that
-#         function is.
-#     """
-
-#     slaveVarGetter:Any = None
-#     """
-#         slaveVarGetter:
-#         ================
-#         Summary:
-#         --------
-#         This member needs to be replaced
-#         by a function that returns a list
-#         of variables (in the same order as :ref:`varTypesToSendAsAnswers`)
-#         The gate will execute that
-#         getter function when it will
-#         need to build an answer to a function request.
-
-#         You need to tell the gate in your __init__ what that
-#         function is.
-#     """
-    
-#     isMasterOnly:bool = None
-#     """
-#         isMasterOnly:
-#         =============
-#         Summary:
-#         --------
-#         Decides if this plane should
-#         execute anything if a master
-#         plane is received.
-
-#         Should be set in your __init__
-#     """
-
-#     receivedData:list = None
-#     """
-#         receivedData:
-#         =============
-#         Summary:
-#         --------
-#         This member holds a list of
-#         parsed and decoded variables
-#         in the same order of :ref:`varTypesToSendAsAnswers`
-#         It is updated when a plane is docked
-#         in this gate.
-#     """
-#     #endregion
-#     #region   --------------------------- METHODS
-#     #region   -------------------- Public
-#     #endregion
-#     #region   ------------------- Private
-#     def _GetFunctionRequestPlane(self) -> Execution:
-#         """
-#             _GetFunctionRequestPlane:
-#             ==========================
-#             Summary:
-#             --------
-#             This function returns a plane
-#             object built to be sent on your
-#             function request or master runway
-#             to be sent to a device that will
-#             perform the function of the plane.
-
-#             DO NOT OVERWRITE THIS FUNCTION.
-#         """
-#         pass
-
-#     def _GetAnswerPlane(self) -> Execution:
-#         """
-#             _GetAnswerPlane:
-#             ===============
-#             Summary:
-#             --------
-#             This function returns a plane
-#             object built to be sent as a 
-#             reply to a function request given
-#             to this gate.
-#         """
-    
-#     def _TryToDockPlane(self, passengers:list) -> Execution:
-#         """
-#             _TryToDockPlane:
-#             ================
-#             Summary:
-#             --------
-#             Tries to dock a plane that just
-#             arrived with your gate.
-#             Do not overwrite this function.
-#         """
-#         Debug.Start("_TryToDockPlane")
-
-#         # We build both planes just to be sure.
-#         slaveArrival = NewArrival(passengers, self.varTypesToSendAsAnswers)
-#         masterArrival = NewArrival(passengers, self.varTypesToSendAsRequests)
-    
-#         if(self.isMasterOnly == True):
-#             # As of now, if anything is received, we just store it as if its an answer plane.
-#             if(slaveArrival)
-
-
-#     #endregion
-#     #endregion
-#     #region   --------------------------- CONSTRUCTOR
-#     #endregion
-    pass
 #====================================================================#
 def PrintPlane(plane:Plane):
     Debug.Start("PrintPlane")
