@@ -92,6 +92,13 @@ class UART:
 
     serialPortObject = None
 
+    planesTakingOff:int = 0
+    """
+        refer to this variable to know how many
+        planes are queued for takeoff in the UART
+        class.
+    """
+
     maxGroupsSlots = 10
     """
         Defines how many groups of
@@ -215,6 +222,7 @@ class UART:
             with uartClass.lockReading:
                 planesReadyForTakeOff = uartClass.planesToWrite
                 uartClass.planesToWrite.clear()
+                uartClass.planesTakingOff = len(planesReadyForTakeOff)
 
                 if(len(arrivedGroupsOfPassengers) > 0):
                     for group in arrivedGroupsOfPassengers:
