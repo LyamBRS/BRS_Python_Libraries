@@ -384,7 +384,7 @@ class UART:
         Debug.Start("GetOldestReceivedGroupOfPassengers")
 
         if(UART.isStarted):
-            
+
             try:
                 UART.GetReceivedPlanes()
                 OldestGroupOfPassengers = UART.groupsOfArrivedPassengers.pop(0)
@@ -397,7 +397,7 @@ class UART:
             Debug.End()
             return OldestGroupOfPassengers
         else:
-            Debug.Log("UART RXthread WAS NOT STARTED.")
+            Debug.Log("UART thread WAS NOT STARTED.")
             Debug.End()
             return Execution.Failed
 #====================================================================#
