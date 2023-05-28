@@ -181,6 +181,8 @@ class UART:
             return arrivedPassengers
         ################################################
         serialPortObject = serial.Serial(uartClass.serialPort, baudrate=9600, timeout=0.01)
+        serialPortObject.reset_output_buffer()
+        serialPortObject.reset_input_buffer()
         planesReadyForTakeOff:list = []
         while True:
 
@@ -215,6 +217,8 @@ class UART:
                         if(len(uartClass.groupsOfArrivedPassengers) < uartClass.maxGroupsSlots):
                             uartClass.groupsOfArrivedPassengers.append(group)
         ################################################
+        serialPortObject.reset_output_buffer()
+        serialPortObject.reset_input_buffer()
         serialPortObject.close()
         uartClass.isStarted = False
 
