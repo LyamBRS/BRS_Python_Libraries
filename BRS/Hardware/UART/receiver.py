@@ -417,6 +417,11 @@ class UART:
                     Debug.End()
                     return Execution.Unecessary
 
+                if(len(UART.planesToWrite) > 1):
+                    Debug.Warn("There is already a plane taking off.")
+                    Debug.End()
+                    return Execution.Unecessary
+
                 Debug.Log("Plane queued successfully.")
                 UART.planesToWrite.append(planeToTakeOff)
                 Debug.End()
