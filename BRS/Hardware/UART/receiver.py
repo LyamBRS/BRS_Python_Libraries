@@ -342,6 +342,7 @@ class UART:
             Debug.End()
             return Execution.Failed
 
+    @staticmethod
     def Reset() -> Execution:
         """
             Reset:
@@ -364,6 +365,7 @@ class UART:
             return Execution.Failed
         Debug.End()
 
+    @staticmethod
     def QueuePlaneOnTaxiway(planeToTakeOff) -> Execution:
         """
             QueuePlaneOnTaxiway:
@@ -387,6 +389,43 @@ class UART:
             Debug.Log("TXthread WAS NOT STARTED. Execution.Failed is returned")
             Debug.End()
             return Execution.Failed
+
+    @staticmethod
+    def QueuePlaneAndWaitForTakeOff(planeToTakeOff) -> Execution:
+        """
+            QueuePlaneAndWaitForTakeOff:
+            ====================
+            Summary:
+            --------
+            Puts a plane to be sent on Serial.
+            However, this function will not allow
+            you to put another plane on the taxiway
+            until it took off.
+
+            Returns:
+            --------
+            - `Execution.Passed` = plane queued
+            - `Execution.Unecessary` = plane already queued
+            - `Execution.Failed` = RXthread isn't started.
+        """
+        Debug.Start("QueuePlaneOnTaxiway")
+        if UART.isStarted:
+            with UART.lockReading:
+
+                if(UART.planesTakingOff > 1):
+                    Debug.Warn("There is already a plane taking off.")
+                    Debug.End()
+                    return Execution.Unecessary
+
+                Debug.Log("Plane queued successfully.")
+                UART.planesToWrite.append(planeToTakeOff)
+                Debug.End()
+                return Execution.Passed
+        else:
+            Debug.Log("TXthread WAS NOT STARTED. Execution.Failed is returned")
+            Debug.End()
+            return Execution.Failed
+
 
     @staticmethod
     def GetOldestReceivedGroupOfPassengers() -> list:
