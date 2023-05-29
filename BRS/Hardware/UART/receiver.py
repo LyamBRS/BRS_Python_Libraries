@@ -449,7 +449,6 @@ class UART:
         Debug.Start("GetOldestReceivedGroupOfPassengers")
 
         if(UART.isStarted):
-
             try:
                 UART.GetReceivedPlanes()
                 OldestGroupOfPassengers = UART.groupsOfArrivedPassengers.pop(0)
