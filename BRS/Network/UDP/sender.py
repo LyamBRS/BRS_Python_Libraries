@@ -2,22 +2,22 @@
 # File Information
 #====================================================================#
 """
-    receiver.py
+    sender.py
     ===========
     Summary:
     --------
     This file contains a driver class made to create a thread
-    that constantly reads all UDP messages addressed to your
-    device from anywhere on the local network. This class is a backend
-    class and must not be initialized more than once.
+    that writes on a specified UDP socket. This class is static
+    as of now and therefor cannot be used more than once in your
+    application.
 
-    See :ref:`UDPReader`.
+    See :ref:`UDPSender`.
 """
 #====================================================================#
 # Loading Logs
 #====================================================================#
 from ...Debug.LoadingLog import LoadingLog
-LoadingLog.Start("UDPReader.py")
+LoadingLog.Start("sender.py")
 #====================================================================#
 # Imports
 #====================================================================#
@@ -46,9 +46,9 @@ from ...Debug.consoleLog import Debug
 #====================================================================#
 # Classes
 #====================================================================#
-class UDPReader:
+class UDPSender:
     """
-        UDPReader:
+        UDPSender:
         ========
         Summary:
         --------
@@ -63,6 +63,8 @@ class UDPReader:
     stop_event = threading.Event()
     isStarted: bool = False
 
+    _thingToSend = None
+
     timeoutInSeconds:int = 5
     """
         timeoutInSeconds:
@@ -76,13 +78,24 @@ class UDPReader:
         will have no effect.
     """
 
-    port:int = 4211
+    ipAddress:str = "198.162.4.2"
+    """
+        ipAddress:
+        ==========
+        Summary:
+        --------
+        The IP address where this class will
+        be sending packets. Defaults to
+        `"198.162.4.2"`
+    """
+
+    port:int = 4210
     """
         port:
         =====
         Summary:
         --------
-        Holds the port that the UDPReader
+        Holds the port that the UDPSender
         will read from. Changing this
         after starting the thread through
         StartDriver will have no effect.
@@ -108,7 +121,7 @@ class UDPReader:
     """
 
     @staticmethod
-    def _reading_thread(udpClass):
+    def _Thread(udpClass):
         counter = 0
 
         # Create a UDP socket
@@ -118,19 +131,28 @@ class UDPReader:
         Socket.settimeout(udpClass.timeoutInSeconds)
 
         # Bind the socket to the IP address and port
-        Socket.bind(("0.0.0.0", udpClass.port))
+        Socket.bind((udpClass.ipAddress, udpClass.port))
 
+        thingToSend = None
         while True:
             if udpClass.stop_event.is_set():
                 break
 
             try:
                 # Receive data and the address of the sender
-                data, addr = Socket.recvfrom(1024)  # Adjust the buffer size as per your requirements
+
+                if(thingToSend != None):
+                    if(type(thingToSend) != bytes):
+                        bytesToSend = bytes(thingToSend)
+                    else:
+                        bytesToSend = thingToSend
+
+                    Socket.sendto(bytesToSend, (udpClass.ipAddress, udpClass.port))
+                    thingToSend = None
+
                 with udpClass.lock:
-                    udpClass.listOfMessageReceived.append({addr[0]:data})
-                    if(len(udpClass.listOfMessageReceived) > 50):
-                        udpClass.listOfMessageReceived.pop(0)
+                    thingToSend = udpClass._thingToSend
+                    udpClass._thingToSend = None
             except:
                 pass
 
@@ -145,29 +167,27 @@ class UDPReader:
             ============
             Summary:
             --------
-            Starts the UDP listener / reader
+            Starts the UDP sender
             thread. The UDP socket object
-            has a buffer of 1024, reads from
-            any addresses but can have the port
-            specified to it through a member of
-            this class. (:ref:`UDPReader.port`)
+            has a buffer of 1024, writes to a
+            specific addresses.
         """
-        Debug.Start("UDPReader -> StartDriver")
-        if UDPReader.isStarted == False:
-            if not UDPReader.thread or not UDPReader.thread.is_alive():
-                UDPReader.stop_event.clear()
-                UDPReader.thread = threading.Thread(target=UDPReader._reading_thread, args=(UDPReader,))
-                UDPReader.thread.daemon = True
-                UDPReader.thread.start()
-                UDPReader.isStarted = True
-                Debug.Log("UDPReader is started.")
+        Debug.Start("UDPSender -> StartDriver")
+        if UDPSender.isStarted == False:
+            if not UDPSender.thread or not UDPSender.thread.is_alive():
+                UDPSender.stop_event.clear()
+                UDPSender.thread = threading.Thread(target=UDPSender._Thread, args=(UDPSender,))
+                UDPSender.thread.daemon = True
+                UDPSender.thread.start()
+                UDPSender.isStarted = True
+                Debug.Log("UDPSender is started.")
                 Debug.End()
                 return Execution.Passed
         else:
             Debug.Error("Thread is already started. You cannot start more than one.")
             Debug.End()
             return Execution.Failed
-        Debug.Log("UDPReader is now started")
+        Debug.Log("UDPSender is now started")
         Debug.End()
         return Execution.Passed
 
@@ -178,90 +198,40 @@ class UDPReader:
             ============
             Summary:
             --------
-            Stops the driver from reading anymore
+            Stops the driver from sending anymore
             UDP stuff. DOES NOT CLEAR THE BUFFER
             OF THIS CLASS
         """
-        Debug.Start("UDPReader -> StopDriver")
-        UDPReader.stop_event.set()
-        if UDPReader.thread and UDPReader.thread.is_alive():
-            UDPReader.thread.join()
+        Debug.Start("UDPSender -> StopDriver")
+        UDPSender.stop_event.set()
+        if UDPSender.thread and UDPSender.thread.is_alive():
+            UDPSender.thread.join()
         Debug.Log("Thread is stopped.")
         Debug.End()
         return Execution.Passed
 
     @staticmethod
-    def ClearBuffer():
+    def SendThing(thingToSend) -> Execution:
         """
-            ClearBuffer:
-            ============
+            SendThing:
+            ==========
             Summary:
             --------
-            Clears the saved message buffer.
+            Sets what to send on the UDP.
+            It will be set back to `None` once
+            its sent.
         """
-        Debug.Start("UDPReader -> ClearBuffer")
-        UDPReader.listOfMessageReceived = []
-        Debug.End()
+        Debug.Start("SendThing")
 
-    @staticmethod
-    def GetOldestMessage(DontDebug=True) -> list:
-        """
-            GetOldestMessage:
-            =================
-            Summary:
-            --------
-            Returns the oldest UDP message
-            read by the UDP class.
-
-            Returns:
-            --------
-            - `None` = No messages or thread not started.
-        """
-        Debug.Start("GetOldestMessage", DontDebug=True)
-        if UDPReader.isStarted:
-            with UDPReader.lock:
-                Debug.Log("Returning values from the thread")
-
-                if(len(UDPReader.listOfMessageReceived) == 0):
-                    Debug.End(ContinueDebug=True)
-                    return None
-
-                Debug.End(ContinueDebug=True)
-                return UDPReader.listOfMessageReceived.pop(0)
-        else:
-            Debug.Log("THREAD IS NOT STARTED. NO UDP MESSAGES CAN BE RETURNED")
-            Debug.End(ContinueDebug=True)
-            return None
-
-    @staticmethod
-    def GetNewestMessage() -> list:
-        """
-            GetNewestMessage:
-            =================
-            Summary:
-            --------
-            Returns the newest UDP message
-            read by the UDP class.
-
-            Returns:
-            --------
-            - `None` = No messages or thread not started.
-        """
-        Debug.Start("GetNewestMessage")
-        if UDPReader.isStarted:
-            with UDPReader.lock:
-                Debug.Log("Returning values from the thread")
-
-                if(len(UDPReader.listOfMessageReceived) == 0):
-                    Debug.End()
-                    return None
-
-                Debug.End()
-                return UDPReader.listOfMessageReceived.pop(-1)
+        if(UDPSender.isStarted):
+            with UDPSender.lock:
+                UDPSender._thingToSend = thingToSend
+            Debug.Log("New thing to send has been specified.")
         else:
             Debug.Log("THREAD IS NOT STARTED. NO UDP MESSAGES CAN BE RETURNED")
             Debug.End()
-            return None
+            return Execution.Failed
 
+        Debug.End()
 #====================================================================#
-LoadingLog.End("UDPReader.py")
+LoadingLog.End("sender.py")
