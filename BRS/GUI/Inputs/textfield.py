@@ -224,6 +224,9 @@ class VirtualKeyboardTextField(MDTextField):
         if(self.capslockState):
             keycode = keycode.upper()
 
+        if(keycode == "None"):
+            return
+
         self.dialog.text = f"{previousText}{keycode}_"
 
     def on_focus(self, instance_text_field, focus: bool) -> None:
