@@ -256,9 +256,11 @@ class Controls:
 
         Values:
         -------
-        - `_axes["name"]["value"]`    Write or read the value ranging from 0 to 1. DONT DO THIS.
+        - `_axes["name"]["value"]`    Write or read the value ranging from 0 to 1. DONT DO THIS. (Deprecated)
         - `_axes["name"]["binded"]`   See or set this axis to being used.
         - `_axes["name"]["bindedTo"]` Says who writes to this axis.
+        - `_axes["name"]["bindedAs"]` Says what hardware axis `bindedTo` binded this axis to.
+        - `_axes["name"]["getter"]`   A function with no parameters that returns the value from 0-1 directly from the binded hardware.
         
         Warning:
         --------
