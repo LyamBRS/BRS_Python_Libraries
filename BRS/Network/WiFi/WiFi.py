@@ -1205,6 +1205,18 @@ def GetWiFiNetworks(DontDebug:bool = True) -> list:
         if(Information.platform == "Linux"):
             Debug.Log("Getting Linux networks")
             interfaces = Linux_GetWiFiNetworks(DontDebug=DontDebug)
+        
+        if(interfaces == Execution.Failed):
+            Debug.End(ContinueDebug=True)
+            return interfaces
+        
+        if(interfaces == Execution.Crashed):
+            Debug.End(ContinueDebug=True)
+            return interfaces
+
+        if(interfaces == Execution.Incompatibility):
+            Debug.End(ContinueDebug=True)
+            return interfaces
     else:
         Debug.Error("The information class was not initialized")
         Debug.End(ContinueDebug=True)
