@@ -184,7 +184,7 @@ class BFIO:
 
             passengers.append(passenger)
         
-        return passengers
+        return passengers.copy()
     # ------------------------------------
     def BuildAndBoardPlane() -> list:
         """
