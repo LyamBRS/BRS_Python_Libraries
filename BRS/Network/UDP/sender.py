@@ -78,7 +78,7 @@ class UDPSender:
         will have no effect.
     """
 
-    ipAddress:str = "198.162.4.2"
+    ipAddress:str = "198.168.4.2"
     """
         ipAddress:
         ==========
@@ -86,7 +86,7 @@ class UDPSender:
         --------
         The IP address where this class will
         be sending packets. Defaults to
-        `"198.162.4.2"`
+        `"198.168.4.2"`
     """
 
     port:int = 4210
