@@ -147,7 +147,7 @@ class UDPSender:
                     else:
                         bytesToSend = thingToSend
 
-                    print("SENDING")
+                    # print("SENDING")
                     Socket.sendto(bytesToSend, (udpClass.ipAddress, udpClass.port))
                     thingToSend = None
 
