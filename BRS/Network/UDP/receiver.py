@@ -63,6 +63,8 @@ class UDPReader:
     stop_event = threading.Event()
     isStarted: bool = False
 
+    listToSend:list = None
+
     timeoutInSeconds:int = 5
     """
         timeoutInSeconds:
@@ -260,6 +262,34 @@ class UDPReader:
                 return UDPReader.listOfMessageReceived.pop(-1)
         else:
             Debug.Log("THREAD IS NOT STARTED. NO UDP MESSAGES CAN BE RETURNED")
+            Debug.End()
+            return None
+
+    @staticmethod
+    def SetNewPeriodicSender(listOfIntsToSend:list) -> list:
+        """
+            SetNewPeriodicSender:
+            =====================
+            Summary:
+            --------
+            Sends some bytes each time
+            we loop in this 10 times.
+
+            Returns:
+            --------
+            - `None` = No messages or thread not started.
+        """
+        Debug.Start("SetNewPeriodicSender")
+        if UDPReader.isStarted:
+            with UDPReader.lock:
+                Debug.Log("Returning values from the thread")
+
+                UDPReader.listToSend = listOfIntsToSend.copy()
+
+                Debug.End()
+                return Execution.Passed
+        else:
+            Debug.Log("THREAD IS NOT STARTED. NO UDP MESSAGES CAN BE SENT")
             Debug.End()
             return None
 

@@ -131,7 +131,7 @@ class UDPSender:
         Socket.settimeout(udpClass.timeoutInSeconds)
 
         # Bind the socket to the IP address and port
-        Socket.bind((udpClass.ipAddress, udpClass.port))
+        Socket.bind(("0.0.0.0", 4210))
 
         thingToSend = None
         while True:
