@@ -89,7 +89,7 @@ class UDPReader:
         after starting the thread through
         StartDriver will have no effect.
 
-        Defaults to 4210
+        Defaults to 4211
     """
 
     lock = threading.Lock()

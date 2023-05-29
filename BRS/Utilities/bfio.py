@@ -530,7 +530,7 @@ class Plane:
     #endregion
     #endregion
     #region   --------------------------- CONSTRUCTOR
-    def __init__(self, planeID:int, variables:list, wantedClasses:list):
+    def __init__(self, planeID:int, variables:list, wantedClasses:list, DontDebug=False):
         """
             Plane:
             ======
@@ -545,7 +545,7 @@ class Plane:
             - `variables`:  a list of variables to make passengers from. Must be same size as :ref:`wantedClasses`
             - `wantedClasses`: a list of VariableType associated with the list of passengers
         """
-        Debug.Start("Plane -> Building and Boarding.")
+        Debug.Start("Plane -> Building and Boarding.", DontDebug=DontDebug)
 
         self.classes = []
         self.classesSizes = []
@@ -555,13 +555,13 @@ class Plane:
         tsaResult = BFIO._CheckPlaneID(planeID)
         if(tsaResult != Execution.Passed):
             Debug.Error(f"You cannot build a plane with an ID of {planeID}")
-            Debug.End()
+            Debug.End(ContinueDebug=DontDebug)
             return Execution.Failed
         self.passedTSA = tsaResult
 
         if(len(variables) != len(wantedClasses)):
             Debug.Error("There is more or less variables or classes. They must be the same length bruh.")
-            Debug.End()
+            Debug.End(ContinueDebug=DontDebug)
             return Execution.Failed
 
         self.amountOfClasses = len(wantedClasses)
@@ -573,7 +573,7 @@ class Plane:
             boardedPassengerClass = PassengerClass(variableToConvert, typeToConvertItTo)
             if(boardedPassengerClass == None):
                 Debug.Error("Failed to board passengers for the specified type.")
-                Debug.End()
+                Debug.End(ContinueDebug=DontDebug)
                 return Execution.Failed
 
             self.classes.append(boardedPassengerClass)
@@ -596,7 +596,7 @@ class Plane:
         self.passengers.append(coPilot)
         Debug.Log("All passengers are in the plane! Ready for 9/11")
         self.passedTSA = True
-        Debug.End()
+        Debug.End(ContinueDebug=DontDebug)
     #endregion
     pass
 #====================================================================#
