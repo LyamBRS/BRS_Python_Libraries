@@ -221,7 +221,7 @@ class VirtualKeyboardTextField(MDTextField):
             self.focus = False
             return
 
-        if(keycode == "None" or keycode == "none"):
+        if(keycode == "None" or keycode == "none" or keycode == None):
             return
 
         if(self.capslockState):
