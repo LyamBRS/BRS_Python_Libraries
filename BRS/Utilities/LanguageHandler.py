@@ -5,7 +5,7 @@
 #====================================================================#
 # Imports
 #====================================================================#
-from Libraries.BRS_Python_Libraries.BRS.Debug.LoadingLog import LoadingLog
+from ..Debug.LoadingLog import LoadingLog
 LoadingLog.Start("LanguageHandler.py")
 
 import os
