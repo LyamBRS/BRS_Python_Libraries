@@ -221,11 +221,11 @@ class VirtualKeyboardTextField(MDTextField):
             self.focus = False
             return
 
+        if(keycode == "None" or keycode == "none"):
+            return
+
         if(self.capslockState):
             keycode = keycode.upper()
-
-        if(keycode == "None"):
-            return
 
         self.dialog.text = f"{previousText}{keycode}_"
 
