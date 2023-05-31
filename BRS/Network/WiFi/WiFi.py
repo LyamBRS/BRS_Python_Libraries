@@ -1192,6 +1192,12 @@ def GetWiFiNetworks(DontDebug:bool = True) -> list:
         ----------
         You need to have initialized the Information
         class prior to calling this function.
+
+        Returns:
+        ----------
+        - `Execution.Failed`          = Information class not initialized / interfaces failed
+        - `Execution.Crashed`         = Interfaces crashed
+        - `Execution.Incompatibility` = incompatibility occured when calling interfaces.
     """
     Debug.Start("GetWiFiNetworks", DontDebug=DontDebug)
 
