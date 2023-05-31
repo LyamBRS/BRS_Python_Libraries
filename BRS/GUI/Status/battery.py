@@ -59,7 +59,10 @@ def GetBatteryIconFromPourcentage(pourcent:int, mode:str = None, DontDebug:bool 
     Debug.Log("Calculating battery value...")
     value = (pourcent/10)
     if(value != 0):
-        value = str(value).split(".")[0] + "0"
+        if(value < 10):
+            value = None
+        else:
+            value = str(value).split(".")[0] + "0"
     else:
         value = None
     
