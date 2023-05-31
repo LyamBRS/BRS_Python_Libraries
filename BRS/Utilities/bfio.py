@@ -467,6 +467,17 @@ class Plane:
         Defaults to `None`
     """
 
+    errorMessage:str = None
+    """
+        errorMessage:
+        =============
+        Summary:
+        --------
+        Saves the error message that
+        caused this plane to fail TSA
+        checks.
+    """
+
     amountOfClasses:int = None
     """
         amountOfClasses:
@@ -555,14 +566,18 @@ class Plane:
         tsaResult = BFIO._CheckPlaneID(planeID)
         if(tsaResult != Execution.Passed):
             Debug.Error(f"You cannot build a plane with an ID of {planeID}")
+            self.passedTSA = False
+            self.errorMessage = f"You cannot build a plane with an ID of {planeID}"
             Debug.End(ContinueDebug=DontDebug)
-            return Execution.Failed
+            return
         self.passedTSA = tsaResult
 
         if(len(variables) != len(wantedClasses)):
             Debug.Error("There is more or less variables or classes. They must be the same length bruh.")
+            self.passedTSA = False
+            self.errorMessage = "There is more or less variables or classes. They must be the same length bruh."
             Debug.End(ContinueDebug=DontDebug)
-            return Execution.Failed
+            return
 
         self.amountOfClasses = len(wantedClasses)
 
@@ -572,9 +587,11 @@ class Plane:
 
             boardedPassengerClass = PassengerClass(variableToConvert, typeToConvertItTo)
             if(boardedPassengerClass == None):
-                Debug.Error("Failed to board passengers for the specified type.")
+                Debug.Error(f"PassengerClass failed to build variable: {variableToConvert} for the specified type: {typeToConvertItTo}")
+                self.passedTSA = False
+                self.errorMessage = f"PassengerClass failed to build variable: {variableToConvert} for the specified type: {typeToConvertItTo}"
                 Debug.End(ContinueDebug=DontDebug)
-                return Execution.Failed
+                return
 
             self.classes.append(boardedPassengerClass)
 
@@ -595,6 +612,7 @@ class Plane:
 
         self.passengers.append(coPilot)
         Debug.Log("All passengers are in the plane! Ready for 9/11")
+        self.errorMessage = "GOOD"
         self.passedTSA = True
         Debug.End(ContinueDebug=DontDebug)
     #endregion
@@ -928,6 +946,16 @@ class PassengerClass:
         given to this class to build
         the passengers.
     """
+    passedTSA:bool
+    """
+        passedTSA:
+        ==========
+        Summary:
+        --------
+        Defines if this class successfully
+        passed all the checks and was
+        built successfully.
+    """
     #endregion
     #region   --------------------------- METHODS
     #region   -------------------- Public
@@ -966,8 +994,9 @@ class PassengerClass:
                 bytes = list(pack_string(variable))
         except:
             Debug.Error(f"Failed to create passengers from {type(variable)} typed variable to {varType}")
+            self.passedTSA = False
             Debug.End()
-            return Execution.Failed
+            return
 
         attendant = Passenger(byte=0, type=PassengerTypes.Div)
         self.passengers.append(attendant)
@@ -976,10 +1005,12 @@ class PassengerClass:
             passenger = Passenger(PassengerTypes.Byte, byte)
             if(passenger == None):
                 Debug.Error("Failed to build one of the passengers.")
+                self.passedTSA = False
             self.passengers.append(passenger)
 
         amountOfPassengers = len(self.passengers)
         Debug.Log(f"{amountOfPassengers-1} passengers and 1 attendant now listed in the class.")
+        self.passedTSA = True
         Debug.End()
     #endregion
     pass
