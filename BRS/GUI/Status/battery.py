@@ -63,6 +63,18 @@ def GetBatteryIconFromPourcentage(pourcent:int, mode:str = None, DontDebug:bool 
     else:
         value = None
     
+    if(mode == None):
+        if(value == "100"):
+            Debug.End()
+            return "battery"
+        
+        if(value == None):
+            Debug.End()
+            return "battery-outline"
+        
+        Debug.End()
+        return "battery-" + value
+
     if(mode == "bluetooth"):
         if(value == "100"):
             Debug.End()
@@ -98,18 +110,6 @@ def GetBatteryIconFromPourcentage(pourcent:int, mode:str = None, DontDebug:bool 
         
         Debug.End()
         return "battery-charging-wireless-" + value
-
-    if(mode == None):
-        if(value == "100"):
-            Debug.End()
-            return "battery"
-        
-        if(value == None):
-            Debug.End()
-            return "battery-charging-wireless-outline"
-        
-        Debug.End()
-        return "battery-" + value
 
     Debug.Error("NO BATTERY MATCHES GIVEN VALUES")
     Debug.End()
