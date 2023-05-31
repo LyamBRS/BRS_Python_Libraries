@@ -207,7 +207,7 @@ class UART:
                     # plane:Plane
                     for plane in planesReadyForTakeOff:
                         planesReadyForTakeOff.pop(0)
-                        print("PLANE TAKEOFF")
+                        # print("PLANE TAKEOFF")
                         # passenger:Passenger
                         if(plane != None):
                             for passenger in plane.passengers:
