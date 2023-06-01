@@ -131,6 +131,51 @@ def GetPrimaryColor(variant:str = "500") -> None:
     Debug.End()
     return color
 
+def GetMDCardColor(theme:str = "Dark") -> None:
+    """
+        GetCardColor:
+        ============
+        Summary:
+        --------
+        This function returns the primary color
+        of the application.
+
+        Arguments:
+        ----------
+        - "Dark" - default value
+        - "Light"
+
+        Returns:
+        --------
+        - (0,0,0) to (1,1,1)
+    """
+    Debug.Start("GetMDCardColor")
+
+    try:
+        if(theme == "Dark"):
+            # color = MDApp.get_running_app().theme_cls.bg_dark
+            hex = colors["Dark"]["CardsDialogs"]
+            color = get_color_from_hex(hex)
+            Debug.Log("Returning darker color")
+            Debug.End()
+            return color
+        elif(theme == "Light"):
+            # color = MDApp.get_running_app().theme_cls.bg_light
+            hex = colors["Light"]["CardsDialogs"]
+            color = get_color_from_hex(hex)
+            Debug.Log("Returning lighter color")
+            Debug.End()
+            return color
+        Debug.End()
+        return (1,0,0)
+    except:
+        Debug.Error("Failed to get primary color.")
+        Debug.Log("Returning red")
+        color = (1,0,0)
+    Debug.End()
+    return color
+
+
 def GetAppTheme() -> str:
     """
         GetAppTheme:
