@@ -38,8 +38,8 @@ LoadingLog.Import('KivyMD')
 #====================================================================#
 # Functions
 #====================================================================#
-def Lerp(current, target, delta) -> float:
-    return (current + (target - current) * delta)
+def Lerp(current,wanted, delta):
+    return current * (1-delta) + wanted * delta
 #====================================================================#
 # Classes
 #====================================================================#
