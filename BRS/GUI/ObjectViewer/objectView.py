@@ -38,7 +38,8 @@ LoadingLog.Import('KivyMD')
 #====================================================================#
 # Functions
 #====================================================================#
-
+def Lerp(current, target, delta) -> float:
+    return (current + (target - current) * delta)
 #====================================================================#
 # Classes
 #====================================================================#
@@ -199,16 +200,24 @@ class ObjViewer(Widget):
                 self.update_glsl(1)
 
     def update_glsl(self, delta):
-        asp = self.width / float(self.height)
-        proj = Matrix().view_clip(-asp, asp, -1, 1, 1, 100, self.fov)
-        self.canvas['projection_mat'] = proj
-
-        self.canvas['diffuse_light'] = self.diffuseLight
-        self.canvas['ambient_light'] = self.ambiantLight
-
-        self.RotationX.angle = self._degreesX
-        self.RotationY.angle = self._degreesY
-        self.RotationZ.angle = self._degreesZ
+        try:
+            asp = self.width / float(self.height)
+            proj = Matrix().view_clip(-asp, asp, -1, 1, 1, 100, self.fov)
+            self.canvas['projection_mat'] = proj
+    
+            self.canvas['diffuse_light'] = self.diffuseLight
+            self.canvas['ambient_light'] = self.ambiantLight
+    
+            if(not self.manuallyUpdated):
+                self.RotationX.angle = Lerp(self.RotationX.angle, self._degreesX, 0.01)
+                self.RotationY.angle = Lerp(self.RotationY.angle, self._degreesY, 0.01)
+                self.RotationZ.angle = Lerp(self.RotationZ.angle, self._degreesZ, 0.01)
+            else:
+                self.RotationX.angle = self._degreesX
+                self.RotationY.angle = self._degreesY
+                self.RotationZ.angle = self._degreesZ
+        except:
+            Clock.unschedule(self.update_glsl)
 
     def setup_scene(self):
         Color(1, 1, 1, 1)
