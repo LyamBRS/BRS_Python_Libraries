@@ -20,7 +20,7 @@ LoadingLog.Start("GitHub.py")
 #====================================================================#
 # Functions
 #====================================================================#
-def StringToGitLink(textToParse:str) -> str:
+def StringToGitLink(textToParse:str, defaultUser:str = "LyamBRS") -> str:
     """
         StringToGitLink:
         ================
@@ -55,7 +55,8 @@ def StringToGitLink(textToParse:str) -> str:
 
     # Check if string has / in it.
     if ("/" not in textToParse):
-        return Execution.Failed
+        textToParse = defaultUser + "/" + textToParse
+        # return Execution.Failed
 
     # Is there .git at the end?
     if (not textToParse.endswith(".git")):
@@ -93,7 +94,7 @@ def RepoLinkIsValid(linkToVerify:str) -> bool:
     if(type(linkToVerify) != str):
         raise(Exception(f"[BRS]: You tried giving {linkToVerify} to RepoLinkIsValid. This function only accepts str typed variables as input parameter."))
 
-    result = subprocess.run(f"git ls-remote {linkToVerify}")
+    result = subprocess.run(["git", "ls-remote", linkToVerify])
     if(result.returncode != 0):
         return False
     else:
