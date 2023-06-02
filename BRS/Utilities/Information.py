@@ -82,6 +82,7 @@ class Information:
         This is set in the __init__ function automatically through
         Kivy.core.Window.width and Kivy.core.Window.height
     """
+    
 
     OS:str = None
     '''
