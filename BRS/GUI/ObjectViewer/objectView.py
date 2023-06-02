@@ -209,9 +209,9 @@ class ObjViewer(Widget):
             self.canvas['ambient_light'] = self.ambiantLight
     
             if(not self.manuallyUpdated):
-                self.RotationX.angle = Lerp(self.RotationX.angle, self._degreesX, 0.05)
-                self.RotationY.angle = Lerp(self.RotationY.angle, self._degreesY, 0.05)
-                self.RotationZ.angle = Lerp(self.RotationZ.angle, self._degreesZ, 0.05)
+                self.RotationX.angle = Lerp(self.RotationX.angle, self._degreesX, 0.2)
+                self.RotationY.angle = Lerp(self.RotationY.angle, self._degreesY, 0.2)
+                self.RotationZ.angle = Lerp(self.RotationZ.angle, self._degreesZ, 0.2)
             else:
                 self.RotationX.angle = self._degreesX
                 self.RotationY.angle = self._degreesY
