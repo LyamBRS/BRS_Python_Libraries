@@ -20,6 +20,105 @@ LoadingLog.Start("GitHub.py")
 #====================================================================#
 # Functions
 #====================================================================#
+def StringToGitLink(textToParse:str) -> str:
+    """
+        StringToGitLink:
+        ================
+        Summary:
+        --------
+        This function's purpose
+        is to transform and validate a given
+        string into a valid git repository link
+        that can be used with git clone console
+        commands.
+
+        Warning:
+        --------
+        This really isn't perfect at all.
+        It can add missing https:// or github.com to the
+        links given, or missing .git at the end but any
+        special git link that isn't from github https won't work
+        greatly.
+
+        Example:
+        --------
+        - `"amongus"` -> Invalid
+        - `"LyamBRS/among_us"` -> "https://github.com/LyamBRS/among_us.git"
+
+        Returns:
+        --------
+        - `Execution.Failed` = Invalid string given.
+        - `str` = Parsed git string
+    """
+    if(type(textToParse) != str):
+        raise(Exception(f"[BRS]: You tried giving {textToParse} to StringToGitLink. This function only accepts str typed variables as input parameter."))
+
+    # Check if string has / in it.
+    if ("/" not in textToParse):
+        return Execution.Failed
+
+    # Is there .git at the end?
+    if (not textToParse.endswith(".git")):
+        textToParse = textToParse + ".git"
+
+    # Is there a git hosting website name in the link? "github.com"
+    if (not ".com" in textToParse):
+        if(textToParse.startswith("/")):
+            textToParse = "github.com" + textToParse
+        else:
+            textToParse = "github.com/" + textToParse
+
+    # There is no HTTPS in the text given.
+    if (not "https://" in textToParse):
+        textToParse = "https://" + textToParse
+
+    return textToParse
+# ----------------------------------------------------------------
+def RepoLinkIsValid(linkToVerify:str) -> bool:
+    """
+        IsRepoLinkValid:
+        ================
+        Summary:
+        --------
+        This function uses `git ls-remote` to verify
+        the validity of a given repository link. If
+        your internet connection is not valid, links
+        cannot be verified.
+
+        Returns:
+        --------
+        - `True` -> Repository is valid and can be accessed.
+        - `False` -> Repository is not valid or can't be accessed.
+    """
+    if(type(linkToVerify) != str):
+        raise(Exception(f"[BRS]: You tried giving {linkToVerify} to RepoLinkIsValid. This function only accepts str typed variables as input parameter."))
+
+    result = subprocess.run(f"git ls-remote {linkToVerify}")
+    if(result.returncode != 0):
+        return False
+    else:
+        return True
+
+def GetRepoFromLink(repositoryLink:str) -> str:
+    """
+        GetRepoFromLink:
+        ================
+        Summary:
+        --------
+        This function's purpose is to extract
+        the name of a repository from a `git clone`
+        compatible git repository link. The function
+        will throw an exception if anything else
+        than a string is given to it.
+    """
+    if(type(repositoryLink) != str):
+        raise(Exception(f"[BRS]: You tried giving {repositoryLink} to GetRepoFromLink. This function only accepts str typed variables as input parameter."))
+
+    repositoryLink = repositoryLink.strip()
+    repositoryLink = repositoryLink.replace(".git", "")
+    repository = repositoryLink.split("/")[-1]
+    return repository
+# ----------------------------------------------------------------
 def DownloadRepositoryAtPath(gitUrl:str, downloadPath:str, progressBar: MDProgressBar, DownloadProgressHandler) -> Execution:
     """
         DownloadRepositoryAtPath:
@@ -98,7 +197,7 @@ def _start_download_thread(repo_url: str, local_path: str, progressBar: MDProgre
     # Start a new thread for the download function
     thread = threading.Thread(target=download_thread)
     thread.start()
-
+# ----------------------------------------------------------------
 async def _download_git_repo_async(repo_url: str, local_path: str, callback_fn=None, passedClass=None) -> Execution:
     try:
         # Clone the Git repository asynchronously
