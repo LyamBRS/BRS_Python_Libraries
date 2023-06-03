@@ -96,6 +96,7 @@ class ObjViewer(Widget):
         Defaults to 1.
     """
 
+    oldAsp = 0
     _degreesX:int = 0
     _degreesY:int = 0
     _degreesZ:int = 0
@@ -179,7 +180,7 @@ class ObjViewer(Widget):
             automatically.
         """
         needToUpdate:bool = False
-        
+
         if(newX != None):
             if(newX != self._degreesX):
                 self._degreesX = newX
@@ -202,16 +203,22 @@ class ObjViewer(Widget):
     def update_glsl(self, delta):
         try:
             asp = self.width / float(self.height)
-            proj = Matrix().view_clip(-asp, asp, -1, 1, 1, 100, self.fov)
-            self.canvas['projection_mat'] = proj
-    
-            self.canvas['diffuse_light'] = self.diffuseLight
-            self.canvas['ambient_light'] = self.ambiantLight
-    
+            if(self.oldAsp != asp):
+                asp = self.width / float(self.height)
+                self.oldAsp = asp
+                proj = Matrix().view_clip(-asp, asp, -1, 1, 1, 100, self.fov)
+                self.canvas['projection_mat'] = proj
+
+                self.canvas['diffuse_light'] = self.diffuseLight
+                self.canvas['ambient_light'] = self.ambiantLight
+
             if(not self.manuallyUpdated):
-                self.RotationX.angle = Lerp(self.RotationX.angle, self._degreesX, 0.2)
-                self.RotationY.angle = Lerp(self.RotationY.angle, self._degreesY, 0.2)
-                self.RotationZ.angle = Lerp(self.RotationZ.angle, self._degreesZ, 0.2)
+                if(int(self.RotationX.angle) != int(self._degreesX)):
+                    self.RotationX.angle = Lerp(self.RotationX.angle, self._degreesX, 0.2)
+                if(int(self.RotationY.angle) != int(self._degreesY)):
+                    self.RotationY.angle = Lerp(self.RotationY.angle, self._degreesY, 0.2)
+                if(int(self.RotationZ.angle) != int(self._degreesZ)):
+                    self.RotationZ.angle = Lerp(self.RotationX.angle, self._degreesZ, 0.2)
             else:
                 self.RotationX.angle = self._degreesX
                 self.RotationY.angle = self._degreesY
