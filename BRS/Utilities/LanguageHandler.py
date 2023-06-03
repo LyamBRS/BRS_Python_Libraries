@@ -22,13 +22,13 @@ def _(string:str) ->str:
         You need to have built Applanguage prior to using this.
         Otherwise, it will simply return the input string no less.
     """
-    Debug.Start("_ translator", DontDebug=True)
-    Debug.Log(f"Amount of times overwrote: {AppLanguage.OverWriteCount}")
-    Debug.Log(f"Language used: {AppLanguage.Current}")
+    # Debug.Start("_ translator", DontDebug=True)
+    # Debug.Log(f"Amount of times overwrote: {AppLanguage.OverWriteCount}")
+    # Debug.Log(f"Language used: {AppLanguage.Current}")
 
     string = AppLanguage.Translate(string)
     # Debug.Log(f"Result: {string}")
-    Debug.End(ContinueDebug=True)
+    # Debug.End(ContinueDebug=True)
     return string
 #====================================================================#
 # Classes
