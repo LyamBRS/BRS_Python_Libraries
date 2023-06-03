@@ -68,7 +68,7 @@ class ObjViewer(Widget):
         =============
         Summary:
         --------
-        The ambiant light around the rendered object. 
+        The ambiant light around the rendered object.
         This is only updated when :ref:`update_glsl` is
         called. Values needs to be within 0 and 1.
         Defaults to (0.1, 0.1, 0.1).
@@ -80,7 +80,7 @@ class ObjViewer(Widget):
         =============
         Summary:
         --------
-        The diffused light around the rendered object. 
+        The diffused light around the rendered object.
         This is only updated when :ref:`update_glsl` is
         called. Values needs to be within 0 and 1.
         Defaults to (1.0, 1.0, 0.8).
@@ -237,9 +237,9 @@ class ObjViewer(Widget):
         )
     #endregion
     #region   --------------------------- CONSTRUCTOR
-    def __init__(self, 
-                 pathToOBJ:str = "", 
-                 pathToglsl:str = "simple.glsl", 
+    def __init__(self,
+                 pathToOBJ:str = "",
+                 pathToglsl:str = "simple.glsl",
                  updateIntervals = 1/60.,
                  diffusedLight = (1.0, 1.0, 0.8),
                  ambiantLight = (0.1, 0.1, 0.1),
