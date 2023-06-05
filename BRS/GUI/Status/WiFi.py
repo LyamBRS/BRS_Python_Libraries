@@ -102,13 +102,13 @@ def GetWiFiNotAvailableCard(textToDisplay) -> Execution:
 
     NoWiFiIcon.md_bg_color = GetAccentColor()
 
-    textDisplayed = MDLabel()
-    textDisplayed.font_style = "H5"
-    textDisplayed.valign = "center"
-    textDisplayed.text = textToDisplay
+    Card.textDisplayed = MDLabel()
+    Card.textDisplayed.font_style = "H5"
+    Card.textDisplayed.valign = "center"
+    Card.textDisplayed.text = textToDisplay
 
     Card.add_widget(NoWiFiIcon)
-    Card.add_widget(textDisplayed)
+    Card.add_widget(Card.textDisplayed)
     Debug.End()
     return Card
 
