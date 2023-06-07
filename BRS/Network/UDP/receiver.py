@@ -112,7 +112,6 @@ class UDPReader:
     @staticmethod
     def _reading_thread(udpClass):
         counter = 0
-
         # Create a UDP socket
         Socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
