@@ -128,7 +128,10 @@ class UDPReader:
 
             try:
                 # Receive data and the address of the sender
-                data, addr = Socket.recvfrom(1024)  # Adjust the buffer size as per your requirements
+                try:
+                    data, addr = Socket.recvfrom(1024)  # Adjust the buffer size as per your requirements
+                except:
+                    print("TX ERR")
                 with udpClass.lock:
                     udpClass.listOfMessageReceived.append({addr[0]:data})
                     if(len(udpClass.listOfMessageReceived) > 50):
