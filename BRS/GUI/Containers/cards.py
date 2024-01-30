@@ -759,7 +759,7 @@ class CreateCard(BaseButton, Widget):
         Debug.End()
     #endregion
     pass
-# -------------------------------------------------------------------
+# ------------------------------------------------------------------
 class ControlsCardData:
     """
         ControlsCardData:
