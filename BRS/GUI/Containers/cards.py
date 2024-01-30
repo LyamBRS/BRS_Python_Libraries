@@ -751,7 +751,7 @@ class CreateCard(BaseButton, Widget):
                                      font_style = "H4",
                                      halign = "center")
 
-        self._MDCard.hide_elevation(True)
+        # self._MDCard.hide_elevation(True)
         self._MDCard.add_widget(self._MDCard.Icon)
         self._MDCard.add_widget(self._MDCard.Title)
         self.add_widget(self._MDCard)
